@@ -36,3 +36,11 @@ Desktop 1440×1000, ponsel 390×844, tablet 768×1024:
 ## Batas verifikasi
 
 Google OAuth nyata belum dijalankan karena client ID/secret belum disediakan dan endpoint Google tidak tersedia dalam kebijakan jaringan lingkungan. Belum ada deployment internet, sehingga akses lintas perangkat melalui domain publik belum diverifikasi. Helper penerbitan Sites tidak terpasang; source disiapkan untuk deployment Node.js mandiri. Kontrol musik diuji untuk ketiadaan autoplay dan elemen audio; kualitas suara belum ditinjau dengan perangkat audio fisik. Keyboard dan screen reader belum diuji menyeluruh.
+
+## Pembaruan halaman awal dan login — 24 Oktober 2026
+
+`npm test`: **19 pengujian lulus**. Selain pengujian sebelumnya, mencakup rute beranda/login/daftar/dashboard/layar tamu, origin pendaftaran, validasi password/email, hash + salt dan sesi pendaftaran, penolakan email duplikat, login email salah/benar, pembatasan percobaan, penanganan Apple yang belum diatur, callback palsu, serta signature/audience/expiry/nonce/email token Apple menggunakan key fixture yang dibuat saat tes. Pengujian token fixture tidak menggantikan uji OAuth Apple nyata.
+
+Login provider Google dan Apple nyata tetap memerlukan kredensial dan akses jaringan eksternal. Tidak ada email konfirmasi atau layanan pemulihan password yang dikirim selama pengujian.
+
+Browser Chromium: menu tujuh item, dialog contoh tema, tautan ZIP GitHub, penjelasan Apple belum dikonfigurasi, pendaftaran email hingga dashboard, login salah/benar, keluar akun, serta sapaan dan hapus nama Layar Tamu berhasil. Beranda, login, daftar, dan Layar Tamu diperiksa di 390×844; beranda juga diperiksa di 768×1024 dan desktop 1440×1000. Tidak ditemukan overflow horizontal maupun JavaScript page error pada alur yang diperiksa.

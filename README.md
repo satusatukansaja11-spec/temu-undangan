@@ -83,3 +83,40 @@ Alur manual:
 8. Periksa desktop, tablet dan layar ponsel, serta navigasi keyboard.
 
 Hasil pengujian otomatis dan browser selama pengerjaan dirangkum dalam `VALIDATION.md`. Login Google nyata memerlukan konfigurasi Anda dan verifikasi tersendiri sebelum produksi.
+
+## Halaman awal dan akun (pembaruan 24 Oktober 2026)
+
+Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Download, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan publik putih/magenta dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
+
+- Tema menampilkan contoh **Temu Klasik**, tema undangan yang saat ini tersedia. Contoh memakai data ilustrasi, bukan acara pelanggan.
+- Harga belum ditentukan; halaman menjelaskan bahwa paket belum diumumkan, tanpa pembayaran atau checkout.
+- Download mengunduh ZIP kode aplikasi dari repository GitHub. Ini bukan aplikasi Android/iOS.
+- Layar Tamu (`/layar-tamu`) menampilkan nama yang diketik petugas dan dapat dibuka layar penuh. Nama hanya berada dalam memori halaman perangkat, tanpa database tamu, RSVP atau sinkronisasi.
+- Form login email, toggle tampil/sembunyikan password, Google, Apple, dan tautan pendaftaran akun.
+- Pendaftaran email menggunakan nama, email, password 12–128 karakter. Password menggunakan scrypt asinkron dengan salt acak per akun. Tabel `credentials` dan `auth_limits` ditambahkan secara idempoten pada database yang sama. Password tidak disimpan sebagai plaintext.
+- Pembatasan login/daftar: 10 percobaan per email dan 30 per alamat socket IP dalam 15 menit; pasang juga rate limit di reverse proxy. Semua pengguna di belakang reverse proxy dapat berbagi alamat socket IP yang sama; pertimbangkan konfigurasi pembatasan ingress untuk deployment Anda.
+- Email/password dan akun Google/Apple tidak ditautkan otomatis berdasarkan email. Menggunakan metode berbeda dapat menghasilkan akun terpisah. Gunakan metode login yang sama untuk mengakses undangan sebelumnya.
+- Pendaftaran email belum memverifikasi kepemilikan alamat email melalui email konfirmasi. Pemulihan password melalui email belum tersedia; tombol Lupa password menjelaskan batasan ini. Jangan mengasumsikan email dari pendaftaran lokal sudah terverifikasi.
+
+### Mengaktifkan Masuk dengan Apple
+
+Tombol sudah terhubung ke endpoint OAuth backend. Untuk login nyata diperlukan keanggotaan dan konfigurasi **Apple Developer**, serta domain HTTPS; Apple tidak menerima localhost sebagai return URL web.
+
+1. Siapkan primary App ID dengan capability **Sign in with Apple**, lalu buat **Services ID** untuk website dan kaitkan dengan primary App ID.
+2. Dalam konfigurasi web Sign in with Apple, daftarkan domain aplikasi dan return URL persis `https://domain-anda/auth/apple/callback`.
+3. Buat key Sign in with Apple dan simpan berkas `.p8` secara aman. Isi di server: `APPLE_CLIENT_ID` (Services ID), `APPLE_TEAM_ID`, `APPLE_KEY_ID`, dan `APPLE_PRIVATE_KEY` (isi private key PEM, mendukung karakter literal `\n` sebagai pemisah baris). Jangan mengunggah `.p8` atau nilai key ke GitHub.
+4. Isi `APP_URL=https://domain-anda` tanpa slash akhir, mulai ulang server, lalu uji dari `/login`.
+
+Backend membuat client secret ES256 berumur singkat, menukar authorization code, serta memverifikasi signature RS256 terhadap JWKS Apple, issuer, audience, masa berlaku, nonce dan email terverifikasi. State sekali pakai diikat pada cookie HttpOnly Secure SameSite=None untuk callback `form_post`. Dibutuhkan akses keluar server ke `https://appleid.apple.com`. Google dan Apple yang belum dikonfigurasi kembali ke halaman login dengan penjelasan; tidak ada login provider palsu.
+
+File tambahan: `auth.js` (akun email dan Apple), `public/website.js` (beranda/login/daftar/layar tamu), `test/auth.test.js` (akun email dan verifikasi token Apple).
+
+### Pratinjau tampilan
+
+Beranda publik:
+
+![Beranda Temu](docs/images/beranda.png)
+
+Halaman login pada ponsel:
+
+![Login Temu](docs/images/login.png)

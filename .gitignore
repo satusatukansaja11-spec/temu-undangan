@@ -5,3 +5,5 @@ data/
 !.env.example
 *.sqlite*
 coverage/
+*.p8
+*.pem
