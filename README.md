@@ -1,6 +1,6 @@
 # Temu — Undangan Pernikahan Digital
 
-Aplikasi full-stack berbahasa Indonesia untuk membuat undangan pernikahan. Backend **Node.js 24 + Express**, database **SQLite** bawaan Node, pemrosesan foto **Sharp**, antarmuka HTML/CSS/JavaScript tanpa build. Aplikasi ini berdiri sendiri dalam repository `satusatukansaja11-spec/temu-undangan`, terpisah dari proyek monitoring keagamaan siswa.
+Aplikasi full-stack berbahasa Indonesia untuk membuat undangan pernikahan. Backend **Node.js 24 + Express**, database **SQLite** untuk lokal atau **PostgreSQL** untuk hosting, pemrosesan foto **Sharp**, antarmuka HTML/CSS/JavaScript tanpa build. Aplikasi ini berdiri sendiri dalam repository `satusatukansaja11-spec/temu-undangan`, terpisah dari proyek monitoring keagamaan siswa.
 
 ## Menjalankan
 
@@ -27,9 +27,9 @@ Data pengguna dan undangan lama tidak dihapus. Akun provider tidak ditautkan oto
 
 ## Penyimpanan dan deployment mandiri
 
-`DATA_DIR` (default `./data`) berisi `app.sqlite` dan `uploads/`. Schema dibuat idempoten saat server pertama berjalan. Tidak perlu akun database atau connection string. Gunakan direktori/volume **persisten**, writable hanya oleh pengguna server. Simpan database dan uploads bersama dalam backup; gunakan SQLite backup API atau hentikan server sebelum menyalin database beserta WAL. Jangan menyajikan direktori data dengan static server.
+`DATA_DIR` (default `./data`) berisi `app.sqlite` dan `uploads/`. Migrasi SQL versioned dijalankan dengan `npm run db:migrate` (otomatis pada localhost jika `AUTO_MIGRATE=true`). Mode lokal tidak memerlukan akun database. Mode PostgreSQL memakai `DATABASE_URL`. Gunakan direktori/volume **persisten**, writable hanya oleh pengguna server. Simpan database dan uploads bersama dalam backup; gunakan SQLite backup API atau hentikan server sebelum menyalin database beserta WAL. Jangan menyajikan direktori data dengan static server.
 
-Untuk hosting: Node 24, `npm ci`, `APP_URL=https://domain-anda`, `NODE_ENV=production`, `DEMO_LOGIN=false`, persistent volume `DATA_DIR`, reverse proxy HTTPS menuju port aplikasi. Hanya satu instance aplikasi yang menggunakan direktori SQLite lokal; deployment multi-instance membutuhkan migrasi database dan object storage bersama. Pasang rate limit dan batas request 6 MB pada reverse proxy untuk endpoint login/upload. Aplikasi membatasi tiap foto 5 MB, galeri 20 foto dan total unggahan 100 per acara.
+Untuk hosting: Node 24, `npm ci`, `APP_URL=https://domain-anda`, `NODE_ENV=production`, `DEMO_LOGIN=false`, persistent volume `DATA_DIR`, reverse proxy HTTPS menuju port aplikasi. Mode SQLite menggunakan satu instance. Deployment multi-instance dapat memakai PostgreSQL dan S3-compatible storage yang kini didukung. Pasang rate limit dan batas request yang mencukupi audio (contoh 40 MB) pada reverse proxy untuk endpoint login/upload. Aplikasi membatasi tiap foto 10 MB secara default, galeri 200 foto, total 1.000 file foto per acara dan kuota media 2 GB secara default; semuanya dapat dikonfigurasi.
 
 Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js mandiri dan memerlukan hosting yang mendukung proses Node.js serta volume penyimpanan persisten; GitHub Pages tidak menjalankan backend aplikasi ini. Link `/u/:slug` menjadi dapat diakses tamu setelah aplikasi di-host di domain publik. Pada localhost, tautan hanya berguna di mesin yang menjalankan server.
 
@@ -40,11 +40,11 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 - Formulir sembilan bagian: info dan tampilan, kedua mempelai, tanggal/waktu/lokasi, galeri, ucapan, love story, susunan acara tambahan, wedding gift, serta pengaturan/rekap RSVP.
 - Wajib publikasi: nama acara; foto sampul, pria dan wanita; nama lengkap dan panggilan kedua mempelai; agama; tanggal; waktu mulai dan selesai; alamat; Maps HTTPS; pembuka dan penutup.
 - Draft parsial dapat disimpan ke database. Seluruh isian valid dan lengkap membuat status **Siap Dibagikan**. Mengosongkan data wajib mengembalikan draft dan mencabut akses publik.
-- Upload foto dengan pratinjau, multiple upload galeri, hapus dari susunan, pindah kiri/kanan. Foto diunggah langsung ke server; perubahan susunan/isian baru tersimpan setelah menekan **Simpan**. File yang gagal tidak dimasukkan, file berhasil tetap ada jika file berikutnya gagal. Upload sementara yang tidak dipakai tetap private sampai acara dihapus. Batas unggahan 100 mencakup foto sementara.
-- Validasi browser serta decoding isi gambar di backend. Hanya JPEG, PNG, WebP; maksimal 5 MB dan 40 megapiksel; metadata dibuang, dirotasi dan diubah menjadi WebP maksimal 2000×2000. SVG/HTML/gambar rusak ditolak.
+- Upload foto dengan pratinjau, multiple upload galeri, hapus dari susunan, pindah kiri/kanan. Foto diunggah langsung ke server; perubahan susunan/isian baru tersimpan setelah menekan **Simpan**. File yang gagal tidak dimasukkan, file berhasil tetap ada jika file berikutnya gagal. Upload sementara yang tidak dipakai tetap private sampai acara dihapus. Batas unggahan 1.000 foto secara default mencakup foto belum dipakai.
+- Validasi browser serta decoding isi gambar di backend. Hanya JPEG, PNG, WebP; maksimal 10 MB secara default dan 40 megapiksel; metadata dibuang, dirotasi dan diubah menjadi WebP maksimal 2000×2000. SVG/HTML/gambar rusak ditolak.
 - Salam sesuai pilihan agama; template baru diterapkan dengan tindakan pengguna. Perubahan agama tidak menimpa teks buatan pengguna.
 - URL unik acak per acara, halaman publik tanpa identitas akun/ID internal, draft dan URL tak ditemukan ditangani.
-- Musik `None` atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Kontrol putar/jeda, tanpa autoplay; `None` tidak membuat elemen audio. Untuk menambah katalog musik, perluas whitelist backend, endpoint audio, dan pilihan form.
+- Musik `None`, lagu unggahan pribadi, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Kontrol putar/jeda, tanpa autoplay; `None` tidak membuat elemen audio. Lagu pribadi diunggah lewat editor, kemudian dipilih dan disimpan sebelum dibagikan.
 - Sebar membuka dialog pesan yang bisa diedit; tautan WhatsApp terisi teks dan URL. Pengguna sendiri membuka WhatsApp dan mengirim. Aplikasi tidak mengirim pesan otomatis.
 
 Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Jenis acara lain, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
@@ -155,3 +155,26 @@ Pratinjau undangan (seluruh konten adalah data ilustrasi pengujian):
 
 - [Tampilan HP](docs/images/undangan-mobile.png)
 - [Tampilan desktop](docs/images/undangan-desktop.png)
+
+
+## PostgreSQL, unggah lagu dan kapasitas foto — 3 November 2026
+
+- **SQL hosting:** PostgreSQL dengan connection pool, migrasi SQL dan alat impor dari SQLite. Mode SQLite lokal tetap tersedia; akun/hash password/ID undangan dapat dipindahkan tanpa membuat ulang akun.
+- **Penyimpanan:** disk lokal persisten atau bucket S3-compatible privat. Media tetap file, bukan base64 database. Akses publik hanya untuk media terpilih pada undangan siap dibagikan.
+- **Musik pribadi:** unggah MP3/M4A/OGG/WAV maksimal 30 MB/30 menit, pilih lagu, Simpan. Musik tetap membutuhkan tindakan putar dari tamu. Audio mendukung streaming/seek.
+- **Foto banyak:** default 200 foto galeri, 1.000 unggahan per acara, 10 MB/foto dan total media 2 GB/acara, semuanya dapat dikonfigurasi. Pustaka dapat memakai ulang dan menghapus file yang tidak dipakai.
+- **Hosting:** Dockerfile, Docker Compose PostgreSQL, healthcheck, contoh reverse proxy dan panduan HTTPS. Dukungan hosting sudah disiapkan; ini bukan konfirmasi website sudah terbit.
+
+Baca [panduan hosting dan pemindahan data](docs/DEPLOYMENT.md) sebelum mengubah database atau penyimpanan. File SQL tersedia di [migrasi PostgreSQL](db/migrations/postgres) dan [migrasi SQLite](db/migrations/sqlite).
+
+Lokal:
+
+```sh
+npm ci
+npm run db:migrate
+npm start
+```
+
+Untuk PostgreSQL, isi `DATABASE_URL` di `.env`, jalankan `npm run db:migrate`, lalu `npm start`. Untuk S3, buat bucket privat dan isi konfigurasi server sesuai panduan. Jangan menghapus data lokal lama sebelum hasil pemindahan diverifikasi.
+
+[Pratinjau pustaka lagu di HP](docs/images/media-mobile.png) menggunakan data sintetis pengujian.

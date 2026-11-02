@@ -1,0 +1,11 @@
+.git
+node_modules
+data
+.env
+.env.*
+!.env.example
+*.p8
+*.pem
+*.sqlite*
+coverage
+docs/images
