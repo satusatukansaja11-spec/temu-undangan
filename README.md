@@ -37,7 +37,7 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 
 - Daftar dan login email/password, identitas dasar tersimpan, sesi 7 hari, keluar akun.
 - Dashboard milik pengguna, pencarian, filter status, tampilan kosong, tambah/edit/pratinjau/hapus dengan konfirmasi.
-- Formulir lima bagian: info dan tampilan, kedua mempelai, tanggal/waktu/lokasi, galeri, ucapan.
+- Formulir sembilan bagian: info dan tampilan, kedua mempelai, tanggal/waktu/lokasi, galeri, ucapan, love story, susunan acara tambahan, wedding gift, serta pengaturan/rekap RSVP.
 - Wajib publikasi: nama acara; foto sampul, pria dan wanita; nama lengkap dan panggilan kedua mempelai; agama; tanggal; waktu mulai dan selesai; alamat; Maps HTTPS; pembuka dan penutup.
 - Draft parsial dapat disimpan ke database. Seluruh isian valid dan lengkap membuat status **Siap Dibagikan**. Mengosongkan data wajib mengembalikan draft dan mencabut akses publik.
 - Upload foto dengan pratinjau, multiple upload galeri, hapus dari susunan, pindah kiri/kanan. Foto diunggah langsung ke server; perubahan susunan/isian baru tersimpan setelah menekan **Simpan**. File yang gagal tidak dimasukkan, file berhasil tetap ada jika file berikutnya gagal. Upload sementara yang tidak dipakai tetap private sampai acara dihapus. Batas unggahan 100 mencakup foto sementara.
@@ -47,7 +47,7 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 - Musik `None` atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Kontrol putar/jeda, tanpa autoplay; `None` tidak membuat elemen audio. Untuk menambah katalog musik, perluas whitelist backend, endpoint audio, dan pilihan form.
 - Sebar membuka dialog pesan yang bisa diedit; tautan WhatsApp terisi teks dan URL. Pengguna sendiri membuka WhatsApp dan mengirim. Aplikasi tidak mengirim pesan otomatis.
 
-Versi ini mengelola satu rangkaian jadwal utama per pernikahan, dengan label bebas (misalnya Akad & Resepsi). `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Waktu ditampilkan sebagai waktu setempat lokasi acara. Jenis acara lain, RSVP, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
+Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Jenis acara lain, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
 
 ## Struktur penting
 
@@ -118,3 +118,40 @@ Beranda publik:
 Halaman login pada ponsel:
 
 ![Login Temu](docs/images/login.png)
+
+
+## Undangan lengkap dan tampilan HP — 3 November 2026
+
+Halaman publik `/u/:slug` kini memiliki cover, **countdown + Save the Date**, profil masing-masing mempelai, **love story**, **susunan acara**, **Maps**, **photo gallery**, **wedding gift**, dan **RSVP**. Navigasi tetap di bawah layar, target sentuh sekitar 44 px, form 16 px untuk menghindari zoom otomatis di HP, gambar galeri lazy-loaded, serta kontrol musik tidak menutup navigasi. Animasi menghormati reduced motion; musik tetap tanpa autoplay.
+
+### Pengisian dari dashboard
+
+1. **Waktu & tempat**: pilih zona waktu acara (WIB/Jakarta, WITA/Makassar, WIT/Jayapura). Countdown dan kalender mengikuti zona tersebut, bukan zona browser tamu. Acara lama tanpa pilihan memakai WIB; sesuaikan jika lokasinya WITA/WIT.
+2. **Love story**: maksimal 12 cerita dengan judul, tanggal opsional dan narasi. Teks seluruhnya dari pemilik acara; tidak ada kisah pribadi buatan otomatis.
+3. **Susunan acara**: jadwal utama tetap dari Waktu & tempat. Tambahkan maksimal 8 rangkaian dengan nama, tanggal, waktu, lokasi dan link HTTPS Maps. Seluruh rangkaian memakai zona waktu acara yang dipilih.
+4. **Wedding gift**: maksimal 3 rekening/e-wallet (nama bank, nomor, nama penerima) dan alamat pengiriman opsional. Informasi ini **ditampilkan kepada publik** jika diisi. Nomor dapat disalin dengan tombol; fallback memilih teks jika clipboard browser tidak tersedia. Tidak ada pembayaran, transfer otomatis, validasi rekening bank, atau penyimpanan data kartu.
+5. **RSVP**: aktifkan/nonaktifkan formulir dan lihat rekap privat (hadir, tidak hadir, belum pasti, jumlah orang). Rekap memiliki paginasi 20 respons per halaman dan tombol muat ulang.
+6. Simpan perubahan. Bagian tambahan bersifat opsional; jika menambahkan baris cerita/rangkaian/rekening yang belum lengkap, draft tetap bisa disimpan tetapi undangan belum siap dibagikan sampai baris dilengkapi atau dihapus. Bagian love story, galeri atau gift yang kosong tidak ditampilkan ke publik.
+
+**Save the Date** mengunduh `.ics` untuk jadwal utama, dengan waktu UTC hasil konversi zona acara. Pengguna membuka/mengimpor berkas tersebut ke aplikasi kalender; aplikasi tidak menulis langsung ke akun kalender dan tidak memerlukan kredensial Google. Teks kalender di-escape dan baris panjang dilipat sesuai batas UTF-8. Kalender draft hanya tersedia bagi pemilik melalui pratinjau.
+
+### RSVP, privasi dan penyimpanan
+
+- Respons tersimpan di tabel SQLite baru `rsvps`, berelasi ke acara dengan cascade delete. `rsvp_limits` menyimpan pembatasan pengiriman. Schema ditambah secara idempoten; tabel/data acara lama tidak dihapus. Backup `DATA_DIR` sebelum memperbarui deployment yang memiliki data nyata.
+- Tamu mengisi nama, kehadiran, jumlah tamu (1–10 termasuk dirinya jika hadir; 0 untuk tidak hadir/belum pasti) serta ucapan opsional. Tidak memerlukan akun tamu.
+- Nama, ucapan dan rekap tidak diterbitkan dalam API data undangan; hanya pemilik terautentikasi dapat membaca daftar. API tamu hanya membaca responsnya sendiri dengan cookie rahasia HttpOnly, SameSite=Lax, Secure pada HTTPS; yang disimpan di database adalah hash token.
+- Pada browser yang sama selama cookie masih tersedia (maksimal 180 hari), pengiriman berikutnya memperbarui respons. Cookie hilang, browser lain, atau perangkat lain dapat menghasilkan respons tambahan. Ini konfirmasi tamu anonim, **bukan verifikasi identitas/undangan individual**.
+- Penulisan memeriksa Origin dan membatasi 60 pengiriman valid per IP socket per acara per jam, maksimal 10.000 respons per acara. Tambahkan proteksi ingress/anti-spam sesuai kebutuhan hosting; beberapa tamu di jaringan/proxy yang sama dapat berbagi pembatasan IP.
+- Draft/tidak ditemukan menolak RSVP dan file kalender publik. RSVP yang dimatikan menolak pengiriman. Form di halaman pratinjau tidak mengirim data. Tidak ada email/WhatsApp otomatis saat RSVP.
+- Cerita, rangkaian, gift, zona waktu dan pengaturan RSVP disimpan bersama dokumen acara tervalidasi; foto tetap berupa file di uploads.
+
+File tambahan: `wedding.js` (validasi, kalender dan API RSVP), `public/wedding.js` (editor tambahan, undangan, countdown, galeri dan RSVP), `test/wedding.test.js` (integrasi dan keamanan).
+
+### Pengujian alur baru
+
+Jalankan `npm test`. Dari dashboard, lengkapi undangan, isi contoh cerita/rangkaian/gift, lalu simpan. Buka URL publik di browser tanpa login, unduh kalender, perbesar galeri, salin nomor dan kirim RSVP. Muat ulang dan ubah kehadiran: respons yang sama diperbarui. Kembali ke pemilik, buka tab RSVP untuk melihat rekap. Coba dari akun pemilik lain: akses rekap harus ditolak. Nonaktifkan RSVP atau ubah undangan menjadi draft dan pastikan akses publik ditolak sesuai status.
+
+Pratinjau undangan (seluruh konten adalah data ilustrasi pengujian):
+
+- [Tampilan HP](docs/images/undangan-mobile.png)
+- [Tampilan desktop](docs/images/undangan-desktop.png)

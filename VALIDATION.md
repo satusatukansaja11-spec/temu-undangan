@@ -52,3 +52,13 @@ Tombol Google, ikon, pesan konfigurasi, endpoint OAuth/callback, pembacaan envir
 Regresi ditambahkan untuk memastikan endpoint Google lama mengembalikan 404 dan API identitas tidak lagi menawarkan konfigurasi Google. Dua pengguna yang benar-benar dibuat melalui endpoint pendaftaran diuji untuk memastikan daftar undangan terpisah dan akses baca/ubah/hapus ke acara milik pengguna lain ditolak.
 
 Hasil: `npm test` **20 lulus, 0 gagal**. Chromium memverifikasi halaman login/daftar tanpa Google dan tanpa akun demo saat `DEMO_LOGIN=false`, daftar akun pribadi, penyimpanan draft, reload, logout, login email kembali dan draft tetap tersedia. Halaman mobile 390×844 serta desktop 1440×1000 tidak menunjukkan overflow horizontal atau JavaScript page error pada alur tersebut. Gambar pratinjau login telah diperbarui.
+
+## Undangan lengkap dan optimasi HP — 3 November 2026
+
+`npm test`: **30 lulus, 0 gagal**. Tambahan pengujian mencakup penyimpanan cerita/rangkaian/gift, validasi array dan URL, draft parsial, konversi WIB/WITA/WIT, kalender dengan escape/lipatan UTF-8, kalender privat draft, RSVP anonim dengan origin sah, validasi jumlah tamu, cookie HttpOnly, pembaruan tanpa duplikasi, respons pribadi tidak terbaca tamu lain, rekap/paginasi hanya pemilik, nonaktifkan RSVP, batas pengiriman, dan cascade delete respons saat acara dihapus. Tes menggunakan database sementara; tidak menyentuh data produksi.
+
+Chromium memeriksa editor love story/susunan acara/wedding gift dan rekap RSVP, countdown, file `.ics` WITA, profil pria/wanita, tautan Maps, galeri lightbox, salin rekening, RSVP simpan/muat ulang/ubah serta tampil dalam rekap pemilik. Pratinjau menonaktifkan pengiriman RSVP. Ukuran 320, 390, 768 dan 1440 piksel diperiksa tanpa overflow horizontal atau JavaScript page error pada alur tersebut. Musik tetap paused sebelum tindakan pengguna. Setelah inspeksi visual, kontrol musik dipindah ke navigasi bawah agar tidak menutupi tombol formulir.
+
+Gambar pratinjau undangan menggunakan ilustrasi buatan untuk fixture QA, nama sintetis dan rekening berlabel contoh. Ini bukan foto atau detail rekening pelanggan. Tidak dilakukan transfer, pengiriman pesan, penulisan ke kalender eksternal, maupun pembukaan navigasi Maps di luar aplikasi.
+
+Batas: RSVP anonim bergantung cookie browser; bukan verifikasi identitas. Kalender diperiksa sebagai unduhan/isi `.ics`, belum diuji impor ke seluruh aplikasi kalender di perangkat fisik. Clipboard memiliki fallback pemilihan teks. Tidak ada klaim audit aksesibilitas penuh atau pengujian semua browser/perangkat.
