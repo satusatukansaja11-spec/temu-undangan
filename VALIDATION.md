@@ -44,3 +44,11 @@ Google OAuth nyata belum dijalankan karena client ID/secret belum disediakan dan
 Login provider Google dan Apple nyata tetap memerlukan kredensial dan akses jaringan eksternal. Tidak ada email konfirmasi atau layanan pemulihan password yang dikirim selama pengujian.
 
 Browser Chromium: menu tujuh item, dialog contoh tema, tautan ZIP GitHub, penjelasan Apple belum dikonfigurasi, pendaftaran email hingga dashboard, login salah/benar, keluar akun, serta sapaan dan hapus nama Layar Tamu berhasil. Beranda, login, daftar, dan Layar Tamu diperiksa di 390×844; beranda juga diperiksa di 768×1024 dan desktop 1440×1000. Tidak ditemukan overflow horizontal maupun JavaScript page error pada alur yang diperiksa.
+
+## Penghapusan login Google — 2 November 2026
+
+Tombol Google, ikon, pesan konfigurasi, endpoint OAuth/callback, pembacaan environment Google dan akses foto profil Google telah dihapus. Akun dan data undangan tidak dihapus. Apple tetap menjadi opsi terpisah sesuai lingkup perubahan; daftar/login email tidak memerlukan Google atau Apple.
+
+Regresi ditambahkan untuk memastikan endpoint Google lama mengembalikan 404 dan API identitas tidak lagi menawarkan konfigurasi Google. Dua pengguna yang benar-benar dibuat melalui endpoint pendaftaran diuji untuk memastikan daftar undangan terpisah dan akses baca/ubah/hapus ke acara milik pengguna lain ditolak.
+
+Hasil: `npm test` **20 lulus, 0 gagal**. Chromium memverifikasi halaman login/daftar tanpa Google dan tanpa akun demo saat `DEMO_LOGIN=false`, daftar akun pribadi, penyimpanan draft, reload, logout, login email kembali dan draft tetap tersedia. Halaman mobile 390×844 serta desktop 1440×1000 tidak menunjukkan overflow horizontal atau JavaScript page error pada alur tersebut. Gambar pratinjau login telah diperbarui.
