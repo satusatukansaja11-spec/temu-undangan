@@ -75,3 +75,9 @@ Batas: RSVP anonim bergantung cookie browser; bukan verifikasi identitas. Kalend
 - `npm audit --omit=dev`: 0 kerentanan pada lockfile yang diserahkan. Multer diperbarui ke 2.5.x dan body-parser dipatok melalui override kompatibel 2.4.x; parser body tidak mengaktifkan inflate.
 
 File SQL/migrasi, alat impor, pemeliharaan media, Docker Compose, contoh reverse proxy dan panduan tersedia di `docs/DEPLOYMENT.md`. Tidak ada hosting/domain/database/bucket eksternal milik pengguna yang dibuat atau diubah. Deployment publik, sertifikat HTTPS, koneksi TLS penyedia PostgreSQL, kebijakan bucket dan kapasitas layanan nyata memerlukan konfigurasi serta verifikasi pada akun hosting pengguna. Dukungan upload tidak berarti penyimpanan tanpa batas.
+
+## Menu Sebar — 3 November 2026
+
+Tes lokal: 40 lulus, 0 gagal, 2 dilewati karena PostgreSQL/S3 eksternal tidak disediakan untuk putaran ini. Tes baru mencakup penyimpanan penerima/template, validasi nama dan placeholder link, penolakan baca/tambah/hapus lintas pemilik, serta cascade delete. Migrasi SQLite lama tetap lulus dengan tiga versi schema.
+
+Browser Chromium memeriksa tambah penerima, simpan pesan, kembali/muat ulang daftar, pratinjau WhatsApp yang dapat diedit, URL ter-encode dengan nama berisi ampersand, sapaan pada undangan publik tanpa login, serta overflow pada HP/desktop. Tidak membuka WhatsApp atau mengirim pesan nyata. Import/export memakai JSON dan template agama mengikuti pilihan acara, bukan jenis acara lain. Pengujian PostgreSQL/S3 terdahulu bukan klaim pengujian layanan eksternal ulang pada revisi ini.

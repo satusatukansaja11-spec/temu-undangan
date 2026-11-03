@@ -1,4 +1,5 @@
 const express = require("express");
+const { installSharing } = require("./sharing");
 const { createStorage } = require("./storage");
 const { installMedia, mediaLimits } = require("./media");
 const { installAccountAuth, appleConfigured } = require("./auth");
@@ -287,17 +288,16 @@ async function createApp(opts = {}) {
         );
       res.json({ ...read(await own(req)), missing: m });
     });
+    installSharing(app, db, { auth, own, fail });
     installMedia(app, db, { auth, own, fail, dataDir: dir, storage, limits });
     app.get("/api/public/:slug", async (req, res) => {
       const e = await db
         .prepare("SELECT * FROM events WHERE slug=? AND status='ready'")
         .get(req.params.slug);
       if (!e)
-        return res
-          .status(404)
-          .json({
-            error: "Undangan tidak ditemukan atau belum siap dibagikan.",
-          });
+        return res.status(404).json({
+          error: "Undangan tidak ditemukan atau belum siap dibagikan.",
+        });
       res.json(JSON.parse(e.data));
     });
     app.get("/music/piano.wav", (req, res) => {

@@ -3,6 +3,8 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const { connectDatabase, migrate } = require("../db");
 const tables = {
+  recipients: ["id", "event_id", "name", "created"],
+  share_settings: ["event_id", "message"],
   users: ["id", "name", "email", "picture"],
   credentials: ["email", "user_id", "salt", "password_hash"],
   events: ["id", "owner", "slug", "status", "data", "created", "updated"],
@@ -45,7 +47,29 @@ async function importSqlite({ sourceFile, targetUrl }) {
           throw Error(
             "Target harus kosong. Impor dibatalkan tanpa menimpa data.",
           );
-      for (const [table, columns] of Object.entries(tables)) {
+      for (const [table, columns] of Object.entries(tables).sort(
+        ([a], [b]) =>
+          [
+            "users",
+            "credentials",
+            "events",
+            "photos",
+            "tracks",
+            "rsvps",
+            "recipients",
+            "share_settings",
+          ].indexOf(a) -
+          [
+            "users",
+            "credentials",
+            "events",
+            "photos",
+            "tracks",
+            "rsvps",
+            "recipients",
+            "share_settings",
+          ].indexOf(b),
+      )) {
         counts[table] = 0;
         if (
           !source

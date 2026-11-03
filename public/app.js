@@ -208,29 +208,12 @@ function remove(id) {
   };
 }
 function share(e) {
-  const m = e.missing || Object.keys(labels).filter((k) => !e[k]);
   if (e.status !== "ready")
     return toast(
-      "Lengkapi terlebih dahulu: " + m.map((k) => labels[k] || k).join(", "),
+      "Lengkapi dan simpan undangan terlebih dahulu: " +
+        (e.missing || []).map((k) => labels[k] || k).join(", "),
     );
-  const d = document.querySelector("#share"),
-    t = document.querySelector("#shareText");
-  t.value =
-    (greetings[e.religion] || greetings.Umum) +
-    "\n\n" +
-    e.name +
-    "\n" +
-    location.origin +
-    "/u/" +
-    e.slug +
-    "\n\nKami menantikan kehadiran Anda.";
-  const update = () =>
-    (document.querySelector("#wa").href =
-      "https://wa.me/?text=" + encodeURIComponent(t.value));
-  t.oninput = update;
-  update();
-  document.querySelector("#closeShare").onclick = () => d.close();
-  d.showModal();
+  renderSharing(e);
 }
 async function edit(id) {
   try {

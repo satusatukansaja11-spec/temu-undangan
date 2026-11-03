@@ -178,3 +178,15 @@ npm start
 Untuk PostgreSQL, isi `DATABASE_URL` di `.env`, jalankan `npm run db:migrate`, lalu `npm start`. Untuk S3, buat bucket privat dan isi konfigurasi server sesuai panduan. Jangan menghapus data lokal lama sebelum hasil pemindahan diverifikasi.
 
 [Pratinjau pustaka lagu di HP](docs/images/media-mobile.png) menggunakan data sintetis pengujian.
+
+## Menu Sebar dan penerima personal
+
+Klik **Sebar** pada undangan yang sudah siap dibagikan. Halaman menampilkan sampul, nama acara, pilihan template Universal/Formal/Custom dan template sesuai agama acara. Pesan dapat diedit menggunakan `{nama}`, `{acara}` dan `{link}`, lalu disimpan ke database.
+
+Tambahkan nama penerima satu per satu atau import JSON berupa array nama (contoh `["Ummi Mahmud", "Bapak Arif & keluarga"]`, maksimal 500 nama per import, 200 KB/file, 1.000 penerima per acara). Export menghasilkan JSON nama. Nama dan pesan hanya dapat dikelola pemilik acara; penghapusan acara ikut menghapusnya melalui foreign key.
+
+Setiap penerima mendapat tautan `/u/:slug?to=...` yang menampilkan sapaan pada sampul. Nama di URL adalah personalisasi, bukan identitas terverifikasi atau kode akses RSVP. URL dapat diedit/dibagikan ulang. Jangan memasukkan informasi rahasia ke nama penerima.
+
+Tombol **Salin pesan**, **Kirim WA** dan **Bagikan tautan** tersedia per nama. Kirim WA membuka dialog pratinjau editable, lalu tautan berbagi WhatsApp. Pengguna memilih tujuan dan menekan Kirim di WhatsApp sendiri; aplikasi tidak mengirim otomatis/massal, tidak memilih nomor kontak dan tidak mengklaim pesan sudah terkirim. Browser tanpa Web Share memakai clipboard; bila clipboard ditolak, salin manual dari pratinjau.
+
+SQL baru: `003_sharing.sql` untuk SQLite/PostgreSQL. Untuk server dengan `AUTO_MIGRATE=false`, jalankan `npm run db:migrate` sebelum memulai versi baru. Impor SQLite juga mencakup daftar penerima dan pengaturan pesan.
