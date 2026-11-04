@@ -190,3 +190,17 @@ Setiap penerima mendapat tautan `/u/:slug?to=...` yang menampilkan sapaan pada s
 Tombol **Salin pesan**, **Kirim WA** dan **Bagikan tautan** tersedia per nama. Kirim WA membuka dialog pratinjau editable, lalu tautan berbagi WhatsApp. Pengguna memilih tujuan dan menekan Kirim di WhatsApp sendiri; aplikasi tidak mengirim otomatis/massal, tidak memilih nomor kontak dan tidak mengklaim pesan sudah terkirim. Browser tanpa Web Share memakai clipboard; bila clipboard ditolak, salin manual dari pratinjau.
 
 SQL baru: `003_sharing.sql` untuk SQLite/PostgreSQL. Untuk server dengan `AUTO_MIGRATE=false`, jalankan `npm run db:migrate` sebelum memulai versi baru. Impor SQLite juga mencakup daftar penerima dan pengaturan pesan.
+
+## Tampilan undangan Navy Ivory — 4 November 2026
+
+Undangan publik/pratinjau kini memakai ornamen navy–ivory dengan ilustrasi botani dan paviliun yang dibuat berdasarkan nuansa referensi pengguna. Aset dekoratif lokal telah dioptimalkan ke WebP; foto dan nama mempelai tetap berasal dari data acara, bukan foto/nama contoh pada referensi.
+
+Pada laptop (lebar 1024 px ke atas), foto sampul besar menetap di kiri, sementara panel undangan 480 px di kanan dapat digulir sendiri. Di HP/tablet, hanya satu kolom undangan ditampilkan. Sampul awal menampilkan foto berbingkai oval emas, nama mempelai, nama penerima dari tautan Sebar dan tombol Buka Undangan. Tombol membuka isi With Love, countdown, profil mempelai, cerita, jadwal, Maps, galeri, gift dan RSVP. Musik tetap manual, tanpa autoplay.
+
+With Love memakai ucapan pembuka pemilik acara. Tidak ada ayat atau salam agama yang ditambahkan otomatis dari gambar referensi. Pembaruan ini tidak mengubah schema database atau data acara.
+
+Pratinjau menggunakan foto warna polos dari fixture pengujian; foto acara nyata akan menggantikannya:
+
+- [Laptop](docs/images/navy-desktop.png)
+- [HP — sampul](docs/images/navy-mobile-cover.png)
+- [HP — profil mempelai](docs/images/navy-mobile-couple.png)

@@ -146,8 +146,7 @@ async function renderWedding(preview, id) {
       <nav class="wedding-nav" aria-label="Navigasi undangan"><a href="#weddingHome">${weddingIcon("heart")}<span>Awal</span></a><a href="#couple">${weddingIcon("heart")}<span>Mempelai</span></a><a href="#schedule">${weddingIcon("calendar")}<span>Acara</span></a><a href="#maps">${weddingIcon("map")}<span>Maps</span></a>${e.gallery?.length ? `<a href="#gallery">${weddingIcon("photos")}<span>Galeri</span></a>` : ""}${e.rsvpEnabled !== false ? `<a href="#rsvp">${weddingIcon("check")}<span>RSVP</span></a>` : ""}${e.music === "piano" || e.music?.startsWith("track:") ? `<button type="button" id="musicToggle" aria-pressed="false" aria-label="Putar musik">${weddingIcon("music")}<span>Musik</span></button>` : ""}</nav>
       ${e.music === "piano" || e.music?.startsWith("track:") ? `<audio id="audio" loop src="${e.music === "piano" ? "/music/piano.wav" : "/audio/" + esc(e.music.slice(6))}" preload="none"></audio>` : ""}
       <dialog class="gallery-lightbox" id="galleryLightbox" aria-labelledby="galleryTitle"><div class="lightbox-header"><span id="galleryTitle">Galeri foto</span><button id="closeGallery" aria-label="Tutup galeri">×</button></div><img id="galleryLarge" alt=""><div class="lightbox-controls"><button id="previousPhoto" aria-label="Foto sebelumnya">←</button><span id="galleryCounter"></span><button id="nextPhoto" aria-label="Foto berikutnya">→</button></div></dialog></div>`;
-    const recipient=new URLSearchParams(location.search).get('to');
-    if(recipient){const greeting=document.createElement('p');greeting.className='personal-recipient';greeting.textContent='Kepada Yth. '+recipient.slice(0,100);document.querySelector('.wedding-title').append(greeting)}
+    applyNavyTheme(e);
     startWeddingCountdown(e);
     bindWeddingGallery(e.gallery || []);
     document.querySelectorAll("[data-copy-gift]").forEach(
