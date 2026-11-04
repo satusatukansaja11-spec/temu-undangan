@@ -42,7 +42,7 @@ const steps = [
   "Ucapan",
   "Love story",
   "Susunan acara",
-  "Wedding gift",
+  "Titip Hadiah",
   "RSVP",
 ];
 const greetings = {

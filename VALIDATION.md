@@ -85,3 +85,7 @@ Browser Chromium memeriksa tambah penerima, simpan pesan, kembali/muat ulang daf
 ## Tema Navy Ivory dan layout undangan — 4 November 2026
 
 Tes lokal: 40 lulus, 0 gagal, 2 pengujian layanan eksternal dilewati. Tidak ada perubahan database pada revisi tampilan ini. Chromium memeriksa laptop 1440×1000, panel kanan bergulir tanpa menggerakkan latar kiri, sampul yang menyembunyikan isi sebelum tombol ditekan, nama penerima, HP/tablet 320/390/768 px tanpa overflow horizontal, dan RSVP berhasil setelah sampul dibuka. Tidak ditemukan JavaScript page error pada alur tersebut. Ilustrasi latar dibuat berdasarkan inspirasi referensi; foto warna polos dalam screenshot adalah fixture pengujian, bukan foto mempelai pengguna. Pengujian tidak mengklaim kesamaan piksel dengan referensi atau audit aksesibilitas menyeluruh.
+
+## Intro dan Titip Hadiah — 4 November 2026
+
+Tes lokal: 40 lulus, 0 gagal, dua tes PostgreSQL/S3 dilewati pada putaran ini. Format rekening lama tetap kompatibel ketika keterangan opsional tidak ada. Chromium memeriksa urutan intro setelah buka sampul, Galeri setelah Maps, Titip Hadiah tepat sebelum penutup, teks doa restu persis, tambah/edit/hapus rekening lewat dialog, penyimpanan dan pembacaan kembali keterangan, angka nol awal, salin nomor, tombol alamat kado fisik, dan tampilan HP/desktop tanpa overflow/page error pada alur yang diuji. Tidak ada transfer nyata. Screenshot memakai nama/nomor sintetis berlabel contoh.

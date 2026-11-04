@@ -71,7 +71,15 @@ function validateWedding(data, fail) {
     address: 1000,
     maps: 2000,
   });
-  result.gifts = array("gifts", 3, { bank: 80, account: 80, holder: 120 });
+  result.gifts = array("gifts", 3, {
+    bank: 80,
+    account: 80,
+    holder: 120,
+    note: 200,
+  });
+  result.gifts.forEach((row) => {
+    if (!row.note) delete row.note;
+  });
   return result;
 }
 function weddingMissing(data) {
@@ -283,14 +291,12 @@ function installWedding(app, db, { auth, own, fail, origin }) {
       path: "/api/public/" + event.slug + "/rsvp",
       maxAge: 180 * 86400000,
     });
-    res
-      .status(previous ? 200 : 201)
-      .json({
-        response: safe(
-          await mine({ cookies: { [cookieName(event)]: token } }, event),
-        ),
-        updated: !!previous,
-      });
+    res.status(previous ? 200 : 201).json({
+      response: safe(
+        await mine({ cookies: { [cookieName(event)]: token } }, event),
+      ),
+      updated: !!previous,
+    });
   });
   app.get("/api/events/:id/rsvps", auth, async (req, res) => {
     const event = await own(req),

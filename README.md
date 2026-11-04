@@ -204,3 +204,13 @@ Pratinjau menggunakan foto warna polos dari fixture pengujian; foto acara nyata 
 - [Laptop](docs/images/navy-desktop.png)
 - [HP — sampul](docs/images/navy-mobile-cover.png)
 - [HP — profil mempelai](docs/images/navy-mobile-couple.png)
+
+## Halaman pembuka dan Titip Hadiah — 4 November 2026
+
+Setelah Buka Undangan, halaman pertama menampilkan **The Wedding Of**, nama panggilan pria dan wanita, lalu tombol melanjutkan isi undangan. Galeri foto berada tepat setelah Maps; jika belum ada foto, tersedia informasi kosong yang jelas. Titip Hadiah berada tepat sebelum penutup, setelah RSVP, dengan teks doa restu yang diminta pemilik proyek.
+
+Dashboard: **Edit undangan → Titip Hadiah → Tambah Rekening**. Pilih bank/e-wallet atau Lainnya, masukkan nomor, atas nama dan keterangan opsional. Tombol **Simpan Perubahan** pada dialog menyimpan rekening beserta perubahan formulir undangan yang sedang berlangsung ke database. Edit/hapus tersedia pada setiap kartu; penghapusan meminta konfirmasi. Maksimal tiga rekening seperti batas aplikasi sebelumnya, tanpa paket berbayar buatan. Nomor rekening dipertahankan sebagai teks agar angka nol awal tidak hilang. Field keterangan opsional kompatibel dengan rekening lama yang belum memilikinya.
+
+Kartu publik menggunakan nama bank dengan tipografi, dekorasi chip dan tombol salin; bukan klaim logo resmi atau verifikasi rekening. Data rekening hanya dari pengelola, bukan nomor contoh pada gambar referensi. Alamat kado fisik dapat ditampilkan melalui tombol jika telah diisi; tidak ada katalog penjualan, pembayaran atau transfer otomatis.
+
+Pratinjau data sintetis: [dialog rekening](docs/images/rekening-modal.png) dan [Titip Hadiah di HP](docs/images/titip-hadiah-mobile.png).
