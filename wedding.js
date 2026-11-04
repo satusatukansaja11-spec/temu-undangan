@@ -29,6 +29,11 @@ function validateWedding(data, fail) {
   if (data.rsvpEnabled !== undefined && typeof data.rsvpEnabled !== "boolean")
     throw fail(400, "Pengaturan RSVP tidak valid.");
   result.rsvpEnabled = data.rsvpEnabled !== false;
+  result.agendaDescription = text(
+    data.agendaDescription,
+    "Deskripsi jadwal utama",
+    1000,
+  );
   result.giftAddress = text(data.giftAddress, "Alamat pengiriman hadiah", 1000);
   const array = (key, max, fields) => {
     const value = data[key] === undefined ? [] : data[key];
@@ -65,6 +70,7 @@ function validateWedding(data, fail) {
   result.stories = array("stories", 12, { title: 120, date: 10, text: 2000 });
   result.schedules = array("schedules", 8, {
     title: 120,
+    description: 1000,
     date: 10,
     start: 5,
     end: 5,
@@ -76,6 +82,9 @@ function validateWedding(data, fail) {
     account: 80,
     holder: 120,
     note: 200,
+  });
+  result.schedules.forEach((row) => {
+    if (!row.description) delete row.description;
   });
   result.gifts.forEach((row) => {
     if (!row.note) delete row.note;

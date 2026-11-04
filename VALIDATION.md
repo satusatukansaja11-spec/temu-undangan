@@ -93,3 +93,7 @@ Tes lokal: 40 lulus, 0 gagal, dua tes PostgreSQL/S3 dilewati pada putaran ini. F
 ## Great Vibes pada cover — 5 November 2026
 
 Chromium memverifikasi font lokal benar-benar berhasil dimuat melalui FontFaceSet, nama cover memakai Great Vibes, serta lebar 320/390/1440 px dan nama panjang tidak menyebabkan overflow horizontal. Screenshot memakai data sintetis. Perubahan hanya CSS dan aset font berlisensi OFL; tes backend tidak diulang untuk perubahan tipografi ini.
+
+## Float in dan timeline — 5 November 2026
+
+Tes backend lokal: 40 lulus, 0 gagal; dua tes layanan eksternal dilewati. Chromium memeriksa elemen timeline sebelum/sesudah masuk viewport, observer panel laptop, posisi kiri/kanan bergantian, empat agenda fixture, lebar 320/390/1440 tanpa overflow/page error, serta reduced motion yang menampilkan elemen langsung. Deskripsi baru bersifat opsional dan mempertahankan format jadwal lama. Animasi memakai keyframes saat reveal agar elemen di luar layar tidak mengalami transisi fade-out awal.

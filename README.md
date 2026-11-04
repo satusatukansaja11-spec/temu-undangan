@@ -216,3 +216,11 @@ Kartu publik menggunakan nama bank dengan tipografi, dekorasi chip dan tombol sa
 Pratinjau data sintetis: [dialog rekening](docs/images/rekening-modal.png) dan [Titip Hadiah di HP](docs/images/titip-hadiah-mobile.png).
 
 Nama mempelai pada sampul undangan dan foto sampul besar di laptop memakai **Great Vibes**, dibundel lokal agar tidak membutuhkan Google Fonts saat halaman dibuka. Lisensi SIL OFL disertakan di `public/assets/fonts/GreatVibes-OFL.txt`. Font pada isi/profil dan halaman pengelola tetap seperti sebelumnya.
+
+## Float in dan timeline susunan acara
+
+Bagian undangan muncul dengan gerakan float in saat masuk area pandang, satu kali per elemen. Pada laptop pengamatan mengikuti panel undangan kanan, sedangkan di HP mengikuti halaman. Perubahan ukuran layar ditangani; reduced motion menampilkan konten tanpa animasi. Browser tanpa IntersectionObserver tetap menampilkan isi, dan formulir/navigasi tidak disembunyikan untuk efek animasi.
+
+Susunan acara kini berupa timeline vertikal emas dengan posisi judul/deskripsi dan waktu bergantian, sesuai urutan jadwal utama lalu rangkaian tambahan. Tanggal, jam dan zona waktu tetap berasal dari acara pengguna. Tambahkan deskripsi opsional maksimal 1.000 karakter melalui Waktu & tempat untuk jadwal utama, atau Susunan acara untuk rangkaian tambahan. Jika deskripsi kosong, lokasi tetap ditampilkan sebagai keterangan. Tidak ada agenda contoh yang otomatis ditambahkan ke undangan nyata.
+
+[Pratinjau timeline di HP](docs/images/timeline-mobile.png) memakai data pengujian.

@@ -1,4 +1,5 @@
 function applyNavyTheme(event) {
+  window.weddingMotion?.destroy();
   const invitation = document.querySelector(".wedding-v2");
   invitation.classList.add("wedding-navy");
   const layout = document.createElement("div");
@@ -85,6 +86,7 @@ function applyNavyTheme(event) {
     intro.scrollIntoView({ block: "start", behavior: "instant" });
     intro.setAttribute("tabindex", "-1");
     intro.focus({ preventScroll: true });
+    startWeddingMotion(invitation, panel);
   };
   const sectionTitle = invitation.querySelector("#couple h2");
   if (sectionTitle) sectionTitle.textContent = "Bride & Groom";
