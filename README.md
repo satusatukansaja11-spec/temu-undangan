@@ -214,3 +214,5 @@ Dashboard: **Edit undangan → Titip Hadiah → Tambah Rekening**. Pilih bank/e-
 Kartu publik menggunakan nama bank dengan tipografi, dekorasi chip dan tombol salin; bukan klaim logo resmi atau verifikasi rekening. Data rekening hanya dari pengelola, bukan nomor contoh pada gambar referensi. Alamat kado fisik dapat ditampilkan melalui tombol jika telah diisi; tidak ada katalog penjualan, pembayaran atau transfer otomatis.
 
 Pratinjau data sintetis: [dialog rekening](docs/images/rekening-modal.png) dan [Titip Hadiah di HP](docs/images/titip-hadiah-mobile.png).
+
+Nama mempelai pada sampul undangan dan foto sampul besar di laptop memakai **Great Vibes**, dibundel lokal agar tidak membutuhkan Google Fonts saat halaman dibuka. Lisensi SIL OFL disertakan di `public/assets/fonts/GreatVibes-OFL.txt`. Font pada isi/profil dan halaman pengelola tetap seperti sebelumnya.

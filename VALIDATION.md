@@ -89,3 +89,7 @@ Tes lokal: 40 lulus, 0 gagal, 2 pengujian layanan eksternal dilewati. Tidak ada 
 ## Intro dan Titip Hadiah — 4 November 2026
 
 Tes lokal: 40 lulus, 0 gagal, dua tes PostgreSQL/S3 dilewati pada putaran ini. Format rekening lama tetap kompatibel ketika keterangan opsional tidak ada. Chromium memeriksa urutan intro setelah buka sampul, Galeri setelah Maps, Titip Hadiah tepat sebelum penutup, teks doa restu persis, tambah/edit/hapus rekening lewat dialog, penyimpanan dan pembacaan kembali keterangan, angka nol awal, salin nomor, tombol alamat kado fisik, dan tampilan HP/desktop tanpa overflow/page error pada alur yang diuji. Tidak ada transfer nyata. Screenshot memakai nama/nomor sintetis berlabel contoh.
+
+## Great Vibes pada cover — 5 November 2026
+
+Chromium memverifikasi font lokal benar-benar berhasil dimuat melalui FontFaceSet, nama cover memakai Great Vibes, serta lebar 320/390/1440 px dan nama panjang tidak menyebabkan overflow horizontal. Screenshot memakai data sintetis. Perubahan hanya CSS dan aset font berlisensi OFL; tes backend tidak diulang untuk perubahan tipografi ini.
