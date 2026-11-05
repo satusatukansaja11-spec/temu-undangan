@@ -51,7 +51,8 @@ Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan pe
 
 ## Struktur penting
 
-- `server.js`: schema, sesi, CSRF, otorisasi, API CRUD, upload dan halaman publik.
+- `server.js`: entry point yang langsung menjalankan server, termasuk saat dimuat loader hosting.
+- `app.js`: factory aplikasi, sesi, CSRF, otorisasi, API CRUD, upload dan halaman publik.
 - `public/index.html`: shell halaman dan dialog aksesibel.
 - `public/app.js`: dashboard, formulir, pratinjau, halaman undangan dan WhatsApp.
 - `public/style.css`: desain sage/ivory, layout desktop/mobile dan reduced motion.

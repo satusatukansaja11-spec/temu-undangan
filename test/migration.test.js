@@ -5,7 +5,7 @@ const { test } = require("node:test"),
   path = require("node:path"),
   { randomBytes, scryptSync } = require("node:crypto");
 const { DatabaseSync } = require("node:sqlite");
-const { createApp } = require("../server");
+const { createApp } = require("../app");
 const { migrate } = require("../db");
 const { importSqlite } = require("../scripts/import-sqlite");
 function legacy(dir) {

@@ -113,3 +113,7 @@ Urutan setelah sampul dibuka: weddingIntro, weddingVerse, saveDate, withLove, co
 ## WhatsApp dan Sampai Selesai — 5 November 2026
 
 Pengujian backend mencakup persistensi pilihan waktu selesai, status ready tanpa jam akhir jika Sampai Selesai dipilih, penolakan tipe salah/jam terbalik, metadata Open Graph tanpa JavaScript, escape judul, foto sampul publik tanpa login, penolakan preview draft, kalender tanpa jam akhir, dan penyimpanan placeholder link_undangan. Pengujian pesan mencakup format Islam, salam agama lain, hari/tanggal, zona waktu, waktu pasti/Selesai dan substitusi satu kali untuk nama penerima. Chromium memeriksa simpan/muat ulang, pesan personal terenkode, preview foto dalam dialog, alias template tersimpan, timeline publik, serta lebar 320/390/1440 tanpa overflow horizontal/page error. Screenshot memakai data sintetis. Tidak mengirim WhatsApp nyata atau mengklaim pratinjau kartu sudah diverifikasi oleh crawler WhatsApp; perlu domain publik HTTPS. Tes PostgreSQL/S3 eksternal tetap dilewati.
+
+## Entry point Hostinger — 6 November 2026
+
+Server startup dipisahkan dari factory app.js. Dua subprocess terisolasi memverifikasi eksekusi langsung dan require oleh loader, GET /healthz serta shutdown SIGTERM. Keduanya selesai di bawah 0,2 detik pada pengujian lokal ini; tidak menyatakan latensi Hostinger. Suite: 44 lulus, 0 gagal, 2 tes layanan eksternal dilewati. Pemeriksaan sintaks dan git diff check lulus. .env pribadi tidak dilacak, tidak dimasukkan ke commit/ZIP, dan tidak diunggah. Deployment Hostinger belum dijalankan dari lingkungan ini.

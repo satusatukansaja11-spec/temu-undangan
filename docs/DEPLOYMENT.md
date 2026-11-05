@@ -185,3 +185,9 @@ Backup yang perlu disimpan: PostgreSQL (misalnya layanan backup penyedia/pg_dump
 `npm test` menguji SQLite lokal. Bila tersedia PostgreSQL uji, set `TEST_DATABASE_URL` lalu jalankan tes. Harness membuat schema acak khusus tes dan menghapus schema tersebut setelah selesai; gunakan database pengujian, bukan produksi. Tes S3 memakai `TEST_S3_ENDPOINT` beserta konfigurasi S3 pada emulator/layanan uji. Aplikasi tidak membuat bucket uji secara otomatis.
 
 Verifikasi deployment nyata tetap memerlukan URL database, bucket, kredensial, domain dan HTTPS milik Anda. Hasil pengerjaan dan batas pengujian tercatat di `VALIDATION.md`.
+
+## Hostinger: entry point dan batas startup
+
+Gunakan Node.js 24+, framework Express, root berisi package.json, startup file `server.js`, dan start command `npm start` jika diminta. `server.js` memulai server ketika dieksekusi langsung maupun ketika di-require oleh loader hosting. Factory `createApp` berada di `app.js`; jangan pilih `app.js` sebagai startup file. Unggah seluruh proyek terbaru karena server.js membutuhkan app.js dan modul lainnya.
+
+Jika log menyebut `App did not call listen() within 3 seconds`, pastikan versi terbaru server.js sudah dipakai. Tidak ada guard `require.main === module` pada entry tersebut. Inisialisasi database/migrasi tetap harus berhasil sebelum listen; untuk PostgreSQL jalankan migrasi terlebih dahulu dan gunakan AUTO_MIGRATE=false sesuai panduan. Uji /healthz setelah deploy; tes lokal tidak menggantikan verifikasi di Hostinger. Environment variables diatur melalui panel; .env pribadi tidak termasuk kode Git atau ZIP rilis.
