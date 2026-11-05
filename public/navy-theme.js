@@ -47,7 +47,8 @@ function applyNavyTheme(event) {
   intro.id = "weddingIntro";
   intro.className = "w-section wedding-intro";
   intro.innerHTML = `<p>The Wedding Of</p><h2>${esc(event.groomNick || "Mempelai pria")}</h2><span>AND</span><h2>${esc(event.brideNick || "Mempelai wanita")}</h2><a class="button" href="#weddingVerse">Lanjutkan undangan ↓</a>`;
-  hero.after(intro, verse, love);
+  hero.after(intro, verse);
+  invitation.querySelector("#couple").before(love);
   const maps = invitation.querySelector("#maps");
   if (!invitation.querySelector("#gallery")) {
     const gallery = document.createElement("section");

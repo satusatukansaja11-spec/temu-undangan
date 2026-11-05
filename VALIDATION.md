@@ -105,3 +105,7 @@ Chromium memeriksa label Preview/Bagikan/Hapus undangan/Keluar akun, membatalkan
 ## Musik saat buka undangan dan urutan pembuka — 5 November 2026
 
 Chromium memverifikasi audio nyata mulai dan waktu pemutaran bergerak setelah klik Buka Undangan, jeda/putar kembali, penolakan play yang tetap membuka undangan dan mengaktifkan kembali tombol, serta undangan tanpa musik. Intro nama tidak lagi berisi ayat; bagian berikutnya menampilkan foto lalu kutipan Ar-Rum, diikuti halaman WITH LOVE dan salam pembuka sesuai teks permintaan. Lebar 320/390/1440 tanpa overflow horizontal atau page error. Screenshot memakai data sintetis. Syntax check frontend dan git diff check lulus; backend tidak berubah. Pemutaran bergantung pada interaksi Buka Undangan dan kebijakan browser/perangkat; tidak mengklaim autoplay bersuara sebelum interaksi.
+
+## WITH LOVE halaman keempat dan judul mempelai — 5 November 2026
+
+Urutan setelah sampul dibuka: weddingIntro, weddingVerse, saveDate, withLove, couple. Chromium memeriksa WITH LOVE hanya muncul satu kali tepat sebelum Bride & Groom, salam pembuka tetap ada, judul mempelai menggunakan Great Vibes dan font benar-benar termuat. Lebar 320/390/1440 tanpa overflow horizontal atau page error. Screenshot memakai data sintetis. Syntax check dan git diff check lulus; backend tidak berubah.
