@@ -41,7 +41,7 @@ function applyNavyTheme(event) {
   const intro = document.createElement("section");
   intro.id = "weddingIntro";
   intro.className = "w-section wedding-intro";
-  intro.innerHTML = `<p>The Wedding Of</p><h2>${esc(event.groomNick || "Mempelai pria")}</h2><span>AND</span><h2>${esc(event.brideNick || "Mempelai wanita")}</h2><a class="button" href="#withLove">Lanjutkan undangan ↓</a>`;
+  intro.innerHTML = `<p>The Wedding Of</p><h2>${esc(event.groomNick || "Mempelai pria")}</h2><span>AND</span><h2>${esc(event.brideNick || "Mempelai wanita")}</h2><blockquote class="wedding-verse"><p>Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.</p><cite>- Ar-Rum · Ayat 21 -</cite></blockquote><a class="button" href="#withLove">Lanjutkan undangan ↓</a>`;
   hero.after(intro, love);
   const maps = invitation.querySelector("#maps");
   if (!invitation.querySelector("#gallery")) {

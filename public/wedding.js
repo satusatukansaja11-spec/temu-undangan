@@ -144,7 +144,7 @@ async function renderWedding(preview, id) {
       <section class="w-section maps-section" id="maps"><p class="w-eyebrow">MAPS</p><h2>Sampai jumpa di sana.</h2><p>Buka petunjuk arah untuk menuju lokasi acara.</p><div class="map-locations">${schedules.map((row) => `<article>${weddingIcon("map")}<h3>${esc(row.title)}</h3><p class="prose">${esc(row.address)}</p>${row.maps ? `<a class="button primary" href="${esc(row.maps)}" target="_blank" rel="noopener noreferrer">Buka Maps ${weddingIcon("arrow")}</a>` : "<p>Lokasi belum diisi.</p>"}</article>`).join("")}</div></section>
       ${e.gallery?.length ? `<section class="w-section gallery-section" id="gallery"><p class="w-eyebrow">PHOTO GALLERY</p><h2>Kenangan yang kami simpan.</h2><p>Sentuh foto untuk melihat lebih dekat.</p><div class="public-gallery">${e.gallery.map((photo, i) => `<button type="button" data-gallery="${i}" aria-label="Perbesar foto galeri ${i + 1}"><img loading="lazy" src="${esc(photo)}" alt="Kenangan kedua mempelai ${i + 1}" width="480" height="600"></button>`).join("")}</div></section>` : ""}
       ${hasGifts ? `<section class="w-section gift-section" id="gift"><p class="w-eyebrow">WEDDING GIFT</p><h2>Doa Anda adalah hadiah terindah.</h2><p>Jika ingin memberikan tanda kasih, Anda dapat menggunakan informasi berikut.</p><div class="gift-list">${(e.gifts || []).map((gift, i) => `<article><span>${esc(gift.bank)}</span><label class="sr-only" for="giftAccount${i}">Nomor ${esc(gift.bank)}</label><input id="giftAccount${i}" class="gift-number" value="${esc(gift.account)}" readonly><p>Atas nama ${esc(gift.holder)}</p><button type="button" class="button" data-copy-gift="${i}">${weddingIcon("copy")} Salin nomor</button></article>`).join("")}</div>${e.giftAddress ? `<div class="gift-address"><h3>Pengiriman hadiah</h3><p class="prose">${esc(e.giftAddress)}</p></div>` : ""}<small>Pastikan nomor dan nama penerima sesuai sebelum mengirim. Temu tidak memproses transfer.</small></section>` : ""}
-      ${e.rsvpEnabled !== false ? `<section class="w-section rsvp-section" id="rsvp"><p class="w-eyebrow">RSVP</p><h2>Kami menantikan kehadiran Anda.</h2><p>Konfirmasikan kehadiran dan titipkan doa untuk kami.</p><form id="rsvpForm"><label for="guestRsvpName">Nama Anda *</label><input id="guestRsvpName" name="name" maxlength="100" autocomplete="name" required><label for="guestAttendance">Konfirmasi kehadiran *</label><select id="guestAttendance" name="attendance" required><option value="">Pilih kehadiran</option><option value="attending">Ya, saya akan hadir</option><option value="not_attending">Maaf, saya tidak dapat hadir</option><option value="unsure">Saya belum dapat memastikan</option></select><label for="guestCount">Jumlah tamu (termasuk Anda) *</label><input id="guestCount" name="guests" type="number" inputmode="numeric" min="1" max="10" value="1" required><label for="guestMessage">Ucapan untuk mempelai (opsional)</label><textarea id="guestMessage" name="message" rows="4" maxlength="1000"></textarea><p id="rsvpFeedback" role="status" aria-live="polite"></p><button class="button primary" id="sendRsvp" ${preview ? "disabled" : ""}>${weddingIcon("check")} ${preview ? "RSVP tidak dikirim dari pratinjau" : "Kirim konfirmasi"}</button><small>Respons dan ucapan hanya dilihat penyelenggara. Ubah jawaban dari browser yang sama selama cookie tersedia.</small></form></section>` : ""}
+      ${e.rsvpEnabled !== false ? `<section class="w-section rsvp-section" id="rsvp"><p class="w-eyebrow">RSVP</p><h2>Kami menantikan kehadiran Anda.</h2><p>Konfirmasikan kehadiran dan titipkan doa untuk kami.</p><form id="rsvpForm"><label for="guestRsvpName">Nama Anda *</label><input id="guestRsvpName" name="name" maxlength="100" autocomplete="name" required><label for="guestAttendance">Konfirmasi kehadiran *</label><select id="guestAttendance" name="attendance" required><option value="">Pilih kehadiran</option><option value="attending">Ya, saya akan hadir</option><option value="not_attending">Maaf, saya tidak dapat hadir</option><option value="unsure">Saya belum dapat memastikan</option></select><label for="guestMessage">Ucapan untuk mempelai (opsional)</label><textarea id="guestMessage" name="message" rows="4" maxlength="1000"></textarea><p id="rsvpFeedback" role="status" aria-live="polite"></p><button class="button primary" id="sendRsvp" ${preview ? "disabled" : ""}>${weddingIcon("check")} ${preview ? "RSVP tidak dikirim dari pratinjau" : "Kirim konfirmasi"}</button><small>Respons dan ucapan hanya dilihat penyelenggara. Ubah jawaban dari browser yang sama selama cookie tersedia.</small></form></section>` : ""}
       <section class="w-section closing"><span aria-hidden="true">✳</span><p class="prose">${esc(e.closing)}</p><h2>${esc(e.groomNick)} & ${esc(e.brideNick)}</h2><small>Dirangkai dengan sepenuh hati bersama temu.</small></section>
       <nav class="wedding-nav" aria-label="Navigasi undangan"><a href="#weddingHome">${weddingIcon("heart")}<span>Awal</span></a><a href="#couple">${weddingIcon("heart")}<span>Mempelai</span></a><a href="#schedule">${weddingIcon("calendar")}<span>Acara</span></a><a href="#maps">${weddingIcon("map")}<span>Maps</span></a>${e.gallery?.length ? `<a href="#gallery">${weddingIcon("photos")}<span>Galeri</span></a>` : ""}${e.rsvpEnabled !== false ? `<a href="#rsvp">${weddingIcon("check")}<span>RSVP</span></a>` : ""}${e.music === "piano" || e.music?.startsWith("track:") ? `<button type="button" id="musicToggle" aria-pressed="false" aria-label="Putar musik">${weddingIcon("music")}<span>Musik</span></button>` : ""}</nav>
       ${e.music === "piano" || e.music?.startsWith("track:") ? `<audio id="audio" loop src="${e.music === "piano" ? "/music/piano.wav" : "/audio/" + esc(e.music.slice(6))}" preload="none"></audio>` : ""}
@@ -268,22 +268,13 @@ function bindWeddingGallery(photos) {
 async function bindGuestRsvp(slug, preview) {
   const form = document.querySelector("#rsvpForm"),
     feedback = document.querySelector("#rsvpFeedback"),
-    count = document.querySelector("#guestCount"),
     attendance = document.querySelector("#guestAttendance");
-  const setCount = () => {
-    const attends = attendance.value === "attending";
-    count.disabled = !attends;
-    count.min = attends ? "1" : "0";
-    count.value = attends ? String(Math.max(1, Number(count.value))) : "0";
-  };
-  attendance.onchange = setCount;
-  setCount();
+  let savedGuests = 1;
   const setResponse = (response) => {
     form.elements.name.value = response.name;
     attendance.value = response.attendance;
-    count.value = response.guests;
+    savedGuests = Number(response.guests) || 1;
     form.elements.message.value = response.message;
-    setCount();
   };
   if (preview) {
     feedback.textContent =
@@ -316,7 +307,7 @@ async function bindGuestRsvp(slug, preview) {
         body: JSON.stringify({
           name: form.elements.name.value,
           attendance: attendance.value,
-          guests: Number(count.value),
+          guests: attendance.value === "attending" ? Math.max(1, savedGuests) : 0,
           message: form.elements.message.value,
         }),
       });
