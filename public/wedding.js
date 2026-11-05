@@ -173,22 +173,27 @@ async function renderWedding(preview, id) {
     if (e.music === "piano" || e.music?.startsWith("track:")) {
       const audio = document.querySelector("#audio"),
         button = document.querySelector("#musicToggle");
+      const syncMusic = () => {
+        const playing = !audio.paused;
+        button.innerHTML = weddingIcon("music") + `<span>${playing ? "Jeda" : "Musik"}</span>`;
+        button.setAttribute("aria-label", playing ? "Jeda musik" : "Putar musik");
+        button.setAttribute("aria-pressed", String(playing));
+      };
+      audio.addEventListener("play", syncMusic);
+      audio.addEventListener("pause", syncMusic);
+      audio.addEventListener("error", () => {
+        audio.pause();
+        syncMusic();
+      });
       button.onclick = async () => {
         button.disabled = true;
         try {
-          if (audio.paused) {
-            await audio.play();
-            button.innerHTML = weddingIcon("music") + "<span>Jeda</span>";
-            button.setAttribute("aria-label", "Jeda musik");
-          } else {
-            audio.pause();
-            button.innerHTML = weddingIcon("music") + "<span>Musik</span>";
-            button.setAttribute("aria-label", "Putar musik");
-          }
-          button.setAttribute("aria-pressed", String(!audio.paused));
+          if (audio.paused) await audio.play();
+          else audio.pause();
         } catch {
-          toast("Musik belum dapat diputar. Silakan coba lagi.");
+          toast("Musik belum dapat diputar. Tekan tombol Musik untuk mencoba lagi.");
         } finally {
+          syncMusic();
           button.disabled = false;
         }
       };

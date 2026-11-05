@@ -143,7 +143,7 @@ Di dashboard → **Edit undangan → Info & tampilan**:
 
 1. Isi judul lagu, pilih file MP3/M4A/OGG/WAV, lalu **Unggah lagu**.
 2. Pilih lagu pada **Musik latar**, kemudian **Simpan**. Lagu yang baru diunggah belum menjadi musik publik sebelum undangan disimpan.
-3. Musik tidak autoplay. Tamu menekan tombol musik di navigasi bawah. Pilihan None menghilangkan pemutar.
+3. Musik mulai diputar saat tamu menekan Buka Undangan. Tombol musik di navigasi bawah dapat menjeda dan memutar kembali. Jika browser menolak pemutaran, tamu dapat menekan tombol Musik untuk mencoba lagi. Pilihan None menghilangkan pemutar.
 4. Menghapus lagu yang sedang dipakai langsung mengubah musik tersimpan menjadi None. Penghapusan meminta konfirmasi.
 
 Di **Galeri foto**:

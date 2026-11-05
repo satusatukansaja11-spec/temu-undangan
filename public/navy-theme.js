@@ -34,15 +34,20 @@ function applyNavyTheme(event) {
   const open = title.querySelector(".wedding-open");
   open.before(label, guest);
   open.href = "#weddingIntro";
+  const verse = document.createElement("section");
+  verse.id = "weddingVerse";
+  verse.className = "w-section with-love verse-page";
+  verse.setAttribute("aria-label", "Ar-Rum ayat 21");
+  verse.innerHTML = `${event.gallery?.[0] || event.cover ? `<img src="${esc(event.gallery?.[0] || event.cover)}" alt="Momen kedua mempelai" loading="lazy">` : ""}<blockquote class="wedding-verse"><p>Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.</p><cite>- Ar-Rum · Ayat 21 -</cite></blockquote>`;
   const love = document.createElement("section");
   love.id = "withLove";
-  love.className = "w-section with-love";
-  love.innerHTML = `${event.gallery?.[0] || event.cover ? `<img src="${esc(event.gallery?.[0] || event.cover)}" alt="Momen kedua mempelai" loading="lazy">` : ""}<p class="w-eyebrow">WITH LOVE</p><h2>Awal indah untuk selamanya.</h2><p class="prose">${esc(event.opening)}</p>`;
+  love.className = "w-section with-love love-opening";
+  love.innerHTML = `<p class="w-eyebrow">WITH LOVE</p><h2>Awal indah untuk selamanya.</h2><p class="prose">Assalamu’alaikum warahmatullahi wabarakatuh. Dengan memohon rahmat dan rida Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk menghadiri pernikahan kami.</p>`;
   const intro = document.createElement("section");
   intro.id = "weddingIntro";
   intro.className = "w-section wedding-intro";
-  intro.innerHTML = `<p>The Wedding Of</p><h2>${esc(event.groomNick || "Mempelai pria")}</h2><span>AND</span><h2>${esc(event.brideNick || "Mempelai wanita")}</h2><blockquote class="wedding-verse"><p>Di antara tanda-tanda (kebesaran)-Nya ialah bahwa Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.</p><cite>- Ar-Rum · Ayat 21 -</cite></blockquote><a class="button" href="#withLove">Lanjutkan undangan ↓</a>`;
-  hero.after(intro, love);
+  intro.innerHTML = `<p>The Wedding Of</p><h2>${esc(event.groomNick || "Mempelai pria")}</h2><span>AND</span><h2>${esc(event.brideNick || "Mempelai wanita")}</h2><a class="button" href="#weddingVerse">Lanjutkan undangan ↓</a>`;
+  hero.after(intro, verse, love);
   const maps = invitation.querySelector("#maps");
   if (!invitation.querySelector("#gallery")) {
     const gallery = document.createElement("section");
@@ -80,6 +85,8 @@ function applyNavyTheme(event) {
   if (firstLink) firstLink.href = "#weddingIntro";
   open.onclick = (e) => {
     e.preventDefault();
+    if (invitation.querySelector("#audio")?.paused)
+      invitation.querySelector("#musicToggle")?.click();
     invitation.classList.add("is-open");
     hero.hidden = true;
     panel.scrollTop = 0;

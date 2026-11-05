@@ -101,3 +101,7 @@ Tes backend lokal: 40 lulus, 0 gagal; dua tes layanan eksternal dilewati. Chromi
 ## Label aksi, intro ayat dan RSVP — 5 November 2026
 
 Chromium memeriksa label Preview/Bagikan/Hapus undangan/Keluar akun, membatalkan serta mengonfirmasi penghapusan draft QA, dan logout. Halaman pertama setelah buka sampul memakai Great Vibes untuk nama dari data mempelai serta kutipan Ar-Rum ayat 21 sesuai permintaan. RSVP publik berhasil tanpa input jumlah tamu; respons baru yang hadir dihitung satu, sementara jumlah pada respons lama dipertahankan saat status hadir tetap dipilih. Lebar 320/390/1440 diperiksa tanpa overflow horizontal atau page error. Screenshot memakai data sintetis. Syntax check frontend dan git diff check lulus; suite backend tidak diulang karena tidak ada perubahan backend.
+
+## Musik saat buka undangan dan urutan pembuka — 5 November 2026
+
+Chromium memverifikasi audio nyata mulai dan waktu pemutaran bergerak setelah klik Buka Undangan, jeda/putar kembali, penolakan play yang tetap membuka undangan dan mengaktifkan kembali tombol, serta undangan tanpa musik. Intro nama tidak lagi berisi ayat; bagian berikutnya menampilkan foto lalu kutipan Ar-Rum, diikuti halaman WITH LOVE dan salam pembuka sesuai teks permintaan. Lebar 320/390/1440 tanpa overflow horizontal atau page error. Screenshot memakai data sintetis. Syntax check frontend dan git diff check lulus; backend tidak berubah. Pemutaran bergantung pada interaksi Buka Undangan dan kebijakan browser/perangkat; tidak mengklaim autoplay bersuara sebelum interaksi.

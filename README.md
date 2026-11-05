@@ -44,7 +44,7 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 - Validasi browser serta decoding isi gambar di backend. Hanya JPEG, PNG, WebP; maksimal 10 MB secara default dan 40 megapiksel; metadata dibuang, dirotasi dan diubah menjadi WebP maksimal 2000×2000. SVG/HTML/gambar rusak ditolak.
 - Salam sesuai pilihan agama; template baru diterapkan dengan tindakan pengguna. Perubahan agama tidak menimpa teks buatan pengguna.
 - URL unik acak per acara, halaman publik tanpa identitas akun/ID internal, draft dan URL tak ditemukan ditangani.
-- Musik `None`, lagu unggahan pribadi, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Kontrol putar/jeda, tanpa autoplay; `None` tidak membuat elemen audio. Lagu pribadi diunggah lewat editor, kemudian dipilih dan disimpan sebelum dibagikan.
+- Musik `None`, lagu unggahan pribadi, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Musik mulai saat Buka Undangan ditekan, dengan kontrol putar/jeda; `None` tidak membuat elemen audio. Lagu pribadi diunggah lewat editor, kemudian dipilih dan disimpan sebelum dibagikan.
 - Sebar membuka dialog pesan yang bisa diedit; tautan WhatsApp terisi teks dan URL. Pengguna sendiri membuka WhatsApp dan mengirim. Aplikasi tidak mengirim pesan otomatis.
 
 Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Jenis acara lain, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
@@ -122,7 +122,7 @@ Halaman login pada ponsel:
 
 ## Undangan lengkap dan tampilan HP — 3 November 2026
 
-Halaman publik `/u/:slug` kini memiliki cover, **countdown + Save the Date**, profil masing-masing mempelai, **love story**, **susunan acara**, **Maps**, **photo gallery**, **wedding gift**, dan **RSVP**. Navigasi tetap di bawah layar, target sentuh sekitar 44 px, form 16 px untuk menghindari zoom otomatis di HP, gambar galeri lazy-loaded, serta kontrol musik tidak menutup navigasi. Animasi menghormati reduced motion; musik tetap tanpa autoplay.
+Halaman publik `/u/:slug` kini memiliki cover, **countdown + Save the Date**, profil masing-masing mempelai, **love story**, **susunan acara**, **Maps**, **photo gallery**, **wedding gift**, dan **RSVP**. Navigasi tetap di bawah layar, target sentuh sekitar 44 px, form 16 px untuk menghindari zoom otomatis di HP, gambar galeri lazy-loaded, serta kontrol musik tidak menutup navigasi. Animasi menghormati reduced motion; musik mulai saat Buka Undangan ditekan.
 
 ### Pengisian dari dashboard
 
@@ -195,7 +195,7 @@ SQL baru: `003_sharing.sql` untuk SQLite/PostgreSQL. Untuk server dengan `AUTO_M
 
 Undangan publik/pratinjau kini memakai ornamen navy–ivory dengan ilustrasi botani dan paviliun yang dibuat berdasarkan nuansa referensi pengguna. Aset dekoratif lokal telah dioptimalkan ke WebP; foto dan nama mempelai tetap berasal dari data acara, bukan foto/nama contoh pada referensi.
 
-Pada laptop (lebar 1024 px ke atas), foto sampul besar menetap di kiri, sementara panel undangan 480 px di kanan dapat digulir sendiri. Di HP/tablet, hanya satu kolom undangan ditampilkan. Sampul awal menampilkan foto berbingkai oval emas, nama mempelai, nama penerima dari tautan Sebar dan tombol Buka Undangan. Tombol membuka isi With Love, countdown, profil mempelai, cerita, jadwal, Maps, galeri, gift dan RSVP. Musik tetap manual, tanpa autoplay.
+Pada laptop (lebar 1024 px ke atas), foto sampul besar menetap di kiri, sementara panel undangan 480 px di kanan dapat digulir sendiri. Di HP/tablet, hanya satu kolom undangan ditampilkan. Sampul awal menampilkan foto berbingkai oval emas, nama mempelai, nama penerima dari tautan Sebar dan tombol Buka Undangan. Tombol membuka isi With Love, countdown, profil mempelai, cerita, jadwal, Maps, galeri, gift dan RSVP. Musik mulai saat Buka Undangan ditekan dan dapat dijeda lewat tombol musik.
 
 With Love memakai ucapan pembuka pemilik acara. Tidak ada ayat atau salam agama yang ditambahkan otomatis dari gambar referensi. Pembaruan ini tidak mengubah schema database atau data acara.
 
