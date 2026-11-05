@@ -224,3 +224,11 @@ Bagian undangan muncul dengan gerakan float in saat masuk area pandang, satu kal
 Susunan acara kini berupa timeline vertikal emas dengan posisi judul/deskripsi dan waktu bergantian, sesuai urutan jadwal utama lalu rangkaian tambahan. Tanggal, jam dan zona waktu tetap berasal dari acara pengguna. Tambahkan deskripsi opsional maksimal 1.000 karakter melalui Waktu & tempat untuk jadwal utama, atau Susunan acara untuk rangkaian tambahan. Jika deskripsi kosong, lokasi tetap ditampilkan sebagai keterangan. Tidak ada agenda contoh yang otomatis ditambahkan ke undangan nyata.
 
 [Pratinjau timeline di HP](docs/images/timeline-mobile.png) memakai data pengujian.
+
+## Pesan WhatsApp dan Sampai Selesai
+
+Menu Sebar menyediakan template Sesuai agama (default mengikuti agama acara) dengan nama penerima, tanggal beserta hari, waktu/zona, lokasi dan tautan personal. Islam menggunakan salam pembuka/penutup dan format pesan yang diminta; agama lain memakai salam masing-masing. Template lama tetap tersimpan dan dapat diganti melalui pilihan template. Placeholder: `{nama}`, `{acara}`, `{tanggal}`, `{waktu}`, `{lokasi}`, `{link_undangan}` atau `{link}`.
+
+Halaman publik mengirim metadata Open Graph langsung dari server, menggunakan judul dan foto sampul milik undangan siap dibagikan. WhatsApp perlu dapat mengakses domain HTTPS dan foto tanpa login; localhost tidak dapat dipakai untuk pratinjau eksternal. Cache dan tampilan kartu ditentukan WhatsApp; wa.me menyiapkan pesan dan tidak mengirim lampiran foto secara otomatis. Isi pesan tetap dapat ditinjau sebelum pengguna mengirimnya.
+
+Pada Waktu & tempat, tombol Sampai Selesai di bawah jam selesai menonaktifkan jam tersebut; klik lagi untuk kembali mengisi waktu pasti. Pilihan tersimpan dalam data SQL acara, tanpa migrasi skema tambahan. Timeline dan pesan menampilkan jam mulai – Selesai. File kalender hanya ditawarkan saat waktu akhir pasti tersedia, sehingga aplikasi tidak mengarang jam selesai. Rangkaian tambahan tetap memakai jam selesai masing-masing.

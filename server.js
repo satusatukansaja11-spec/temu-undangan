@@ -160,7 +160,10 @@ async function createApp(opts = {}) {
       "closing",
     ];
     function missing(d) {
-      return [...required.filter((k) => !d[k]), ...weddingMissing(d)];
+      return [
+        ...required.filter((k) => !d[k] && !(k === "end" && d.untilFinished)),
+        ...weddingMissing(d),
+      ];
     }
     async function validate(req, d) {
       if (!d || typeof d !== "object" || Array.isArray(d))
@@ -178,6 +181,10 @@ async function createApp(opts = {}) {
         clean[k] = (d[k] || "").trim();
         if (clean[k].length > 6000) throw fail(400, "Teks terlalu panjang.");
       }
+      if (d.untilFinished !== undefined && typeof d.untilFinished !== "boolean")
+        throw fail(400, "Pilihan Sampai Selesai tidak valid.");
+      clean.untilFinished = d.untilFinished === true;
+      if (clean.untilFinished) clean.end = "";
       clean.music = clean.music || "none";
       if (
         !["none", "piano"].includes(clean.music) &&
@@ -345,16 +352,59 @@ async function createApp(opts = {}) {
       next();
     });
     app.use(express.static(path.join(__dirname, "public")));
+    app.get("/u/:slug", async (req, res) => {
+      const event = await db
+        .prepare("SELECT * FROM events WHERE slug=? AND status='ready'")
+        .get(req.params.slug);
+      if (!event)
+        return res
+          .status(404)
+          .type("html")
+          .send("<h1>Undangan tidak ditemukan atau belum siap dibagikan.</h1>");
+      const data = JSON.parse(event.data);
+      const escape = (value) =>
+        String(value || "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      const url = new URL("/u/" + event.slug, origin).href;
+      const title = data.name || `${data.groomNick} & ${data.brideNick}`;
+      const description = [
+        "Undangan Pernikahan",
+        data.date,
+        data.start &&
+          `${data.start} – ${data.untilFinished ? "Selesai" : data.end}`,
+        data.address,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      const photo = data.cover?.startsWith("/media/")
+        ? new URL(data.cover, origin).href
+        : "";
+      const metadata = `<meta property="og:type" content="website"><meta property="og:site_name" content="Temu"><meta property="og:title" content="${escape(title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${escape(url)}">${photo ? `<meta property="og:image" content="${escape(photo)}"><meta property="og:image:type" content="image/webp"><meta property="og:image:alt" content="Foto sampul ${escape(title)}">` : ""}<meta name="twitter:card" content="summary_large_image">`;
+      const html = await fs.promises.readFile(
+        path.join(__dirname, "public/index.html"),
+        "utf8",
+      );
+      res.type("html").send(
+        html
+          .replace(/<title>.*?<\/title>/, () => `<title>${escape(title)}</title>`)
+          .replace(
+            /<meta name="description"[^>]*>/,
+            () => `<meta name="description" content="${escape(description)}">`,
+          )
+          .replace("</head>", () => metadata + "</head>"),
+      );
+    });
     app.get(
-      [
-        "/",
-        "/login",
-        "/daftar",
-        "/dashboard",
-        "/layar-tamu",
-        "/u/:slug",
-        "/preview/:id",
-      ],
+      ["/", "/login", "/daftar", "/dashboard", "/layar-tamu", "/preview/:id"],
       (req, res) => res.sendFile(path.join(__dirname, "public/index.html")),
     );
     app.use((err, req, res, next) => {

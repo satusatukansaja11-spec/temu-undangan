@@ -126,6 +126,74 @@ test("Undangan lengkap: cerita, rangkaian, hadiah, kalender, dan RSVP privat", a
       request(`/api/events/${event.id}`, { method: "PUT", body: data });
     const publicPath = "/api/public/" + event.slug;
     await t.test(
+      "Sampai Selesai persisten dan pratinjau bot hanya untuk undangan siap",
+      async () => {
+        let response = await save({ ...full, untilFinished: true, end: "" });
+        assert.equal(response.status, 200);
+        let data = await response.json();
+        assert.equal(data.status, "ready");
+        assert.equal(data.untilFinished, true);
+        data = await (await request(publicPath, { user: null })).json();
+        assert.equal(data.end, "");
+        assert.equal(data.untilFinished, true);
+        assert.equal(
+          (await save({ ...full, untilFinished: "true" })).status,
+          400,
+        );
+        assert.equal(
+          (await save({ ...full, untilFinished: false, end: "09:00" })).status,
+          400,
+        );
+        await save({ ...full, untilFinished: false, end: "" });
+        assert.equal(
+          (await request("/u/" + event.slug, { user: null })).status,
+          404,
+        );
+        await save({
+          ...full,
+          name: 'Arif & "Nisa" <contoh>',
+          untilFinished: true,
+        });
+        const html = await (
+          await request("/u/" + event.slug + "?to=NamaRahasia", { user: null })
+        ).text();
+        assert.match(
+          html,
+          /property="og:image" content="http:\/\/localhost:3000\/media\//,
+        );
+        assert.match(
+          html,
+          /property="og:title" content="Arif &amp; &quot;Nisa&quot; &lt;contoh&gt;"/,
+        );
+        assert.ok(!html.includes("NamaRahasia"));
+        assert.equal((await request(photo, { user: null })).status, 200);
+        assert.equal(
+          (
+            await request(`/api/public/${event.slug}/calendar.ics`, {
+              user: null,
+            })
+          ).status,
+          400,
+        );
+        const message = "Yth. {nama} {link_undangan}";
+        assert.equal(
+          (
+            await request(`/api/events/${event.id}/sharing`, {
+              method: "PUT",
+              body: { message },
+            })
+          ).status,
+          200,
+        );
+        assert.equal(
+          (await (await request(`/api/events/${event.id}/sharing`)).json())
+            .message,
+          message,
+        );
+        await save(full);
+      },
+    );
+    await t.test(
       "Data tambahan disimpan dan dibaca kembali tanpa identitas pemilik",
       async () => {
         const result = await save(full);

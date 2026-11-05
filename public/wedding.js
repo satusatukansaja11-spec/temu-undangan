@@ -119,6 +119,7 @@ async function renderWedding(preview, id) {
         date: e.date,
         start: e.start,
         end: e.end,
+        untilFinished: e.untilFinished,
         address: e.address,
         maps: e.maps,
       },
@@ -175,8 +176,12 @@ async function renderWedding(preview, id) {
         button = document.querySelector("#musicToggle");
       const syncMusic = () => {
         const playing = !audio.paused;
-        button.innerHTML = weddingIcon("music") + `<span>${playing ? "Jeda" : "Musik"}</span>`;
-        button.setAttribute("aria-label", playing ? "Jeda musik" : "Putar musik");
+        button.innerHTML =
+          weddingIcon("music") + `<span>${playing ? "Jeda" : "Musik"}</span>`;
+        button.setAttribute(
+          "aria-label",
+          playing ? "Jeda musik" : "Putar musik",
+        );
         button.setAttribute("aria-pressed", String(playing));
       };
       audio.addEventListener("play", syncMusic);
@@ -191,7 +196,9 @@ async function renderWedding(preview, id) {
           if (audio.paused) await audio.play();
           else audio.pause();
         } catch {
-          toast("Musik belum dapat diputar. Tekan tombol Musik untuk mencoba lagi.");
+          toast(
+            "Musik belum dapat diputar. Tekan tombol Musik untuk mencoba lagi.",
+          );
         } finally {
           syncMusic();
           button.disabled = false;
@@ -312,7 +319,8 @@ async function bindGuestRsvp(slug, preview) {
         body: JSON.stringify({
           name: form.elements.name.value,
           attendance: attendance.value,
-          guests: attendance.value === "attending" ? Math.max(1, savedGuests) : 0,
+          guests:
+            attendance.value === "attending" ? Math.max(1, savedGuests) : 0,
           message: form.elements.message.value,
         }),
       });

@@ -15,15 +15,16 @@ async function renderSharing(event) {
       Formal:
         "Kepada Yth. {nama},\n\nDengan hormat, kami mengundang Bapak/Ibu/Saudara/i pada {acara}. Informasi acara tersedia melalui:\n{link}\n\nTerima kasih atas perhatian dan kehadirannya.",
     };
-    if (event.religion && event.religion !== "Umum")
-      templates["Sesuai agama"] =
-        greetings[event.religion] +
-        "\n\nYth. {nama}\n{acara}\n{link}\n\nTerima kasih atas doa restu Anda.";
+    templates["Sesuai agama"] = weddingShareTemplate(event.religion);
+    const defaultTemplate =
+      event.religion && event.religion !== "Umum"
+        ? "Sesuai agama"
+        : "Universal";
     shell(
-      `<main class="share-page"><button class="text-button" id="shareBack">← Undangan saya</button><section class="share-heading"><p class="eyebrow">HADIRKAN ORANG TERKASIH</p><h1>Sebar undangan</h1><p>Tema <strong>Navy Ivory</strong></p>${event.cover ? `<img src="${esc(event.cover)}" alt="Sampul acara">` : ""}<h2>${esc(event.name)}</h2></section><p class="share-notice">Tambahkan nama penerima, tinjau pesan, lalu buka WhatsApp. Pengiriman dilakukan sendiri oleh Anda, satu penerima setiap kali.</p><div class="share-tools"><label class="button" for="importRecipients">Import nama</label><input id="importRecipients" type="file" accept="application/json,.json" hidden><button id="exportRecipients">Export nama</button></div><section class="share-compose"><h2>Sesuaikan kata-kata pengiriman</h2><label for="messageTemplate">Pilih template kalimat sebar</label><div class="share-template-options" id="messageTemplate">${[...Object.keys(templates), "Custom"].map((name, i) => `<label><input type="radio" name="shareTemplate" value="${esc(name)}" ${i === 0 ? "checked" : ""}> ${name}</label>`).join("")}</div><label for="shareMessage">Pesan undangan</label><textarea id="shareMessage" rows="8" maxlength="4000"></textarea><small>Gunakan {nama}, {acara}, dan {link}. Nama dan tautan personal akan diganti untuk setiap penerima.</small><button id="saveShareMessage" class="primary">Simpan pesan</button><p id="messageStatus" role="status"></p></section><section class="share-recipients"><h2>Daftar penerima <span id="recipientCount"></span></h2><p>Nama tersimpan di akun Anda dan tidak ditampilkan sebagai daftar publik.</p><form id="recipientForm"><label class="sr-only" for="recipientName">Nama penerima</label><input id="recipientName" placeholder="Tambah nama penerima" maxlength="100" required><button class="primary" id="addRecipient">Tambah</button></form><p id="recipientStatus" role="status"></p><div id="recipientList"></div></section><dialog id="recipientPreview" aria-labelledby="recipientPreviewTitle"><h2 id="recipientPreviewTitle">Tinjau pesan WhatsApp</h2><label for="recipientPreviewMessage">Pesan untuk penerima</label><textarea id="recipientPreviewMessage" rows="10"></textarea><p>Anda dapat mengedit pesan ini sebelum membuka WhatsApp.</p><div class="actions"><button id="closeRecipientPreview">Batal</button><a class="button share-wa" id="openRecipientWa" target="_blank" rel="noopener noreferrer">Buka WhatsApp</a></div></dialog></main>`,
+      `<main class="share-page"><button class="text-button" id="shareBack">← Undangan saya</button><section class="share-heading"><p class="eyebrow">HADIRKAN ORANG TERKASIH</p><h1>Sebar undangan</h1><p>Tema <strong>Navy Ivory</strong></p>${event.cover ? `<img src="${esc(event.cover)}" alt="Sampul acara">` : ""}<h2>${esc(event.name)}</h2></section><p class="share-notice">Tambahkan nama penerima, tinjau pesan, lalu buka WhatsApp. Foto sampul dipakai sebagai pratinjau tautan WhatsApp. Pratinjau memerlukan URL publik HTTPS dan dapat tersimpan dalam cache WhatsApp. Pengiriman dilakukan sendiri oleh Anda, satu penerima setiap kali.</p><div class="share-tools"><label class="button" for="importRecipients">Import nama</label><input id="importRecipients" type="file" accept="application/json,.json" hidden><button id="exportRecipients">Export nama</button></div><section class="share-compose"><h2>Sesuaikan kata-kata pengiriman</h2><label for="messageTemplate">Pilih template kalimat sebar</label><div class="share-template-options" id="messageTemplate">${[...Object.keys(templates), "Custom"].map((name, i) => `<label><input type="radio" name="shareTemplate" value="${esc(name)}" ${name === defaultTemplate ? "checked" : ""}> ${name}</label>`).join("")}</div><label for="shareMessage">Pesan undangan</label><textarea id="shareMessage" rows="8" maxlength="4000"></textarea><small>Gunakan {nama}, {acara}, {tanggal}, {waktu}, {lokasi}, dan {link_undangan} (atau {link}). Nama dan tautan personal akan diganti untuk setiap penerima.</small><button id="saveShareMessage" class="primary">Simpan pesan</button><p id="messageStatus" role="status"></p></section><section class="share-recipients"><h2>Daftar penerima <span id="recipientCount"></span></h2><p>Nama tersimpan di akun Anda dan tidak ditampilkan sebagai daftar publik.</p><form id="recipientForm"><label class="sr-only" for="recipientName">Nama penerima</label><input id="recipientName" placeholder="Tambah nama penerima" maxlength="100" required><button class="primary" id="addRecipient">Tambah</button></form><p id="recipientStatus" role="status"></p><div id="recipientList"></div></section><dialog id="recipientPreview" aria-labelledby="recipientPreviewTitle"><h2 id="recipientPreviewTitle">Tinjau pesan WhatsApp</h2>${event.cover ? `<img class="share-preview-photo" src="${esc(event.cover)}" alt="Foto sampul untuk pratinjau tautan"><small>Foto pratinjau tautan; tampilan akhirnya mengikuti WhatsApp.</small>` : ""}<label for="recipientPreviewMessage">Pesan untuk penerima</label><textarea id="recipientPreviewMessage" rows="10"></textarea><p>Anda dapat mengedit pesan ini sebelum membuka WhatsApp.</p><div class="actions"><button id="closeRecipientPreview">Batal</button><a class="button share-wa" id="openRecipientWa" target="_blank" rel="noopener noreferrer">Buka WhatsApp</a></div></dialog></main>`,
     );
     const message = document.querySelector("#shareMessage");
-    message.value = state.message || universal;
+    message.value = state.message || templates[defaultTemplate];
     if (state.message)
       document.querySelector("[name=shareTemplate][value=Custom]").checked =
         true;
@@ -34,15 +35,7 @@ async function renderSharing(event) {
       return url.href;
     };
     const textFor = (name) =>
-      message.value.replace(
-        /\{nama\}|\{acara\}|\{link\}/g,
-        (token) =>
-          ({
-            "{nama}": name,
-            "{acara}": event.name,
-            "{link}": personalUrl(name),
-          })[token],
-      );
+      fillWeddingShareMessage(message.value, event, name, personalUrl(name));
     const feedback = (text) =>
       (document.querySelector("#recipientStatus").textContent = text);
     const copy = async (text) => {
@@ -137,7 +130,7 @@ async function renderSharing(event) {
         (r.onchange = () => {
           if (r.value !== "Custom") {
             if (
-              message.value !== universal &&
+              message.value !== templates[r.value] &&
               !confirm("Ganti isi pesan dengan template yang dipilih?")
             )
               return;
@@ -226,4 +219,40 @@ async function renderSharing(event) {
   } catch (error) {
     toast(error.message);
   }
+}
+
+function weddingShareTemplate(religion) {
+  const islam = religion === "Islam";
+  const opening = islam
+    ? "Assalamu'alaikum. Wr. Wb.\n\nDengan Rahmat dan Ridho Allah SWT. Kami bermaksud mengundang Bapak/Ibu/Saudara/i di acara kami,"
+    : greetings[religion] || greetings.Umum;
+  return `${opening}\n\nYth. {nama}\n\nPada Pernikahan\n{acara}\n🗓️ Tanggal: {tanggal}\n🕛 Pukul: {waktu}\n📍 Lokasi: {lokasi}\n\nLink undangan bisa diakses lengkap di:\n{link_undangan}\n\nMerupakan suatu kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir di acara kami\nMohon maaf perihal undangan hanya di bagikan melalui pesan ini\nTerima kasih banyak atas perhatiannya${islam ? "\n\nWassalamu'alaikum. Wr. Wb" : ""}`;
+}
+function fillWeddingShareMessage(template, event, name, link) {
+  const zone =
+    { "Asia/Jakarta": "WIB", "Asia/Makassar": "WITA", "Asia/Jayapura": "WIT" }[
+      event.timezone || "Asia/Jakarta"
+    ] || "WIB";
+  const values = {
+    nama: name,
+    acara: event.name,
+    tanggal: event.date
+      ? new Date(event.date + "T12:00:00").toLocaleDateString("id-ID", {
+          weekday: "long",
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "Tanggal akan diumumkan",
+    waktu: event.start
+      ? `${event.start} - ${event.untilFinished ? "Selesai" : event.end || "Selesai"} ${zone}`
+      : "Waktu akan diumumkan",
+    lokasi: event.address || "Lokasi akan diumumkan",
+    link,
+    link_undangan: link,
+  };
+  return template.replace(
+    /\{(nama|acara|tanggal|waktu|lokasi|link_undangan|link)\}/g,
+    (_, key) => values[key] || "",
+  );
 }

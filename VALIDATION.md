@@ -109,3 +109,7 @@ Chromium memverifikasi audio nyata mulai dan waktu pemutaran bergerak setelah kl
 ## WITH LOVE halaman keempat dan judul mempelai — 5 November 2026
 
 Urutan setelah sampul dibuka: weddingIntro, weddingVerse, saveDate, withLove, couple. Chromium memeriksa WITH LOVE hanya muncul satu kali tepat sebelum Bride & Groom, salam pembuka tetap ada, judul mempelai menggunakan Great Vibes dan font benar-benar termuat. Lebar 320/390/1440 tanpa overflow horizontal atau page error. Screenshot memakai data sintetis. Syntax check dan git diff check lulus; backend tidak berubah.
+
+## WhatsApp dan Sampai Selesai — 5 November 2026
+
+Pengujian backend mencakup persistensi pilihan waktu selesai, status ready tanpa jam akhir jika Sampai Selesai dipilih, penolakan tipe salah/jam terbalik, metadata Open Graph tanpa JavaScript, escape judul, foto sampul publik tanpa login, penolakan preview draft, kalender tanpa jam akhir, dan penyimpanan placeholder link_undangan. Pengujian pesan mencakup format Islam, salam agama lain, hari/tanggal, zona waktu, waktu pasti/Selesai dan substitusi satu kali untuk nama penerima. Chromium memeriksa simpan/muat ulang, pesan personal terenkode, preview foto dalam dialog, alias template tersimpan, timeline publik, serta lebar 320/390/1440 tanpa overflow horizontal/page error. Screenshot memakai data sintetis. Tidak mengirim WhatsApp nyata atau mengklaim pratinjau kartu sudah diverifikasi oleh crawler WhatsApp; perlu domain publik HTTPS. Tes PostgreSQL/S3 eksternal tetap dilewati.

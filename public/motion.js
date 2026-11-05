@@ -54,5 +54,5 @@ function startWeddingMotion(invitation, panel) {
   };
 }
 function scheduleTimeline(schedules, zone) {
-  return `<ol class="schedule-timeline">${schedules.map((row, i) => `<li><div class="agenda-details"><h3>${esc(row.title)}</h3><p>${row.date ? date(row.date) : "Tanggal belum diisi"}</p><p class="prose">${esc(row.description || row.address || "")}</p></div><span class="agenda-marker" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><div class="agenda-time"><span>${esc(row.start)}${row.end ? " – " + esc(row.end) : ""}</span><small>${zone}</small></div></li>`).join("")}</ol>`;
+  return `<ol class="schedule-timeline">${schedules.map((row, i) => `<li><div class="agenda-details"><h3>${esc(row.title)}</h3><p>${row.date ? date(row.date) : "Tanggal belum diisi"}</p><p class="prose">${esc(row.description || row.address || "")}</p></div><span class="agenda-marker" aria-hidden="true">${String(i + 1).padStart(2, "0")}</span><div class="agenda-time"><span>${esc(row.start)}${row.untilFinished ? " – Selesai" : row.end ? " – " + esc(row.end) : ""}</span><small>${zone}</small></div></li>`).join("")}</ol>`;
 }

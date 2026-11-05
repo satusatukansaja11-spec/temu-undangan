@@ -68,11 +68,11 @@ function installSharing(app, db, { auth, own, fail }) {
       typeof message !== "string" ||
       !message.trim() ||
       message.length > 4000 ||
-      !message.includes("{link}")
+      !/\{link(?:_undangan)?\}/.test(message)
     )
       throw fail(
         400,
-        "Pesan maksimal 4.000 karakter dan harus menyertakan {link}.",
+        "Pesan maksimal 4.000 karakter dan harus menyertakan {link} atau {link_undangan}.",
       );
     await db
       .prepare(
