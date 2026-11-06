@@ -213,4 +213,20 @@ Perintah membutuhkan akun email/password yang sudah terdaftar. Pemeriksaan admin
 
 Panel mendukung pencarian nama/email/undangan, koreksi tanggal dengan alasan wajib, riwayat tindakan, dan upload/hapus lagu bersama. Koreksi memindahkan tanggal jadwal tambahan yang sama dengan tanggal utama lama; jadwal di hari lain tetap utuh. Jika pengguna membuka editor sebelum koreksi, penyimpanan data lama ditolak agar tidak menimpa koreksi: pengguna perlu memuat ulang. Audit dan data pelanggan hanya tersedia bagi admin.
 
-Lagu bersama disimpan di storage local/S3 yang sudah dipilih. Metadata, peran admin, dan audit perlu disertakan dalam backup database; `storage:sync` juga memindahkan lagu pustaka saat migrasi storage. Tidak ada file .env pribadi pada kode rilis. Pembayaran, katalog berbayar, dan penguncian masa aktif dalam rules.md masih spesifikasi terpisah dan belum diaktifkan oleh panel bantuan ini.
+Lagu bersama disimpan di storage local/S3 yang sudah dipilih. Metadata, peran admin, dan audit perlu disertakan dalam backup database; `storage:sync` juga memindahkan lagu pustaka saat migrasi storage. Tidak ada file .env pribadi pada kode rilis. Pembayaran transfer manual, katalog, aktivasi tanggal dan expiry tersedia pada migrasi 005. Penjualan memerlukan konfigurasi rekening/harga di panel admin.
+
+
+## Penjualan tema, transfer manual dan migrasi 005
+
+1. Backup database serta seluruh media (termasuk bukti pembayaran privat), lalu deploy seluruh kode terbaru. Jangan menghapus volume data atau mengganti .env/database ketika update.
+2. Jalankan `npm run db:migrate` pada database produksi; SQLite AUTO_MIGRATE=true melakukannya saat startup. Migrasi 005 menandai undangan lama sebagai legacy agar tetap berfungsi. Perintah tidak memberi akses gratis untuk undangan baru.
+3. Login pemilik ke `/admin` dengan peran admin yang sudah diberikan melalui `admin:grant`. Hak admin lama tetap dipertahankan. Jika belum, daftarkan akun sendiri lalu gunakan perintah grant pada bagian sebelumnya.
+4. Pada **Rekening dan harga produk**, isi bank, nomor rekening asli, nama pemilik rekening, petunjuk transfer, harga rupiah masing-masing tema dan batas waktu pembayaran. WhatsApp awal `6282137665266` dapat diganti. Harga 0 berarti tema belum dijual. Aktifkan checkbox penjualan hanya sesudah rekening dan harga diperiksa.
+5. Order tampil pada **Pesanan produk**. Gunakan Perbarui untuk melihat order baru. Pelanggan mengirim konfirmasi melalui aplikasi dan dapat melanjutkan chat WhatsApp. Link WhatsApp tidak mengirim otomatis.
+6. Periksa dana melalui mutasi bank sebenarnya. Klik Periksa pembayaran, masukkan nominal dan referensi transaksi bank unik, centang dana sudah diperiksa, lalu Setujui & aktifkan. Bukti transfer saja tidak membuktikan dana masuk. Gunakan alasan untuk penolakan; transfer terlambat memerlukan alasan tambahan saat disetujui.
+7. Pelanggan membuka undangan yang dibuat dari satu order tersebut, menyimpan tanggal/zona waktu, lalu menekan Aktifkan & kunci tanggal. Setelah aktivasi, perubahan tanggal hanya melalui admin selama masa aktif. Seluruh jadwal tambahan pada undangan baru berada di tanggal yang sama.
+8. Masa aktif berakhir tepat pukul 00.00 hari berikutnya pada zona WIB/WITA/WIT terpilih. Pemeriksaan berlangsung pada request server, tidak memerlukan cron. Undangan lama legacy tidak mengikuti expiry baru sampai kebijakan migrasi tersendiri ditentukan. Undangan expired menjadi arsip baca saja, bukan dihapus.
+
+Bukti foto maksimal 5 MB, JPEG/PNG/WebP, disimpan sebagai objek privat di prefix photos/ yang sama tanpa dimasukkan ke tabel foto publik. Akses hanya pemilik order/admin melalui endpoint terotorisasi. `storage:sync` mencakup bukti; backup database dan storage tetap dua hal berbeda. Impor SQLite ke PostgreSQL mempertahankan order, hak akses, kunci tanggal, konfigurasi penjualan dan referensi bukti. Pada sumber lama tanpa lisensi, undangan yang diimpor ditandai legacy.
+
+Harga/rekening pada screenshot dan fixture adalah fiktif. Tidak ada pembayaran bank sungguhan dijalankan pada pengujian kode. Refund otomatis dan notifikasi WhatsApp/email otomatis belum disediakan; proses admin dan tombol WhatsApp manual yang digunakan.

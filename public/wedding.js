@@ -36,7 +36,9 @@ function weddingExtraForm() {
 function extraInput(key, i, fieldName, label, type = "text", max = 2000) {
   const id = `${key}-${i}-${fieldName}`,
     value = esc(current[key]?.[i]?.[fieldName] || "");
-  const attributes = `id="${id}" data-extra="${key}:${i}:${fieldName}" maxlength="${max}"`;
+  const locked =
+    key === "schedules" && fieldName === "date" && current.license?.lockedDate;
+  const attributes = `id="${id}" data-extra="${key}:${i}:${fieldName}" maxlength="${max}" ${locked ? "disabled" : ""}`;
   return `<label class="field" for="${id}">${label}${type === "textarea" ? `<textarea ${attributes} rows="4">${value}</textarea>` : `<input ${attributes} type="${type}" value="${value}">`}</label>`;
 }
 function bindWeddingEditor() {
@@ -58,7 +60,11 @@ function bindWeddingEditor() {
       (b.onclick = () => {
         const key = b.dataset.addExtra;
         current[key] ||= [];
-        current[key].push({});
+        current[key].push(
+          key === "schedules" && current.license?.lockedDate
+            ? { date: current.license.lockedDate }
+            : {},
+        );
         dirty = true;
         renderEditor();
       }),
@@ -104,10 +110,17 @@ async function loadRsvpReport(id, page = 1) {
     }
   }
 }
-async function renderWedding(preview, id) {
+async function renderWedding(preview, id, themeDemo = false) {
+  window.themeMotionCleanup?.();
   if (window.weddingCountdown) clearInterval(window.weddingCountdown);
   try {
-    const e = await api(preview ? "/api/events/" + id : "/api/public/" + id),
+    const e = await api(
+        themeDemo
+          ? "/api/themes/" + id + "/preview"
+          : preview
+            ? "/api/events/" + id
+            : "/api/public/" + id,
+      ),
       zone = weddingZone(e)[1];
     const calendarUrl = preview
       ? `/api/events/${id}/calendar.ics`
@@ -128,9 +141,9 @@ async function renderWedding(preview, id) {
     const hasGifts = (e.gifts || []).length || e.giftAddress,
       hasStories = (e.stories || []).length;
     document.title = `${e.groomNick || "Mempelai pria"} & ${e.brideNick || "Mempelai wanita"} — Undangan Pernikahan`;
-    root.innerHTML = `<div class="invitation wedding-v2">${preview ? `<div class="preview-banner">PRATINJAU PEMILIK · ${e.status === "ready" ? "Siap Dibagikan" : "Draft — belum dapat dibuka publik"}</div>` : ""}
+    root.innerHTML = `<div class="invitation wedding-v2">${preview ? `<div class="preview-banner">${themeDemo ? "PRATINJAU TEMA · DATA ILUSTRASI" : e.license?.expired ? "ARSIP · MASA AKTIF BERAKHIR" : "PRATINJAU PEMILIK"} · ${e.status === "ready" ? "Siap Dibagikan" : "Draft — belum dapat dibuka publik"}</div>` : ""}
       <section class="wedding-hero" id="weddingHome">${e.cover ? `<img class="wedding-cover" src="${esc(e.cover)}" alt="Foto sampul pernikahan" fetchpriority="high">` : ""}<div class="wedding-title"><p>THE WEDDING OF</p><h1>${esc(e.groomNick || "Mempelai pria")}<i>&</i>${esc(e.brideNick || "Mempelai wanita")}</h1><span>${e.date ? date(e.date) : "Tanggal akan diumumkan"}</span><a class="button wedding-open" href="#saveDate">Buka undangan ${weddingIcon("heart")}</a><small>Dengan bahagia, kami mengundang Anda.</small></div><span class="cover-caption">SEBUAH JANJI, UNTUK SELAMANYA</span></section>
-      <section class="w-section save-date" id="saveDate"><p class="w-eyebrow">SAVE THE DATE</p><h2>Menuju hari bahagia.</h2><p>${e.date ? date(e.date) : "Tanggal belum diisi"}${e.start ? ` · ${esc(e.start)} ${zone}` : ""}</p><div class="countdown" role="timer" aria-label="Hitung mundur hari pernikahan"><div><strong id="countDays">00</strong><span>Hari</span></div><div><strong id="countHours">00</strong><span>Jam</span></div><div><strong id="countMinutes">00</strong><span>Menit</span></div><div><strong id="countSeconds">00</strong><span>Detik</span></div></div><p id="countdownStatus" class="countdown-status"></p>${e.date && e.start && e.end ? `<a class="button primary calendar-button" href="${calendarUrl}" download="undangan-pernikahan.ics">${weddingIcon("calendar")} Simpan ke kalender</a><small class="calendar-hint">Unduh file kalender, lalu buka untuk menambahkan pengingat.</small>` : ""}</section>
+      <section class="w-section save-date" id="saveDate"><p class="w-eyebrow">SAVE THE DATE</p><h2>Menuju hari bahagia.</h2><p>${e.date ? date(e.date) : "Tanggal belum diisi"}${e.start ? ` · ${esc(e.start)} ${zone}` : ""}</p><div class="countdown" role="timer" aria-label="Hitung mundur hari pernikahan"><div><strong id="countDays">00</strong><span>Hari</span></div><div><strong id="countHours">00</strong><span>Jam</span></div><div><strong id="countMinutes">00</strong><span>Menit</span></div><div><strong id="countSeconds">00</strong><span>Detik</span></div></div><p id="countdownStatus" class="countdown-status"></p>${!themeDemo && e.date && e.start && e.end ? `<a class="button primary calendar-button" href="${calendarUrl}" download="undangan-pernikahan.ics">${weddingIcon("calendar")} Simpan ke kalender</a><small class="calendar-hint">Unduh file kalender, lalu buka untuk menambahkan pengingat.</small>` : ""}</section>
       <section class="w-section w-couple" id="couple"><p class="w-eyebrow">MEMPELAI</p><h2>Dua hati, satu perjalanan.</h2><p class="prose opening-text">${esc(e.opening)}</p><div class="couple">${[
         ["groom", "Mempelai pria"],
         ["bride", "Mempelai wanita"],
@@ -151,6 +164,14 @@ async function renderWedding(preview, id) {
       ${e.music === "piano" || e.music?.startsWith("track:") ? `<audio id="audio" loop src="${e.music === "piano" ? "/music/piano.wav" : "/audio/" + esc(e.music.slice(6))}" preload="none"></audio>` : ""}
       <dialog class="gallery-lightbox" id="galleryLightbox" aria-labelledby="galleryTitle"><div class="lightbox-header"><span id="galleryTitle">Galeri foto</span><button id="closeGallery" aria-label="Tutup galeri">×</button></div><img id="galleryLarge" alt=""><div class="lightbox-controls"><button id="previousPhoto" aria-label="Foto sebelumnya">←</button><span id="galleryCounter"></span><button id="nextPhoto" aria-label="Foto berikutnya">→</button></div></dialog></div>`;
     applyNavyTheme(e);
+    if (e.theme === "sakura") applySakuraTheme();
+    if (themeDemo) {
+      const banner = document.querySelector(".preview-banner");
+      banner.insertAdjacentHTML(
+        "beforeend",
+        `<div class="demo-actions"><a href="/#tema">← Katalog</a><a href="/pesanan?tema=${esc(id)}">Select / Order</a></div>`,
+      );
+    }
     startWeddingCountdown(e);
     bindWeddingGallery(e.gallery || []);
     document.querySelectorAll("[data-copy-gift]").forEach(

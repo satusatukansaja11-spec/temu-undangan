@@ -27,6 +27,7 @@ function installSharing(app, db, { auth, own, fail }) {
       )
     )
       throw fail(400, "Isi 1–500 nama, masing-masing maksimal 100 karakter.");
+    await own(req);
     await db.transaction(async () => {
       if (!(await db.lockEvent(req.params.id, req.session.user_id)))
         throw fail(404, "Acara tidak ditemukan.");

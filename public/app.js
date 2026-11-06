@@ -91,7 +91,7 @@ async function api(url, options = {}) {
 }
 const logo = '<a href="/dashboard" class="brand">temu<span>✳</span></a>';
 function shell(content) {
-  root.innerHTML = `<aside>${logo}<div class="workspace">RUANG PERNIKAHAN ANDA</div><nav><button class="nav active" id="dashboardLink">▦ <span>Undangan saya</span></button>${me.isAdmin ? '<a class="nav admin-link" href="/admin">Panel admin</a>' : ""}</nav><div class="aside-bottom"><div class="tiny-flower">✳</div><h3>Awal cerita indah.</h3><p>Satu undangan, sejuta kenangan.</p></div><div class="user"><span class="avatar">${esc((me.name || "U")[0])}</span><div><strong>${esc(me.name)}</strong><small>Akun pribadi</small></div><button id="logout" title="Keluar akun" aria-label="Keluar akun"><span aria-hidden="true">↗</span> Keluar akun</button>${me.isAdmin ? '<a class="admin-mobile-link" href="/admin">Panel admin</a>' : ""}</div></aside><div class="main"><header><span>Ruang pribadi <i>/</i> <b>Undangan saya</b></span><span class="header-note">Dibuat dengan sepenuh hati ♡</span></header>${content}<footer>temu ✳ <span>Tempat cerita bahagia dimulai.</span><small>Undangan pernikahan digital</small></footer></div>`;
+  root.innerHTML = `<aside>${logo}<div class="workspace">RUANG PERNIKAHAN ANDA</div><nav><a class="nav admin-link" href="/pesanan">Pesanan & tema</a><button class="nav active" id="dashboardLink">▦ <span>Undangan saya</span></button>${me.isAdmin ? '<a class="nav admin-link" href="/admin">Panel admin</a>' : ""}</nav><div class="aside-bottom"><div class="tiny-flower">✳</div><h3>Awal cerita indah.</h3><p>Satu undangan, sejuta kenangan.</p></div><div class="user"><span class="avatar">${esc((me.name || "U")[0])}</span><div><strong>${esc(me.name)}</strong><small>Akun pribadi</small></div><button id="logout" title="Keluar akun" aria-label="Keluar akun"><span aria-hidden="true">↗</span> Keluar akun</button>${me.isAdmin ? '<a class="admin-mobile-link" href="/admin">Panel admin</a>' : ""}</div></aside><div class="main"><header><span>Ruang pribadi <i>/</i> <b>Undangan saya</b></span><span class="header-note">Dibuat dengan sepenuh hati ♡</span></header>${content}<footer>temu ✳ <span>Tempat cerita bahagia dimulai.</span><small>Undangan pernikahan digital</small></footer></div>`;
   document.querySelector("#dashboardLink").onclick = () => leave(dashboard);
   document.querySelector("#logout").onclick = async () =>
     leave(async () => {
@@ -124,7 +124,7 @@ async function dashboard() {
 function renderDashboard() {
   const ready = events.filter((e) => e.status === "ready").length;
   shell(
-    `<main><div class="page-heading"><div><p class="eyebrow">SETIAP CERITA PUNYA AWAL</p><h1>Undangan saya<span class="serif-dot">.</span></h1><p>Kelola undangan, rangkai momen yang tak terlupakan.</p></div><button class="primary" id="add">＋ &nbsp; Tambah Acara</button></div><section class="hero"><div><span class="pill">✧ &nbsp; SEBUAH AWAL YANG INDAH</span><h2>Hari istimewa.<br>Undangan penuh cerita.</h2><p>Hadirkan kehangatan hari bahagia Anda,<br>bahkan sebelum para tamu tiba.</p><button id="heroAdd">Buat undangan Anda &nbsp; ↗</button></div><div class="hero-art" aria-hidden="true"><div class="sun"></div><div class="invite-paper"><div class="paper-border"><small>THE WEDDING OF</small><div>Anda<br><i>&</i><br>Pasangan</div><span>SEBUAH JANJI, SELAMANYA</span><b>✳</b></div></div><div class="stem stem-one"></div><div class="stem stem-two"></div><span class="art-caption">a little love, a lasting memory</span></div></section><section class="stats"><div><span class="stat-icon">▦</span><div><small>Total undangan</small><strong>${events.length.toString().padStart(2, "0")}</strong></div></div><div><span class="stat-icon green">↗</span><div><small>Siap dibagikan</small><strong>${ready.toString().padStart(2, "0")}</strong></div></div><div><span class="stat-icon gold">✎</span><div><small>Masih dirangkai</small><strong>${(events.length - ready).toString().padStart(2, "0")}</strong></div></div></section><div class="list-heading"><h2>Koleksi undangan <span>${events.length}</span></h2><label class="search"><span>⌕</span><input id="search" aria-label="Cari undangan" placeholder="Cari nama acara…" value="${esc(query)}"></label></div><div class="tabs"><button data-filter="all" class="${filter === "all" ? "selected" : ""}">Semua undangan</button><button data-filter="ready" class="${filter === "ready" ? "selected" : ""}">Siap dibagikan</button><button data-filter="draft" class="${filter === "draft" ? "selected" : ""}">Draft</button></div><div id="cards" class="cards"></div><div class="bottom-note"><span>✧</span><div><strong>Tak perlu sempurna untuk memulai.</strong><p>Simpan sebagai draft, lalu lanjutkan kapan pun Anda siap.</p></div></div></main>`,
+    `<main><div class="page-heading"><div><p class="eyebrow">SETIAP CERITA PUNYA AWAL</p><h1>Undangan saya<span class="serif-dot">.</span></h1><p>Kelola undangan, rangkai momen yang tak terlupakan.</p><a href="/pesanan">Pesanan & pilih tema</a></div><button class="primary" id="add">＋ &nbsp; Tambah Acara</button></div><section class="hero"><div><span class="pill">✧ &nbsp; SEBUAH AWAL YANG INDAH</span><h2>Hari istimewa.<br>Undangan penuh cerita.</h2><p>Hadirkan kehangatan hari bahagia Anda,<br>bahkan sebelum para tamu tiba.</p><button id="heroAdd">Buat undangan Anda &nbsp; ↗</button></div><div class="hero-art" aria-hidden="true"><div class="sun"></div><div class="invite-paper"><div class="paper-border"><small>THE WEDDING OF</small><div>Anda<br><i>&</i><br>Pasangan</div><span>SEBUAH JANJI, SELAMANYA</span><b>✳</b></div></div><div class="stem stem-one"></div><div class="stem stem-two"></div><span class="art-caption">a little love, a lasting memory</span></div></section><section class="stats"><div><span class="stat-icon">▦</span><div><small>Total undangan</small><strong>${events.length.toString().padStart(2, "0")}</strong></div></div><div><span class="stat-icon green">↗</span><div><small>Siap dibagikan</small><strong>${ready.toString().padStart(2, "0")}</strong></div></div><div><span class="stat-icon gold">✎</span><div><small>Masih dirangkai</small><strong>${(events.length - ready).toString().padStart(2, "0")}</strong></div></div></section><div class="list-heading"><h2>Koleksi undangan <span>${events.length}</span></h2><label class="search"><span>⌕</span><input id="search" aria-label="Cari undangan" placeholder="Cari nama acara…" value="${esc(query)}"></label></div><div class="tabs"><button data-filter="all" class="${filter === "all" ? "selected" : ""}">Semua undangan</button><button data-filter="ready" class="${filter === "ready" ? "selected" : ""}">Siap dibagikan</button><button data-filter="draft" class="${filter === "draft" ? "selected" : ""}">Draft</button></div><div id="cards" class="cards"></div><div class="bottom-note"><span>✧</span><div><strong>Tak perlu sempurna untuk memulai.</strong><p>Simpan sebagai draft, lalu lanjutkan kapan pun Anda siap.</p></div></div></main>`,
   );
   document.querySelector("#add").onclick = add;
   document.querySelector("#heroAdd").onclick = add;
@@ -151,7 +151,7 @@ function cards() {
     list
       .map(
         (e) =>
-          `<article class="card"><div class="card-cover">${e.cover ? `<img src="${esc(e.cover)}" alt="Sampul ${esc(e.name)}">` : '<div class="blank-cover">✳<small>YOUR STORY STARTS HERE</small></div>'}<span class="status ${e.status}">${e.status === "ready" ? "● Siap Dibagikan" : "● Draft"}</span><button class="delete" data-delete="${e.id}" aria-label="Hapus ${esc(e.name || "undangan")}"><span aria-hidden="true">⌫</span> Hapus undangan</button></div><div class="card-body"><p class="eyebrow">PERNIKAHAN</p><h3>${esc(e.name || "Undangan baru")}</h3><p class="card-date">◷ &nbsp; ${e.date ? date(e.date) : "Tanggal belum ditentukan"}</p><div class="card-actions"><button data-edit="${e.id}">✎ &nbsp; Edit undangan</button><a href="/preview/${e.id}" target="_blank" aria-label="Pratinjau ${esc(e.name)}"><span aria-hidden="true">◉</span> Preview</a><button data-share="${e.id}" aria-label="Bagikan ${esc(e.name)}"><span aria-hidden="true">↗</span> Bagikan</button></div></div></article>`,
+          `<article class="card"><div class="card-cover">${e.cover ? `<img src="${esc(e.cover)}" alt="Sampul ${esc(e.name)}">` : '<div class="blank-cover">✳<small>YOUR STORY STARTS HERE</small></div>'}<span class="status ${e.status}">${e.status === "expired" ? "● Masa aktif berakhir" : e.status === "ready" ? "● Siap Dibagikan" : "● Draft"}</span><button class="delete" data-delete="${e.id}" aria-label="Hapus ${esc(e.name || "undangan")}"><span aria-hidden="true">⌫</span> Hapus undangan</button></div><div class="card-body"><p class="eyebrow">PERNIKAHAN</p><h3>${esc(e.name || "Undangan baru")}</h3><p class="card-date">◷ &nbsp; ${e.date ? date(e.date) : "Tanggal belum ditentukan"}</p><div class="card-actions"><button data-edit="${e.id}">✎ &nbsp; ${e.status === "expired" ? "Lihat arsip" : "Edit undangan"}</button><a href="/preview/${e.id}" target="_blank" aria-label="Pratinjau ${esc(e.name)}"><span aria-hidden="true">◉</span> Preview</a><button ${e.status === "expired" ? "disabled" : ""} data-share="${e.id}" aria-label="Bagikan ${esc(e.name)}"><span aria-hidden="true">↗</span> Bagikan</button></div></div></article>`,
       )
       .join("") +
     `<button class="new-card" id="newCard"><span>＋</span><h3>Mulai cerita baru</h3><p>Buat undangan pernikahan<br>yang terasa seperti Anda.</p><b>Tambah acara &nbsp; ↗</b></button>`;
@@ -177,14 +177,9 @@ function cards() {
     );
 }
 async function add() {
-  try {
-    const e = await api("/api/events", { method: "POST", body: "{}" });
-    step = 0;
-    await edit(e.id);
-  } catch (e) {
-    toast(e.message);
-  }
+  location.href = "/pesanan";
 }
+
 function date(d) {
   return new Date(d + "T12:00:00").toLocaleDateString("id-ID", {
     day: "numeric",
@@ -219,6 +214,7 @@ async function edit(id) {
   try {
     current = await api("/api/events/" + id);
     current.gallery ||= [];
+    if (current.license?.expired) return renderArchive(current);
     await refreshMedia();
     renderEditor();
   } catch (e) {
@@ -246,7 +242,7 @@ function renderEditor() {
       )
       .join(
         "",
-      )}</select><small>Menentukan saran salam. Teks tetap dapat Anda edit.</small></label><label class="field" for="music">Musik latar<select id="music" name="music">${musicOptions()}</select></label><p class="notice">Musik hanya diputar setelah tamu menekan tombol putar.</p></div></div>${musicUploadForm()}`;
+      )}</select><small>Menentukan saran salam. Teks tetap dapat Anda edit.</small></label><label class="field" for="music">Musik latar<select id="music" name="music">${musicOptions()}</select></label><p class="notice">Musik mulai saat tamu membuka undangan dan dapat dijeda melalui tombol musik.</p></div></div>${musicUploadForm()}`;
   if (step === 1)
     body = `<div class="form-grid"><section><h3>Mempelai pria</h3>${photo("groomPhoto", "Foto mempelai pria")}${field("groomName")}${field("groomNick")}${area("groomInfo", "Informasi lainnya (keluarga, alamat)")}</section><section><h3>Mempelai wanita</h3>${photo("bridePhoto", "Foto mempelai wanita")}${field("brideName")}${field("brideNick")}${area("brideInfo", "Informasi lainnya (keluarga, alamat)")}</section></div>`;
   if (step === 2)
@@ -258,8 +254,16 @@ function renderEditor() {
   if (step === 3) body += photoLibrary();
   if (step >= 5) body = weddingExtraForm();
   shell(
-    `<main><button id="back" class="text-button">← Semua undangan</button><div class="page-heading"><div><p class="eyebrow">RANGKAI CERITA ANDA</p><h1>${esc(current.name || "Undangan baru")}</h1><p id="saveStatus">${current.status === "ready" ? "Siap Dibagikan" : "Draft — lengkapi informasi untuk membagikan"}</p></div><a class="button" target="_blank" href="/preview/${current.id}">Pratinjau ↗</a></div><div class="editor-tabs">${steps.map((s, i) => `<button data-step="${i}" class="${i === step ? "selected" : ""}"><span>${i + 1}</span>${s}</button>`).join("")}</div><form id="editor" class="editor"><div class="section-heading"><span>0${step + 1}</span><div><h2>${steps[step]}</h2><p>Anda dapat menyimpan draft kapan saja.</p></div></div>${body}<p class="form-error" id="formError" role="alert"></p><div class="savebar"><span id="dirtyText">Perubahan disimpan saat Anda menekan Simpan.</span><div><button type="button" id="next">${step === steps.length - 1 ? "← Sebelumnya" : "Lanjut →"}</button><button class="primary" type="submit" id="save">Simpan</button></div></div></form></main>`,
+    `<main><button id="back" class="text-button">← Semua undangan</button><div class="page-heading"><div><p class="eyebrow">RANGKAI CERITA ANDA</p><h1>${esc(current.name || "Undangan baru")}</h1><p id="saveStatus">${current.status === "ready" ? "Siap Dibagikan" : "Draft — lengkapi informasi untuk membagikan"}</p></div><a class="button" target="_blank" href="/preview/${current.id}">Pratinjau ↗</a></div>${current.license && !current.license.legacy ? `<div class="notice">${current.license.lockedDate ? `Tanggal dikunci: ${esc(current.license.lockedDate)}. Koreksi hanya melalui admin. Masa aktif sampai ${esc(new Date(current.license.expiresAt).toLocaleString("id-ID", { timeZone: current.license.timezone }))}.` : '<p>Isi dan simpan tanggal pernikahan, lalu konfirmasikan aktivasi sekali pakai sebelum undangan dapat dibagikan.</p><button type="button" id="activateDate">Aktifkan & kunci tanggal</button>'}</div>` : ""}<div class="editor-tabs">${steps.map((s, i) => `<button data-step="${i}" class="${i === step ? "selected" : ""}"><span>${i + 1}</span>${s}</button>`).join("")}</div><form id="editor" class="editor"><div class="section-heading"><span>0${step + 1}</span><div><h2>${steps[step]}</h2><p>Anda dapat menyimpan draft kapan saja.</p></div></div>${body}<p class="form-error" id="formError" role="alert"></p><div class="savebar"><span id="dirtyText">Perubahan disimpan saat Anda menekan Simpan.</span><div><button type="button" id="next">${step === steps.length - 1 ? "← Sebelumnya" : "Lanjut →"}</button><button class="primary" type="submit" id="save">Simpan</button></div></div></form></main>`,
   );
+  const activate = document.querySelector("#activateDate");
+  if (activate) activate.onclick = activateWeddingDate;
+  if (current.license?.lockedDate) {
+    for (const name of ["date", "timezone"]) {
+      const input = document.querySelector(`[name="${name}"]`);
+      if (input) input.disabled = true;
+    }
+  }
   const f = document.querySelector("#editor");
   f.oninput = (e) => {
     if (e.target.name) {
@@ -470,6 +474,11 @@ window.addEventListener("beforeunload", (e) => {
     csrf = info.csrf;
     appLimits = { ...appLimits, ...info.limits };
     const parts = location.pathname.split("/");
+    if (parts[1] === "tema") return renderWedding(true, parts[2], true);
+    if (parts[1] === "pesanan")
+      return parts[2]
+        ? renderOrder(parts[2])
+        : renderOrders(new URLSearchParams(location.search).get("tema"));
     if (parts[1] === "u") return invitation(false, parts[2]);
     if (parts[1] === "preview") {
       if (!me) return login(info);
@@ -478,7 +487,12 @@ window.addEventListener("beforeunload", (e) => {
     if (parts[1] === "layar-tamu") return renderGuestScreen();
     if (parts[1] === "login" || parts[1] === "daftar") {
       if (me) {
-        location.replace("/dashboard");
+        location.replace(
+          sessionStorage.getItem("pendingTheme")
+            ? "/pesanan?tema=" +
+                encodeURIComponent(sessionStorage.getItem("pendingTheme"))
+            : "/dashboard",
+        );
         return;
       }
       return renderLogin(info, parts[1] === "daftar");
@@ -500,9 +514,11 @@ window.addEventListener("beforeunload", (e) => {
         location.replace("/login");
         return;
       }
-      return dashboard();
+      const selectedEvent = new URLSearchParams(location.search).get("event");
+      return selectedEvent ? edit(selectedEvent) : dashboard();
     }
     renderLanding(info);
+    mountCatalog();
   } catch (e) {
     root.innerHTML =
       '<p class="loading">Tidak dapat menghubungi server. Muat ulang halaman untuk mencoba kembali.</p>';

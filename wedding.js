@@ -161,13 +161,19 @@ function calendar(event) {
       .join("\r\n") + "\r\n"
   );
 }
-function installWedding(app, db, { auth, own, fail, origin }) {
+function installWedding(
+  app,
+  db,
+  { auth, own, fail, origin, available = async () => true },
+) {
   async function published(req) {
     const event = await db
       .prepare("SELECT * FROM events WHERE slug=? AND status='ready'")
       .get(req.params.slug);
     if (!event)
       throw fail(404, "Undangan tidak ditemukan atau belum siap dibagikan.");
+    if (!(await available(event)))
+      throw fail(410, "Masa aktif undangan telah berakhir.");
     return event;
   }
   const sendCalendar = (res, event) => {

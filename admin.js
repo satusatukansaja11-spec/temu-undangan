@@ -20,7 +20,7 @@ function makeAdminGuard(db, auth, fail) {
       }
     });
 }
-function installAdmin(app, db, { admin, fail, read, missing }) {
+function installAdmin(app, db, { admin, fail, read, missing, commerce }) {
   app.get("/api/admin/events", admin, async (req, res) => {
     const page = Math.max(1, Math.min(100000, Number(req.query.page) || 1));
     const q = String(req.query.q || "")
@@ -42,11 +42,13 @@ function installAdmin(app, db, { admin, fail, read, missing }) {
     res.json({
       total,
       page: Math.floor(page),
-      events: rows.map((e) => ({
-        ...read(e),
-        ownerName: e.owner_name,
-        ownerEmail: e.owner_email,
-      })),
+      events: await Promise.all(
+        rows.map(async (e) => ({
+          ...(await commerce.describe(e, read(e))),
+          ownerName: e.owner_name,
+          ownerEmail: e.owner_email,
+        })),
+      ),
     });
   });
   app.patch("/api/admin/events/:id/date", admin, async (req, res) => {
@@ -79,6 +81,12 @@ function installAdmin(app, db, { admin, fail, read, missing }) {
           409,
           "Undangan telah berubah. Muat ulang sebelum mengoreksi.",
         );
+      const license = await commerce.license(event.id);
+      if (commerce.expired(license))
+        throw fail(
+          410,
+          "Undangan sudah kedaluwarsa. Pembelian baru diperlukan; koreksi tidak dapat mengaktifkan ulang arsip.",
+        );
       const data = JSON.parse(event.data),
         before = data.date || "";
       if (date === before)
@@ -90,6 +98,21 @@ function installAdmin(app, db, { admin, fail, read, missing }) {
           row.date = date;
           changedSchedules.push(index);
         }
+      if (license?.locked_date) {
+        const expires = commerce.endOfWedding(date, license.locked_timezone);
+        if (!expires || expires <= commerce.now())
+          throw fail(400, "Tanggal koreksi harus belum lewat.");
+        if ((data.schedules || []).some((row) => row.date && row.date !== date))
+          throw fail(
+            400,
+            "Jadwal tambahan berada di hari berbeda. Hubungi pemilik untuk merapikan jadwal sebelum koreksi.",
+          );
+        await db
+          .prepare(
+            "UPDATE event_licenses SET locked_date=?,expires_at=? WHERE event_id=?",
+          )
+          .run(date, expires, event.id);
+      }
       const now = new Date().toISOString();
       await db
         .prepare("UPDATE events SET data=?,status=?,updated=? WHERE id=?")
@@ -99,21 +122,19 @@ function installAdmin(app, db, { admin, fail, read, missing }) {
           now,
           event.id,
         );
-      await db
-        .prepare("INSERT INTO admin_audit VALUES(?,?,?,?,?,?)")
-        .run(
-          randomBytes(16).toString("hex"),
-          req.session.user_id,
-          "event.date",
-          event.id,
-          JSON.stringify({
-            before,
-            after: date,
-            reason: reason.trim(),
-            changedSchedules,
-          }),
-          now,
-        );
+      await db.prepare("INSERT INTO admin_audit VALUES(?,?,?,?,?,?)").run(
+        randomBytes(16).toString("hex"),
+        req.session.user_id,
+        "event.date",
+        event.id,
+        JSON.stringify({
+          before,
+          after: date,
+          reason: reason.trim(),
+          changedSchedules,
+        }),
+        now,
+      );
     });
     res.json({ ok: true });
   });

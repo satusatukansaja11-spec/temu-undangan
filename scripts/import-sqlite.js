@@ -3,6 +3,33 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const { connectDatabase, migrate } = require("../db");
 const tables = {
+  theme_orders: [
+    "id",
+    "owner",
+    "theme_id",
+    "amount",
+    "bank_snapshot",
+    "status",
+    "confirmation",
+    "reason",
+    "transfer_ref",
+    "event_id",
+    "created",
+    "deadline",
+    "verified_by",
+    "verified_at",
+    "proof_id",
+  ],
+  event_licenses: [
+    "event_id",
+    "order_id",
+    "theme_id",
+    "legacy",
+    "locked_date",
+    "locked_timezone",
+    "expires_at",
+    "created",
+  ],
   admin_users: ["user_id", "created"],
   library_tracks: ["id", "name", "mime", "size_bytes", "duration", "created"],
   admin_audit: ["id", "actor", "action", "target", "details", "created"],
@@ -64,6 +91,8 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "admin_users",
             "library_tracks",
             "admin_audit",
+            "theme_orders",
+            "event_licenses",
           ].indexOf(a) -
           [
             "users",
@@ -77,6 +106,8 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "admin_users",
             "library_tracks",
             "admin_audit",
+            "theme_orders",
+            "event_licenses",
           ].indexOf(b),
       )) {
         counts[table] = 0;
@@ -105,6 +136,27 @@ async function importSqlite({ sourceFile, targetUrl }) {
             .run(...columns.map((column) => row[column] ?? null));
           counts[table]++;
         }
+      }
+      // Old sources without licenses remain grandfathered; existing paid licenses are retained.
+      await target
+        .prepare(
+          "INSERT INTO event_licenses(event_id,theme_id,legacy,created) SELECT e.id,'navy',1,e.created FROM events e WHERE NOT EXISTS (SELECT 1 FROM event_licenses l WHERE l.event_id=e.id)",
+        )
+        .run();
+      if (
+        source
+          .prepare(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name='shop_settings'",
+          )
+          .get()
+      ) {
+        const config = source
+          .prepare("SELECT data FROM shop_settings WHERE id=1")
+          .get();
+        if (config)
+          await target
+            .prepare("UPDATE shop_settings SET data=? WHERE id=1")
+            .run(config.data);
       }
     });
     return counts;

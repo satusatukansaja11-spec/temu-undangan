@@ -23,7 +23,16 @@ function mediaLimits() {
 function installMedia(
   app,
   db,
-  { auth, admin, own, fail, dataDir, storage, limits },
+  {
+    auth,
+    admin,
+    own,
+    fail,
+    dataDir,
+    storage,
+    limits,
+    available = async () => true,
+  },
 ) {
   const temporary = path.join(dataDir, ".tmp");
   fs.mkdirSync(temporary, { recursive: true });
@@ -73,6 +82,7 @@ function installMedia(
     };
   };
   async function quota(req, size, kind) {
+    await own(req);
     if (!(await db.lockEvent(req.params.id, req.session.user_id)))
       throw fail(404, "Acara tidak ditemukan.");
     const photos = await db
@@ -398,7 +408,7 @@ function installMedia(
       ].includes("/media/" + req.params.photo);
     if (!(
       req.session?.user_id === event.owner ||
-      (event.status === "ready" && visible)
+      (event.status === "ready" && visible && (await available(event)))
     ))
       return res.sendStatus(404);
     await storage.serve(req, res, "photos/" + req.params.photo, "image/webp");
@@ -410,10 +420,18 @@ function installMedia(
     if (shared) {
       if (!req.session) {
         const events = await db
-          .prepare("SELECT data FROM events WHERE status='ready'")
+          .prepare("SELECT * FROM events WHERE status='ready'")
           .all();
         if (
-          !events.some((e) => JSON.parse(e.data).music === "track:" + shared.id)
+          !(
+            await Promise.all(
+              events.map(
+                async (e) =>
+                  JSON.parse(e.data).music === "track:" + shared.id &&
+                  (await available(e)),
+              ),
+            )
+          ).some(Boolean)
         )
           return res.sendStatus(404);
       }
@@ -421,7 +439,7 @@ function installMedia(
     }
     const track = await db
       .prepare(
-        "SELECT tracks.*,events.owner,events.status,events.data FROM tracks JOIN events ON events.id=tracks.event_id WHERE tracks.id=?",
+        "SELECT tracks.*,events.owner,events.status,events.data,events.id AS invitation_id FROM tracks JOIN events ON events.id=tracks.event_id WHERE tracks.id=?",
       )
       .get(req.params.track);
     if (
@@ -429,7 +447,8 @@ function installMedia(
       !(
         req.session?.user_id === track.owner ||
         (track.status === "ready" &&
-          JSON.parse(track.data).music === "track:" + track.id)
+          JSON.parse(track.data).music === "track:" + track.id &&
+          (await available({ ...track, id: track.invitation_id })))
       )
     )
       return res.sendStatus(404);

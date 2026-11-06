@@ -31,7 +31,17 @@ async function main() {
           .prepare("SELECT id,size_bytes,mime FROM library_tracks")
           .all()),
       ];
+    const proofs = await db
+      .prepare("SELECT proof_id FROM theme_orders WHERE proof_id IS NOT NULL")
+      .all();
     for (const item of [
+      ...proofs.map((row) => ({
+        id: row.proof_id.slice(7),
+        key: row.proof_id,
+        mime: "image/webp",
+        folder: "uploads",
+        proof: true,
+      })),
       ...photos.map((row) => ({
         ...row,
         key: "photos/" + row.id,
@@ -59,11 +69,15 @@ async function main() {
             throw Error("Ukuran objek berbeda; tidak ditimpa.");
           if (!exists)
             await storage.put(item.key, { file, mime: item.mime, size });
-          if (item.folder === "uploads" && !item.size_bytes)
+          if (item.folder === "uploads" && !item.proof && !item.size_bytes)
             await db
               .prepare("UPDATE photos SET size_bytes=? WHERE id=?")
               .run(size, item.id);
-        } else if (item.folder === "uploads" && !item.size_bytes) {
+        } else if (
+          item.folder === "uploads" &&
+          !item.proof &&
+          !item.size_bytes
+        ) {
           const { size } = await storage.stat(item.key);
           await db
             .prepare("UPDATE photos SET size_bytes=? WHERE id=?")

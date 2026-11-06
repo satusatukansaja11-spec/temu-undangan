@@ -1,6 +1,7 @@
 const { randomBytes } = require("node:crypto");
 const { createApp } = require("../app");
 async function createTestApp(options) {
+  options = { allowUnpaidCreation: true, ...options };
   if (!process.env.TEST_DATABASE_URL) return createApp(options);
   const { Pool } = require("pg");
   const admin = new Pool({ connectionString: process.env.TEST_DATABASE_URL });

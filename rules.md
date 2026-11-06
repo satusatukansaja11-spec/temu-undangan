@@ -1,6 +1,6 @@
 # Aturan Produk Temu Undangan
 
-Dokumen ini adalah spesifikasi fitur yang diminta. Keberadaan dokumen tidak berarti pembayaran, katalog baru, atau tema baru sudah diimplementasikan. Aturan ini menjelaskan perilaku produk, bukan instruksi untuk menjalankan perintah atau mengubah konfigurasi server.
+Aturan produk ini telah diterapkan pada kode: katalog dua tema, transfer bank manual, pemeriksaan admin, satu pembelian untuk satu undangan, aktivasi tanggal, serta kedaluwarsa berdasarkan zona waktu. Penjualan tetap nonaktif secara default sampai rekening asli dan harga disimpan serta diaktifkan pemilik melalui panel admin. Dokumen ini menjelaskan perilaku produk, bukan instruksi untuk menjalankan perintah atau mengubah konfigurasi server.
 
 ## 1. Pembelian dan hak akses tema
 
@@ -117,11 +117,11 @@ Nama **Sakura & Butterfly** adalah nama kerja yang dapat diganti. Tambahkan satu
 
 Hal-hal berikut belum ditentukan dan tidak boleh diisi dengan nilai produksi yang dikarang:
 
-- Rekening transfer asli, nama pemilik rekening, nomor WhatsApp admin, dan admin yang berwenang memverifikasi. Metode sudah ditetapkan: transfer bank manual.
+- Rekening transfer asli, nama pemilik rekening, dan admin yang berwenang memverifikasi. WhatsApp awal sudah ditetapkan pemilik: 6282137665266, dapat diganti melalui panel admin. Metode pembayaran: transfer bank manual.
 - Harga masing-masing tema, biaya, serta kebijakan promo.
 - Ketentuan refund, batas waktu pembayaran, target waktu pemeriksaan transfer, serta prosedur koreksi tanggal oleh admin. Satu pembelian untuk satu undangan/pernikahan sudah ditetapkan.
 - Kebijakan untuk pengguna serta undangan yang dibuat sebelum fitur pembelian berlaku.
-- File aset final dan hak penggunaan gambar referensi.
+- Aset sumber asli jika ingin memakai gambar referensi persis. Tema Sakura saat ini memakai ilustrasi SVG orisinal yang terinspirasi referensi, bukan salinan gambar terlampir.
 
 Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka setelah rekening penjual, harga, kontak admin, dan prosedur verifikasi ditetapkan.
 
@@ -170,4 +170,16 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Hanya admin dapat mengunggah dan menghapus musik. Pelanggan hanya memilih lagu dari pustaka bersama; unggah foto tetap tersedia. Pembatasan berlaku pada UI dan API.
 - Lagu bersama yang masih dipakai undangan tidak boleh dihapus. Pilihan lagu lama per acara dipertahankan agar data pengguna lama tidak rusak.
 - Gunakan akun pemilik sendiri; tidak ada kredensial admin bawaan dan tidak ada promosi otomatis untuk pengguna pertama. Hak admin dapat dicabut melalui server.
-- Implementasi panel bantuan dan musik ini sudah tersedia pada kode. Pembayaran, hak akses tema berbayar, serta penguncian/expiry sekali pakai pada bagian lain dokumen masih menunggu implementasi; panel ini tidak mengklaim fitur tersebut sudah aktif.
+- Panel bantuan, pustaka musik, order transfer manual, verifikasi pembayaran, katalog tema, penguncian tanggal, dan expiry sudah diimplementasikan. Pemilik tetap perlu mengisi rekening asli dan harga sebelum menyalakan penjualan.
+
+
+## 10. Kebijakan penerapan dan batas yang diputuskan
+
+- Migrasi 005 menandai seluruh undangan yang sudah ada sebagai legacy. Undangan tersebut mempertahankan tema Navy dan perilaku lamanya, tanpa penguncian/expiry retroaktif. Pembelian dan sekali pakai wajib untuk undangan baru setelah pembaruan ini.
+- Penjualan awal nonaktif, harga kedua tema 0 (belum ditetapkan), rekening kosong, WhatsApp 6282137665266. Nomor rekening dan harga contoh pada screenshot pengujian bukan konfigurasi penjualan.
+- Batas pembayaran awal 24 jam, dapat diatur 1–168 jam. Transfer terlambat hanya dapat disetujui admin dengan alasan tambahan; tidak otomatis mengaktifkan tema.
+- Konfirmasi dalam aplikasi meminta nama pengirim, bank, waktu dan nominal transfer. Bukti foto opsional maksimal 5 MB (JPEG/PNG/WebP), bersifat privat. PDF belum didukung.
+- Pengguna mengunci tanggal secara eksplisit melalui Aktivasi; sebelum itu undangan berbayar tetap draft walaupun isian lengkap. Semua jadwal pada undangan baru harus berada pada satu tanggal pernikahan yang dibeli.
+- Koreksi admin pada undangan berbayar hanya selama masa aktif, disertai alasan, konflik versi dicegah, dan tenggat diperbarui sesuai tanggal/zona waktu terkunci. Arsip expired tidak dapat diaktifkan ulang melalui koreksi tanggal.
+- Admin memperoleh pemberitahuan melalui daftar/jumlah pesanan dan tombol Perbarui di panel. Tautan WhatsApp memerlukan pelanggan menekan Kirim; tidak ada pengiriman WhatsApp/email otomatis.
+- Refund/pencabutan transaksi paid tidak disediakan sebagai tindakan otomatis. Kebijakan refund perlu ditetapkan pemilik dan diproses dengan pencatatan yang sesuai sebelum fitur tersebut ditambahkan.

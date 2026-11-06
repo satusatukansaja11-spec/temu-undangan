@@ -47,7 +47,7 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 - Musik `None`, lagu dari pustaka admin, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Musik mulai saat Buka Undangan ditekan, dengan kontrol putar/jeda; `None` tidak membuat elemen audio. Lagu diunggah oleh admin melalui /admin; pelanggan hanya memilih dan menyimpan pilihan musik.
 - Sebar membuka dialog pesan yang bisa diedit; tautan WhatsApp terisi teks dan URL. Pengguna sendiri membuka WhatsApp dan mengirim. Aplikasi tidak mengirim pesan otomatis.
 
-Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Jenis acara lain, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
+Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Pembayaran produk memakai transfer bank manual dengan persetujuan admin. Jenis acara lain, AI eksternal dan pengiriman WhatsApp otomatis belum disediakan.
 
 ## Struktur penting
 
@@ -85,11 +85,11 @@ Hasil pengujian otomatis dan browser selama pengerjaan dirangkum dalam `VALIDATI
 
 ## Halaman awal dan akun (pembaruan 24 Oktober 2026)
 
-Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Download, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan publik putih/magenta dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
+Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan publik putih/magenta dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
 
-- Tema menampilkan contoh **Temu Klasik**, tema undangan yang saat ini tersedia. Contoh memakai data ilustrasi, bukan acara pelanggan.
-- Harga belum ditentukan; halaman menjelaskan bahwa paket belum diumumkan, tanpa pembayaran atau checkout.
-- Download mengunduh ZIP kode aplikasi dari repository GitHub. Ini bukan aplikasi Android/iOS.
+- Tema menampilkan katalog **Navy Ivory** dan **Sakura & Butterfly**. Preview memakai data ilustrasi, bukan acara pelanggan.
+- Harga diatur pemilik melalui panel admin. Checkout transfer bank baru tersedia setelah rekening dan harga diaktifkan.
+- Menu dan bagian Download kode aplikasi sudah dihapus dari beranda.
 - Layar Tamu (`/layar-tamu`) menampilkan nama yang diketik petugas dan dapat dibuka layar penuh. Nama hanya berada dalam memori halaman perangkat, tanpa database tamu, RSVP atau sinkronisasi.
 - Form login email, toggle tampil/sembunyikan password, Apple, dan tautan pendaftaran akun.
 - Pendaftaran email menggunakan nama, email, password 12–128 karakter. Password menggunakan scrypt asinkron dengan salt acak per akun. Tabel `credentials` dan `auth_limits` ditambahkan secara idempoten pada database yang sama. Password tidak disimpan sebagai plaintext.
@@ -248,4 +248,19 @@ npm run admin:grant -- pemilik@example.com
 
 Ganti email contoh dengan akun pribadi yang sudah terdaftar. Muat ulang/login dan buka `/admin`. Tidak ada admin default, tidak ada password bersama, dan pelanggan tidak dapat memilih peran saat mendaftar. Pencabutan: `npm run admin:revoke -- pemilik@example.com`. Lihat [panduan aktivasi](docs/DEPLOYMENT.md#panel-pemilik-dan-aktivasi-akses-admin).
 
-[Pratinjau laptop](docs/images/admin-desktop.png) · [Pratinjau HP](docs/images/admin-mobile.png). Screenshot memakai akun dan lagu sintetis. Pembayaran/masa aktif sekali pakai dalam rules.md belum diimplementasikan oleh revisi panel admin ini.
+[Pratinjau laptop](docs/images/admin-desktop.png) · [Pratinjau HP](docs/images/admin-mobile.png). Screenshot memakai akun dan lagu sintetis. Pembayaran transfer manual dan masa aktif sekali pakai kini tersedia; lihat bagian Pembelian tema di bawah.
+
+
+## Pembelian tema dan undangan sekali pakai
+
+Katalog berisi **Navy Ivory** dan **Sakura & Butterfly**, masing-masing dengan Preview publik dan Select. Ilustrasi Sakura merupakan SVG orisinal terinspirasi referensi, dengan cabang bergoyang dan kupu-kupu mengepak; reduced motion menampilkan ornamen diam. Preview memakai data ilustrasi dan tidak mengirim RSVP atau memberikan hak akses.
+
+Alur pelanggan: Select → login/daftar → pesanan → transfer → konfirmasi di aplikasi (bukti foto opsional) / WhatsApp → pemeriksaan mutasi oleh admin → satu undangan baru → isi data → Aktifkan & kunci tanggal. Konfirmasi pelanggan sendiri tidak membuka tema. Harga/rekening order disimpan sebagai snapshot. Persetujuan idempoten dan referensi mutasi yang sama tidak bisa membayar dua order.
+
+Di `/admin`, pemilik mengisi **Rekening dan harga produk**, memeriksa isinya lalu mengaktifkan penjualan. Default: penjualan mati, rekening kosong, harga belum ditetapkan, WhatsApp `6282137665266` (dapat diganti). Rekening ini berbeda dari rekening hadiah mempelai. Tidak ada harga/rekening contoh yang diaktifkan di produksi. Pesanan baru terlihat di panel; WhatsApp membuka pesan siap kirim dan bukan notifikasi otomatis.
+
+Setelah aktivasi, tanggal/zona waktu dikunci. Pelanggan dapat mengubah data lain sampai pukul 00.00 hari setelah tanggal pernikahan di WIB/WITA/WIT yang dipilih. Sesudahnya, server menolak edit, publikasi, RSVP dan media publik undangan tersebut. Akun, riwayat dan arsip tetap dapat dibaca. Acara baru memerlukan pembelian baru. Admin dapat mengoreksi tanggal selama masa aktif dengan alasan dan audit; koreksi tidak menghidupkan kembali arsip kedaluwarsa.
+
+Migrasi 005 mempertahankan semua undangan yang sudah ada sebagai **legacy**; tidak menutup undangan lama secara retroaktif. Undangan baru harus berasal dari pembayaran yang disetujui. Lihat [aturan lengkap](rules.md) dan [panduan deployment](docs/DEPLOYMENT.md#penjualan-tema-transfer-manual-dan-migrasi-005).
+
+Screenshot [katalog](docs/images/catalog-desktop.png), [Sakura di HP](docs/images/sakura-preview-mobile.png), dan [pesanan HP](docs/images/payment-order-mobile.png) menggunakan data/harga/rekening QA fiktif; bukan instruksi pembayaran nyata.

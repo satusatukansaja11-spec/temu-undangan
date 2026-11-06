@@ -1,4 +1,5 @@
 const express = require("express");
+const { createCommerce } = require("./commerce");
 const { installAdmin, makeAdminGuard, isAdmin } = require("./admin");
 const { installSharing } = require("./sharing");
 const { createStorage } = require("./storage");
@@ -72,11 +73,14 @@ async function createApp(opts = {}) {
       next();
     };
     const admin = makeAdminGuard(db, auth, fail);
+    let commerce;
     async function own(req) {
       const e = await db
         .prepare("SELECT * FROM events WHERE id=? AND owner=?")
         .get(req.params.id, req.session.user_id);
       if (!e) throw fail(404, "Acara tidak ditemukan.");
+      if (commerce && !["GET", "HEAD"].includes(req.method))
+        await commerce.writable(e);
       return e;
     }
     async function session(res, user) {
@@ -178,6 +182,7 @@ async function createApp(opts = {}) {
         "brideInfo",
         "ceremony",
         "music",
+        "theme",
       ]) {
         if (d[k] !== undefined && typeof d[k] !== "string")
           throw fail(400, "Format isian tidak valid.");
@@ -264,17 +269,42 @@ async function createApp(opts = {}) {
       }
       return { ...clean, ...validateWedding(d, fail) };
     }
-    installWedding(app, db, { auth, own, fail, origin });
+    commerce = createCommerce(app, db, {
+      auth,
+      admin,
+      fail,
+      storage,
+      dataDir: dir,
+      missing,
+      allowUnpaidCreation: opts.allowUnpaidCreation === true,
+      clock: opts.clock,
+    });
+    installWedding(app, db, {
+      auth,
+      own,
+      fail,
+      origin,
+      available: commerce.available,
+    });
     app.get("/api/events", auth, async (req, res) =>
       res.json(
-        (
-          await db
-            .prepare("SELECT * FROM events WHERE owner=? ORDER BY updated DESC")
-            .all(req.session.user_id)
-        ).map(read),
+        await Promise.all(
+          (
+            await db
+              .prepare(
+                "SELECT * FROM events WHERE owner=? ORDER BY updated DESC",
+              )
+              .all(req.session.user_id)
+          ).map((e) => commerce.describe(e, read(e))),
+        ),
       ),
     );
     app.post("/api/events", auth, async (req, res) => {
+      if (!commerce.allowUnpaidCreation)
+        throw fail(
+          402,
+          "Pilih tema dan lakukan pembayaran melalui katalog terlebih dahulu.",
+        );
       const id = randomBytes(16).toString("hex"),
         slug = "pernikahan-" + randomBytes(9).toString("hex"),
         now = new Date().toISOString();
@@ -284,7 +314,7 @@ async function createApp(opts = {}) {
       res.status(201).json({ id, slug, status: "draft" });
     });
     app.get("/api/events/:id", auth, async (req, res) =>
-      res.json(read(await own(req))),
+      res.json(await commerce.describe(await own(req), read(await own(req)))),
     );
     app.put("/api/events/:id", auth, async (req, res) => {
       await db.transaction(async () => {
@@ -297,8 +327,10 @@ async function createApp(opts = {}) {
             "Undangan telah diperbarui, mungkin oleh admin. Muat ulang sebelum menyimpan.",
           );
         const d = await validate(req, req.body),
+          l = await commerce.validateLicense(latest, d),
           m = missing(d),
-          status = m.length ? "draft" : "ready";
+          status =
+            m.length || (l && !l.legacy && !l.locked_date) ? "draft" : "ready";
         await db
           .prepare(
             "UPDATE events SET data=?,status=?,updated=? WHERE id=? AND owner=?",
@@ -310,7 +342,10 @@ async function createApp(opts = {}) {
             req.params.id,
             req.session.user_id,
           );
-        res.json({ ...read(await own(req)), missing: m });
+        res.json({
+          ...(await commerce.describe(await own(req), read(await own(req)))),
+          missing: m,
+        });
       });
     });
     installSharing(app, db, { auth, own, fail });
@@ -322,17 +357,26 @@ async function createApp(opts = {}) {
       dataDir: dir,
       storage,
       limits,
+      available: commerce.available,
     });
-    installAdmin(app, db, { admin, fail, read, missing });
+    installAdmin(app, db, { admin, fail, read, missing, commerce });
     app.get("/api/public/:slug", async (req, res) => {
       const e = await db
         .prepare("SELECT * FROM events WHERE slug=? AND status='ready'")
         .get(req.params.slug);
+      if (e && !(await commerce.available(e)))
+        throw fail(
+          410,
+          "Masa aktif undangan berakhir atau tanggal belum diaktifkan.",
+        );
       if (!e)
         return res.status(404).json({
           error: "Undangan tidak ditemukan atau belum siap dibagikan.",
         });
-      res.json(JSON.parse(e.data));
+      res.json({
+        ...JSON.parse(e.data),
+        theme: (await commerce.license(e.id))?.theme_id || "navy",
+      });
     });
     app.get("/music/piano.wav", (req, res) => {
       const rate = 16000,
@@ -388,6 +432,13 @@ async function createApp(opts = {}) {
           .status(404)
           .type("html")
           .send("<h1>Undangan tidak ditemukan atau belum siap dibagikan.</h1>");
+      if (!(await commerce.available(event)))
+        return res
+          .status(410)
+          .type("html")
+          .send(
+            '<!doctype html><html lang="id"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Masa aktif berakhir</title><body><h1>Undangan tidak aktif</h1><p>Masa aktif undangan berakhir atau tanggal belum diaktifkan.</p></body></html>',
+          );
       const data = JSON.parse(event.data);
       const escape = (value) =>
         String(value || "").replace(
@@ -442,6 +493,9 @@ async function createApp(opts = {}) {
         "/layar-tamu",
         "/preview/:id",
         "/admin",
+        "/tema/:theme",
+        "/pesanan",
+        "/pesanan/:order",
       ],
       (req, res) => res.sendFile(path.join(__dirname, "public/index.html")),
     );
