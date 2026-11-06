@@ -20,6 +20,9 @@ test("Unggah lagu, banyak foto, kuota dan penyimpanan privat", async (t) => {
       .prepare("INSERT INTO sessions VALUES(?,?,?,?)")
       .run("sid-" + id, id, Date.now() + 120000, "csrf-" + id);
   }
+  await db
+    .prepare("INSERT INTO admin_users VALUES(?,?)")
+    .run("a", new Date().toISOString());
   const call = (url, { method = "GET", body, user = "a", range } = {}) =>
     fetch(base + url, {
       method,
@@ -74,7 +77,7 @@ test("Unggah lagu, banyak foto, kuota dan penyimpanan privat", async (t) => {
             user: "b",
           })
         ).status,
-        404,
+        403,
       );
       assert.equal(
         (
@@ -245,7 +248,7 @@ test("Unggah lagu, banyak foto, kuota dan penyimpanan privat", async (t) => {
               user: "b",
             })
           ).status,
-          404,
+          403,
         );
         assert.equal(
           (
@@ -322,6 +325,9 @@ test("Kuota atomik menolak unggahan foto bersamaan dan audio yang melebihi kapas
     await db
       .prepare("INSERT INTO sessions VALUES(?,?,?,?)")
       .run("quota-sid", "quota", Date.now() + 120000, "quota-csrf");
+    await db
+      .prepare("INSERT INTO admin_users VALUES(?,?)")
+      .run("quota", new Date().toISOString());
     const event = await (
       await fetch(base + "/api/events", { method: "POST", headers })
     ).json();

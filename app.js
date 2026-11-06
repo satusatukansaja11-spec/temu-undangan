@@ -1,4 +1,5 @@
 const express = require("express");
+const { installAdmin, makeAdminGuard, isAdmin } = require("./admin");
 const { installSharing } = require("./sharing");
 const { createStorage } = require("./storage");
 const { installMedia, mediaLimits } = require("./media");
@@ -70,6 +71,7 @@ async function createApp(opts = {}) {
         return next(fail(403, "Permintaan tidak sah. Muat ulang halaman."));
       next();
     };
+    const admin = makeAdminGuard(db, auth, fail);
     async function own(req) {
       const e = await db
         .prepare("SELECT * FROM events WHERE id=? AND owner=?")
@@ -93,13 +95,14 @@ async function createApp(opts = {}) {
       });
     }
     installAccountAuth(app, db, { origin, session, fail });
-    app.get("/api/me", (req, res) =>
+    app.get("/api/me", async (req, res) =>
       res.json({
         user: req.session
           ? {
               name: req.session.name,
               email: req.session.email,
               picture: req.session.picture,
+              isAdmin: await isAdmin(db, req.session.user_id),
             }
           : null,
         csrf: req.session?.csrf,
@@ -190,9 +193,15 @@ async function createApp(opts = {}) {
         !["none", "piano"].includes(clean.music) &&
         !(
           clean.music.startsWith("track:") &&
-          (await db
+          ((await db
             .prepare("SELECT id FROM tracks WHERE id=? AND event_id=?")
-            .get(clean.music.slice(6), req.params.id))
+            .get(clean.music.slice(6), req.params.id)) ||
+            (await db
+              .prepare(
+                "SELECT id FROM library_tracks WHERE id=?" +
+                  (db.driver === "postgres" ? " FOR UPDATE" : ""),
+              )
+              .get(clean.music.slice(6))))
         )
       )
         throw fail(400, "Musik tidak tersedia atau bukan milik acara ini.");
@@ -278,25 +287,43 @@ async function createApp(opts = {}) {
       res.json(read(await own(req))),
     );
     app.put("/api/events/:id", auth, async (req, res) => {
-      await own(req);
-      const d = await validate(req, req.body),
-        m = missing(d),
-        status = m.length ? "draft" : "ready";
-      await db
-        .prepare(
-          "UPDATE events SET data=?,status=?,updated=? WHERE id=? AND owner=?",
-        )
-        .run(
-          JSON.stringify(d),
-          status,
-          new Date().toISOString(),
-          req.params.id,
-          req.session.user_id,
-        );
-      res.json({ ...read(await own(req)), missing: m });
+      await db.transaction(async () => {
+        if (!(await db.lockEvent(req.params.id, req.session.user_id)))
+          throw fail(404, "Acara tidak ditemukan.");
+        const latest = await own(req);
+        if (req.body?.updated && req.body.updated !== latest.updated)
+          throw fail(
+            409,
+            "Undangan telah diperbarui, mungkin oleh admin. Muat ulang sebelum menyimpan.",
+          );
+        const d = await validate(req, req.body),
+          m = missing(d),
+          status = m.length ? "draft" : "ready";
+        await db
+          .prepare(
+            "UPDATE events SET data=?,status=?,updated=? WHERE id=? AND owner=?",
+          )
+          .run(
+            JSON.stringify(d),
+            status,
+            new Date().toISOString(),
+            req.params.id,
+            req.session.user_id,
+          );
+        res.json({ ...read(await own(req)), missing: m });
+      });
     });
     installSharing(app, db, { auth, own, fail });
-    installMedia(app, db, { auth, own, fail, dataDir: dir, storage, limits });
+    installMedia(app, db, {
+      auth,
+      admin,
+      own,
+      fail,
+      dataDir: dir,
+      storage,
+      limits,
+    });
+    installAdmin(app, db, { admin, fail, read, missing });
     app.get("/api/public/:slug", async (req, res) => {
       const e = await db
         .prepare("SELECT * FROM events WHERE slug=? AND status='ready'")
@@ -395,7 +422,10 @@ async function createApp(opts = {}) {
       );
       res.type("html").send(
         html
-          .replace(/<title>.*?<\/title>/, () => `<title>${escape(title)}</title>`)
+          .replace(
+            /<title>.*?<\/title>/,
+            () => `<title>${escape(title)}</title>`,
+          )
           .replace(
             /<meta name="description"[^>]*>/,
             () => `<meta name="description" content="${escape(description)}">`,
@@ -404,7 +434,15 @@ async function createApp(opts = {}) {
       );
     });
     app.get(
-      ["/", "/login", "/daftar", "/dashboard", "/layar-tamu", "/preview/:id"],
+      [
+        "/",
+        "/login",
+        "/daftar",
+        "/dashboard",
+        "/layar-tamu",
+        "/preview/:id",
+        "/admin",
+      ],
       (req, res) => res.sendFile(path.join(__dirname, "public/index.html")),
     );
     app.use((err, req, res, next) => {

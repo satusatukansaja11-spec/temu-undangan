@@ -3,6 +3,9 @@ const path = require("node:path");
 const { DatabaseSync } = require("node:sqlite");
 const { connectDatabase, migrate } = require("../db");
 const tables = {
+  admin_users: ["user_id", "created"],
+  library_tracks: ["id", "name", "mime", "size_bytes", "duration", "created"],
+  admin_audit: ["id", "actor", "action", "target", "details", "created"],
   recipients: ["id", "event_id", "name", "created"],
   share_settings: ["event_id", "message"],
   users: ["id", "name", "email", "picture"],
@@ -58,6 +61,9 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "rsvps",
             "recipients",
             "share_settings",
+            "admin_users",
+            "library_tracks",
+            "admin_audit",
           ].indexOf(a) -
           [
             "users",
@@ -68,6 +74,9 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "rsvps",
             "recipients",
             "share_settings",
+            "admin_users",
+            "library_tracks",
+            "admin_audit",
           ].indexOf(b),
       )) {
         counts[table] = 0;

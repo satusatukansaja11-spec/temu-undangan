@@ -139,12 +139,9 @@ Di lingkungan proxy build khusus, Dockerfile mendukung secret `proxy_ca` untuk C
 
 ## 7. Menambahkan lagu dan banyak foto
 
-Di dashboard → **Edit undangan → Info & tampilan**:
+Admin mengelola lagu dari **/admin → Pustaka musik bersama**. Isi judul, pilih MP3/M4A/OGG/WAV, lalu Unggah lagu. Hapus hanya diizinkan jika lagu belum dipakai undangan mana pun. Lagu lama per acara dipertahankan agar undangan yang sudah ada tetap berfungsi.
 
-1. Isi judul lagu, pilih file MP3/M4A/OGG/WAV, lalu **Unggah lagu**.
-2. Pilih lagu pada **Musik latar**, kemudian **Simpan**. Lagu yang baru diunggah belum menjadi musik publik sebelum undangan disimpan.
-3. Musik mulai diputar saat tamu menekan Buka Undangan. Tombol musik di navigasi bawah dapat menjeda dan memutar kembali. Jika browser menolak pemutaran, tamu dapat menekan tombol Musik untuk mencoba lagi. Pilihan None menghilangkan pemutar.
-4. Menghapus lagu yang sedang dipakai langsung mengubah musik tersimpan menjadi None. Penghapusan meminta konfirmasi.
+Pelanggan membuka **Edit undangan → Info & tampilan → Musik latar**, memilih lagu dari pustaka, lalu Simpan. Pelanggan tidak dapat mengunggah atau menghapus audio, termasuk melalui API. Musik mulai saat Buka Undangan ditekan; tombol musik menjeda dan memutar kembali. Jika browser menolak play, gunakan tombol Musik untuk mencoba lagi. None menghilangkan pemutar.
 
 Di **Galeri foto**:
 
@@ -191,3 +188,29 @@ Verifikasi deployment nyata tetap memerlukan URL database, bucket, kredensial, d
 Gunakan Node.js 24+, framework Express, root berisi package.json, startup file `server.js`, dan start command `npm start` jika diminta. `server.js` memulai server ketika dieksekusi langsung maupun ketika di-require oleh loader hosting. Factory `createApp` berada di `app.js`; jangan pilih `app.js` sebagai startup file. Unggah seluruh proyek terbaru karena server.js membutuhkan app.js dan modul lainnya.
 
 Jika log menyebut `App did not call listen() within 3 seconds`, pastikan versi terbaru server.js sudah dipakai. Tidak ada guard `require.main === module` pada entry tersebut. Inisialisasi database/migrasi tetap harus berhasil sebelum listen; untuk PostgreSQL jalankan migrasi terlebih dahulu dan gunakan AUTO_MIGRATE=false sesuai panduan. Uji /healthz setelah deploy; tes lokal tidak menggantikan verifikasi di Hostinger. Environment variables diatur melalui panel; .env pribadi tidak termasuk kode Git atau ZIP rilis.
+
+
+## Panel pemilik dan aktivasi akses admin
+
+Halaman `/admin` menggunakan akun login yang sama dengan aplikasi utama, dengan hak admin tersimpan di server. Tidak ada password admin bawaan dan akun pertama tidak otomatis menjadi admin.
+
+1. Backup database dan media, deploy seluruh kode terbaru, lalu jalankan `npm run db:migrate` pada database aplikasi (migrasi 004 menambahkan tabel admin, pustaka musik dan audit). SQLite dengan AUTO_MIGRATE=true juga menjalankannya saat startup.
+2. Daftarkan akun pemilik melalui `/daftar` jika belum ada. Pakai email dan password yang Anda kuasai.
+3. Dari terminal server pada folder aplikasi dan konfigurasi database yang sama, jalankan (ganti email contoh dengan email akun Anda):
+
+   ```sh
+   npm run admin:grant -- pemilik@example.com
+   ```
+
+4. Login/muat ulang, lalu buka `https://domain-anda/admin`. Panel Admin juga muncul pada dashboard akun pemilik di HP/laptop. Jika paket tidak menyediakan terminal, minta dukungan hosting menjalankan perintah tersebut pada environment aplikasi. Jangan memberikan hak admin melalui form publik atau membagikan akses server kepada pelanggan.
+5. Untuk mencabut hak akses:
+
+   ```sh
+   npm run admin:revoke -- pemilik@example.com
+   ```
+
+Perintah membutuhkan akun email/password yang sudah terdaftar. Pemeriksaan admin dilakukan pada setiap request server, sehingga pencabutan juga berlaku untuk sesi yang masih login. Jalankan grant hanya untuk akun Anda sendiri yang identitasnya sudah dipastikan; tidak ada verifikasi kepemilikan email otomatis pada alur pendaftaran saat ini.
+
+Panel mendukung pencarian nama/email/undangan, koreksi tanggal dengan alasan wajib, riwayat tindakan, dan upload/hapus lagu bersama. Koreksi memindahkan tanggal jadwal tambahan yang sama dengan tanggal utama lama; jadwal di hari lain tetap utuh. Jika pengguna membuka editor sebelum koreksi, penyimpanan data lama ditolak agar tidak menimpa koreksi: pengguna perlu memuat ulang. Audit dan data pelanggan hanya tersedia bagi admin.
+
+Lagu bersama disimpan di storage local/S3 yang sudah dipilih. Metadata, peran admin, dan audit perlu disertakan dalam backup database; `storage:sync` juga memindahkan lagu pustaka saat migrasi storage. Tidak ada file .env pribadi pada kode rilis. Pembayaran, katalog berbayar, dan penguncian masa aktif dalam rules.md masih spesifikasi terpisah dan belum diaktifkan oleh panel bantuan ini.

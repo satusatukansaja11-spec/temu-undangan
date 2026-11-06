@@ -117,3 +117,9 @@ Pengujian backend mencakup persistensi pilihan waktu selesai, status ready tanpa
 ## Entry point Hostinger — 6 November 2026
 
 Server startup dipisahkan dari factory app.js. Dua subprocess terisolasi memverifikasi eksekusi langsung dan require oleh loader, GET /healthz serta shutdown SIGTERM. Keduanya selesai di bawah 0,2 detik pada pengujian lokal ini; tidak menyatakan latensi Hostinger. Suite: 44 lulus, 0 gagal, 2 tes layanan eksternal dilewati. Pemeriksaan sintaks dan git diff check lulus. .env pribadi tidak dilacak, tidak dimasukkan ke commit/ZIP, dan tidak diunggah. Deployment Hostinger belum dijalankan dari lingkungan ini.
+
+## Admin pemilik dan pustaka musik — 6 November 2026
+
+Suite backend lokal: 45 lulus, 0 gagal, 2 layanan eksternal dilewati. Tes baru mencakup penolakan akses admin/CSRF/unggah-hapus pengguna biasa, audio palsu, pustaka bersama, pilihan musik pengguna, HTTP Range publik hanya saat lagu dipakai undangan ready, perlindungan lagu aktif, penghapusan/cleanup, koreksi tanggal beserta jadwal yang relevan, konflik editor lama, pencarian, audit, dan pencabutan hak admin. Migrasi lama tetap idempoten dan tidak menghapus lagu lama.
+
+Chromium menguji pemberian hak melalui CLI ke akun QA, koreksi tanggal via dialog, unggah/hapus pustaka, penolakan hapus lagu yang masih dipakai, pilihan lagu di editor pelanggan tanpa kontrol upload, penolakan halaman admin untuk pelanggan, lebar 320/390/1440 tanpa overflow horizontal atau JavaScript page error. Screenshot memakai data sintetis. Tampilan audit memakai label dan ringkasan yang terbaca. Hostinger tidak dideploy dari lingkungan ini; admin produksi perlu dipromosikan lewat perintah server pada database yang benar. PostgreSQL/S3 eksternal tidak diuji pada putaran ini. .env pribadi tidak ditambahkan ke Git.

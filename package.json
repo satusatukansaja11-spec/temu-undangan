@@ -14,7 +14,9 @@
     "db:import-sqlite": "node --env-file-if-exists=.env scripts/import-sqlite.js",
     "storage:sync": "node --env-file-if-exists=.env scripts/storage-maintenance.js sync",
     "media:backfill": "node --env-file-if-exists=.env scripts/storage-maintenance.js backfill",
-    "storage:cleanup": "node --env-file-if-exists=.env scripts/storage-maintenance.js cleanup"
+    "storage:cleanup": "node --env-file-if-exists=.env scripts/storage-maintenance.js cleanup",
+    "admin:grant": "node --env-file-if-exists=.env scripts/admin-access.js grant",
+    "admin:revoke": "node --env-file-if-exists=.env scripts/admin-access.js revoke"
   },
   "keywords": [],
   "author": "",

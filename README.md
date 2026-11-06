@@ -44,7 +44,7 @@ Aplikasi **belum diterbitkan ke internet**. Proyek ini adalah aplikasi Node.js m
 - Validasi browser serta decoding isi gambar di backend. Hanya JPEG, PNG, WebP; maksimal 10 MB secara default dan 40 megapiksel; metadata dibuang, dirotasi dan diubah menjadi WebP maksimal 2000×2000. SVG/HTML/gambar rusak ditolak.
 - Salam sesuai pilihan agama; template baru diterapkan dengan tindakan pengguna. Perubahan agama tidak menimpa teks buatan pengguna.
 - URL unik acak per acara, halaman publik tanpa identitas akun/ID internal, draft dan URL tak ditemukan ditangani.
-- Musik `None`, lagu unggahan pribadi, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Musik mulai saat Buka Undangan ditekan, dengan kontrol putar/jeda; `None` tidak membuat elemen audio. Lagu pribadi diunggah lewat editor, kemudian dipilih dan disimpan sebelum dibagikan.
+- Musik `None`, lagu dari pustaka admin, atau **Melodi Temu**, instrumental sintetis orisinal yang dibuat aplikasi tanpa lisensi/layanan eksternal. Musik mulai saat Buka Undangan ditekan, dengan kontrol putar/jeda; `None` tidak membuat elemen audio. Lagu diunggah oleh admin melalui /admin; pelanggan hanya memilih dan menyimpan pilihan musik.
 - Sebar membuka dialog pesan yang bisa diedit; tautan WhatsApp terisi teks dan URL. Pengguna sendiri membuka WhatsApp dan mengirim. Aplikasi tidak mengirim pesan otomatis.
 
 Versi ini mengelola satu jadwal utama dan maksimal delapan rangkaian tambahan per pernikahan. `end` harus sesudah `start` pada tanggal sama; acara lintas tengah malam belum didukung. Pilih WIB/WITA/WIT untuk countdown dan kalender. Jenis acara lain, pembayaran, AI eksternal dan pengiriman WhatsApp otomatis tidak dibuat.
@@ -162,7 +162,7 @@ Pratinjau undangan (seluruh konten adalah data ilustrasi pengujian):
 
 - **SQL hosting:** PostgreSQL dengan connection pool, migrasi SQL dan alat impor dari SQLite. Mode SQLite lokal tetap tersedia; akun/hash password/ID undangan dapat dipindahkan tanpa membuat ulang akun.
 - **Penyimpanan:** disk lokal persisten atau bucket S3-compatible privat. Media tetap file, bukan base64 database. Akses publik hanya untuk media terpilih pada undangan siap dibagikan.
-- **Musik pribadi:** unggah MP3/M4A/OGG/WAV maksimal 30 MB/30 menit, pilih lagu, Simpan. Musik tetap membutuhkan tindakan putar dari tamu. Audio mendukung streaming/seek.
+- **Pustaka musik admin:** admin unggah MP3/M4A/OGG/WAV maksimal 30 MB/30 menit melalui /admin; pelanggan memilih lagu lalu Simpan. Musik mulai saat Buka Undangan ditekan. Audio mendukung streaming/seek.
 - **Foto banyak:** default 200 foto galeri, 1.000 unggahan per acara, 10 MB/foto dan total media 2 GB/acara, semuanya dapat dikonfigurasi. Pustaka dapat memakai ulang dan menghapus file yang tidak dipakai.
 - **Hosting:** Dockerfile, Docker Compose PostgreSQL, healthcheck, contoh reverse proxy dan panduan HTTPS. Dukungan hosting sudah disiapkan; ini bukan konfirmasi website sudah terbit.
 
@@ -233,3 +233,19 @@ Menu Sebar menyediakan template Sesuai agama (default mengikuti agama acara) den
 Halaman publik mengirim metadata Open Graph langsung dari server, menggunakan judul dan foto sampul milik undangan siap dibagikan. WhatsApp perlu dapat mengakses domain HTTPS dan foto tanpa login; localhost tidak dapat dipakai untuk pratinjau eksternal. Cache dan tampilan kartu ditentukan WhatsApp; wa.me menyiapkan pesan dan tidak mengirim lampiran foto secara otomatis. Isi pesan tetap dapat ditinjau sebelum pengguna mengirimnya.
 
 Pada Waktu & tempat, tombol Sampai Selesai di bawah jam selesai menonaktifkan jam tersebut; klik lagi untuk kembali mengisi waktu pasti. Pilihan tersimpan dalam data SQL acara, tanpa migrasi skema tambahan. Timeline dan pesan menampilkan jam mulai – Selesai. File kalender hanya ditawarkan saat waktu akhir pasti tersedia, sehingga aplikasi tidak mengarang jam selesai. Rangkaian tambahan tetap memakai jam selesai masing-masing.
+
+
+## Panel admin pemilik
+
+`/admin` menyediakan pencarian undangan pelanggan, koreksi tanggal dengan alasan dan audit, serta pustaka musik bersama (unggah/pratinjau/hapus). Pengguna biasa tidak dapat upload/hapus lagu melalui tampilan maupun API; foto tetap dapat diunggah seperti biasa. Lagu yang masih dipakai dilindungi dari penghapusan. Lagu lama per acara tetap dapat dipilih oleh pemiliknya untuk kompatibilitas.
+
+Sesudah deploy dan migrasi, daftarkan akun pemilik lalu jalankan dari terminal server dengan database aplikasi yang sama:
+
+```sh
+npm run db:migrate
+npm run admin:grant -- pemilik@example.com
+```
+
+Ganti email contoh dengan akun pribadi yang sudah terdaftar. Muat ulang/login dan buka `/admin`. Tidak ada admin default, tidak ada password bersama, dan pelanggan tidak dapat memilih peran saat mendaftar. Pencabutan: `npm run admin:revoke -- pemilik@example.com`. Lihat [panduan aktivasi](docs/DEPLOYMENT.md#panel-pemilik-dan-aktivasi-akses-admin).
+
+[Pratinjau laptop](docs/images/admin-desktop.png) · [Pratinjau HP](docs/images/admin-mobile.png). Screenshot memakai akun dan lagu sintetis. Pembayaran/masa aktif sekali pakai dalam rules.md belum diimplementasikan oleh revisi panel admin ini.

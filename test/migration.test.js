@@ -63,7 +63,7 @@ test("Migrasi SQLite lama idempoten dan mempertahankan akun, hash dan undangan",
     await migrate(db);
     assert.equal(
       (await db.prepare("SELECT COUNT(*) n FROM schema_migrations").get()).n,
-      3,
+      4,
     );
     assert.equal(
       (

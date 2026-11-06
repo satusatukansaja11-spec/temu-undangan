@@ -161,3 +161,13 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Tepat sebelum batas akhir, undangan masih aktif; tepat pada batas akhir dan sesudahnya seluruh pembatasan expired berlaku, termasuk untuk tab editor yang sudah terbuka.
 - Uji batas tanggal pada WIB, WITA, dan WIT, penggantian tanggal lewat API, serta upaya memakai order sama pada undangan lain.
 - Setelah expired, pelanggan tetap dapat login/membaca arsip, tetapi tidak dapat memindahkan tanggal atau memakai undangan untuk pernikahan baru.
+
+
+## 9. Panel admin pemilik dan pustaka musik
+
+- Panel `/admin` terhubung ke database dan akun aplikasi utama, dengan peran admin yang diberikan lewat perintah server kepada akun pemilik. Pelanggan tidak dapat mendaftar sebagai admin.
+- Pemilik dapat mencari undangan pelanggan dan mengoreksi tanggal dengan alasan wajib. Simpan tanggal sebelum/sesudah, pelaku, waktu, dan alasan pada audit; koreksi tidak boleh menimpa perubahan yang lebih baru tanpa memuat ulang data.
+- Hanya admin dapat mengunggah dan menghapus musik. Pelanggan hanya memilih lagu dari pustaka bersama; unggah foto tetap tersedia. Pembatasan berlaku pada UI dan API.
+- Lagu bersama yang masih dipakai undangan tidak boleh dihapus. Pilihan lagu lama per acara dipertahankan agar data pengguna lama tidak rusak.
+- Gunakan akun pemilik sendiri; tidak ada kredensial admin bawaan dan tidak ada promosi otomatis untuk pengguna pertama. Hak admin dapat dicabut melalui server.
+- Implementasi panel bantuan dan musik ini sudah tersedia pada kode. Pembayaran, hak akses tema berbayar, serta penguncian/expiry sekali pakai pada bagian lain dokumen masih menunggu implementasi; panel ini tidak mengklaim fitur tersebut sudah aktif.

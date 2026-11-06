@@ -20,7 +20,11 @@ function mediaLimits() {
     eventTracks: value("MAX_EVENT_TRACKS", 20, 100),
   };
 }
-function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
+function installMedia(
+  app,
+  db,
+  { auth, admin, own, fail, dataDir, storage, limits },
+) {
   const temporary = path.join(dataDir, ".tmp");
   fs.mkdirSync(temporary, { recursive: true });
   const disk = multer.diskStorage({
@@ -29,7 +33,7 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
       cb(null, randomBytes(32).toString("hex") + ".upload"),
   });
   let active = 0;
-  const upload = (field, megabytes, fields = 0) => {
+  const upload = (field, megabytes, fields = 0, library = false) => {
     const parse = multer({
       storage: disk,
       limits: {
@@ -40,7 +44,7 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
       },
     }).single(field);
     return async (req, res, next) => {
-      await own(req);
+      if (!library) await own(req);
       if (active >= 2)
         throw fail(
           503,
@@ -131,7 +135,12 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
       .all(req.params.id);
     res.json({
       photos: photos.map((photo) => ({ ...photo, url: "/media/" + photo.id })),
-      tracks,
+      tracks: [
+        ...(await db
+          .prepare("SELECT * FROM library_tracks ORDER BY created DESC,id DESC")
+          .all()),
+        ...tracks,
+      ],
       limits,
       usedBytes:
         photos.reduce((n, p) => n + p.size_bytes, 0) +
@@ -181,70 +190,108 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
       }
     },
   );
-  app.post(
-    "/api/events/:id/tracks",
-    auth,
-    upload("audio", limits.audioMB, 1),
-    async (req, res) => {
+  const uploadTrack = async (req, res) => {
+    try {
+      if (!req.file) throw fail(400, "Pilih file MP3, M4A, OGG, atau WAV.");
+      const header = Buffer.alloc(16),
+        file = await fs.promises.open(req.file.path, "r");
       try {
-        if (!req.file) throw fail(400, "Pilih file MP3, M4A, OGG, atau WAV.");
-        const header = Buffer.alloc(16),
-          file = await fs.promises.open(req.file.path, "r");
+        await file.read(header, 0, 16, 0);
+      } finally {
+        await file.close();
+      }
+      let extension, mime;
+      if (
+        header.toString("ascii", 0, 4) === "RIFF" &&
+        header.readUInt32LE(4) + 8 > req.file.size
+      )
+        throw fail(400, "Isi audio WAV tidak lengkap.");
+      if (
+        header.toString("ascii", 0, 4) === "RIFF" &&
+        header.toString("ascii", 8, 12) === "WAVE"
+      ) {
+        extension = "wav";
+        mime = "audio/wav";
+      } else if (header.toString("ascii", 0, 4) === "OggS") {
+        extension = "ogg";
+        mime = "audio/ogg";
+      } else if (
+        header.toString("ascii", 4, 8) === "ftyp" &&
+        ["M4A ", "M4B "].includes(header.toString("ascii", 8, 12))
+      ) {
+        extension = "m4a";
+        mime = "audio/mp4";
+      } else if (
+        header.toString("ascii", 0, 3) === "ID3" ||
+        (header[0] === 255 && (header[1] & 224) === 224)
+      ) {
+        extension = "mp3";
+        mime = "audio/mpeg";
+      } else
+        throw fail(
+          400,
+          "Isi file harus berupa audio MP3, M4A, OGG, atau WAV yang valid.",
+        );
+      const { parseFile } = await import("music-metadata");
+      const metadata = await parseFile(req.file.path, { duration: true });
+      if (
+        !Number.isFinite(metadata.format.duration) ||
+        metadata.format.duration <= 0 ||
+        metadata.format.duration > 1800 ||
+        !metadata.format.numberOfChannels ||
+        !metadata.format.sampleRate
+      )
+        throw fail(
+          400,
+          "Audio harus dapat dibaca dan berdurasi maksimal 30 menit.",
+        );
+      const name =
+        typeof req.body.name === "string" ? req.body.name.trim() : "";
+      if (!name || name.length > 140)
+        throw fail(400, "Isi judul lagu maksimal 140 karakter.");
+      const id = randomBytes(32).toString("hex") + "." + extension;
+      if (req.libraryUpload) {
+        let written = false;
         try {
-          await file.read(header, 0, 16, 0);
-        } finally {
-          await file.close();
+          await db.transaction(async () => {
+            written = true;
+            await storage.put("audio/" + id, {
+              file: req.file.path,
+              mime,
+              size: req.file.size,
+            });
+            await db
+              .prepare("INSERT INTO library_tracks VALUES(?,?,?,?,?,?)")
+              .run(
+                id,
+                name,
+                mime,
+                req.file.size,
+                metadata.format.duration,
+                new Date().toISOString(),
+              );
+            await db
+              .prepare("INSERT INTO admin_audit VALUES(?,?,?,?,?,?)")
+              .run(
+                randomBytes(16).toString("hex"),
+                req.session.user_id,
+                "music.upload",
+                id,
+                JSON.stringify({ name }),
+                new Date().toISOString(),
+              );
+          });
+        } catch (error) {
+          if (written) {
+            try {
+              await storage.remove("audio/" + id);
+            } catch {
+              await queueDeletion(db, "audio/" + id);
+            }
+          }
+          throw error;
         }
-        let extension, mime;
-        if (
-          header.toString("ascii", 0, 4) === "RIFF" &&
-          header.readUInt32LE(4) + 8 > req.file.size
-        )
-          throw fail(400, "Isi audio WAV tidak lengkap.");
-        if (
-          header.toString("ascii", 0, 4) === "RIFF" &&
-          header.toString("ascii", 8, 12) === "WAVE"
-        ) {
-          extension = "wav";
-          mime = "audio/wav";
-        } else if (header.toString("ascii", 0, 4) === "OggS") {
-          extension = "ogg";
-          mime = "audio/ogg";
-        } else if (
-          header.toString("ascii", 4, 8) === "ftyp" &&
-          ["M4A ", "M4B "].includes(header.toString("ascii", 8, 12))
-        ) {
-          extension = "m4a";
-          mime = "audio/mp4";
-        } else if (
-          header.toString("ascii", 0, 3) === "ID3" ||
-          (header[0] === 255 && (header[1] & 224) === 224)
-        ) {
-          extension = "mp3";
-          mime = "audio/mpeg";
-        } else
-          throw fail(
-            400,
-            "Isi file harus berupa audio MP3, M4A, OGG, atau WAV yang valid.",
-          );
-        const { parseFile } = await import("music-metadata");
-        const metadata = await parseFile(req.file.path, { duration: true });
-        if (
-          !Number.isFinite(metadata.format.duration) ||
-          metadata.format.duration <= 0 ||
-          metadata.format.duration > 1800 ||
-          !metadata.format.numberOfChannels ||
-          !metadata.format.sampleRate
-        )
-          throw fail(
-            400,
-            "Audio harus dapat dibaca dan berdurasi maksimal 30 menit.",
-          );
-        const name =
-          typeof req.body.name === "string" ? req.body.name.trim() : "";
-        if (!name || name.length > 140)
-          throw fail(400, "Isi judul lagu maksimal 140 karakter.");
-        const id = randomBytes(32).toString("hex") + "." + extension;
+      } else
         await persist(
           req,
           "audio/" + id,
@@ -263,27 +310,78 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
               ),
           "track",
         );
-        await fs.promises.rm(req.file.path, { force: true });
-        res
-          .status(201)
-          .json({
-            id,
-            name,
-            duration: metadata.format.duration,
-            size_bytes: req.file.size,
-          });
-      } catch (error) {
-        throw error.status
-          ? error
-          : fail(
-              400,
-              "Audio tidak dapat diproses. Periksa format, ukuran, dan koneksi penyimpanan lalu coba lagi.",
-            );
-      } finally {
-        if (req.file) await fs.promises.rm(req.file.path, { force: true });
-      }
-    },
+      await fs.promises.rm(req.file.path, { force: true });
+      res.status(201).json({
+        id,
+        name,
+        duration: metadata.format.duration,
+        size_bytes: req.file.size,
+      });
+    } catch (error) {
+      throw error.status
+        ? error
+        : fail(
+            400,
+            "Audio tidak dapat diproses. Periksa format, ukuran, dan koneksi penyimpanan lalu coba lagi.",
+          );
+    } finally {
+      if (req.file) await fs.promises.rm(req.file.path, { force: true });
+    }
+  };
+  app.post(
+    "/api/events/:id/tracks",
+    admin,
+    upload("audio", limits.audioMB, 1),
+    uploadTrack,
   );
+  app.post(
+    "/api/admin/music",
+    admin,
+    (req, res, next) => {
+      req.libraryUpload = true;
+      next();
+    },
+    upload("audio", limits.audioMB, 1, true),
+    uploadTrack,
+  );
+  app.get("/api/admin/music", admin, async (req, res) =>
+    res.json(
+      await db
+        .prepare("SELECT * FROM library_tracks ORDER BY created DESC,id DESC")
+        .all(),
+    ),
+  );
+  app.delete("/api/admin/music/:track", admin, async (req, res) => {
+    await db.transaction(async () => {
+      const track = await db
+        .prepare(
+          "SELECT * FROM library_tracks WHERE id=?" +
+            (db.driver === "postgres" ? " FOR UPDATE" : ""),
+        )
+        .get(req.params.track);
+      if (!track) throw fail(404, "Lagu tidak ditemukan.");
+      const events = await db.prepare("SELECT data FROM events").all();
+      if (events.some((e) => JSON.parse(e.data).music === "track:" + track.id))
+        throw fail(
+          409,
+          "Lagu masih digunakan undangan. Ganti musik pada undangan tersebut sebelum menghapus lagu.",
+        );
+      await db.prepare("DELETE FROM library_tracks WHERE id=?").run(track.id);
+      await queueDeletion(db, "audio/" + track.id);
+      await db
+        .prepare("INSERT INTO admin_audit VALUES(?,?,?,?,?,?)")
+        .run(
+          randomBytes(16).toString("hex"),
+          req.session.user_id,
+          "music.delete",
+          track.id,
+          JSON.stringify({ name: track.name }),
+          new Date().toISOString(),
+        );
+    });
+    const pending = await drainDeletions(db, storage);
+    res.json({ ok: true, cleanupPending: pending > 0 });
+  });
   app.get("/media/:photo", async (req, res) => {
     const event = await db
       .prepare(
@@ -306,6 +404,21 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
     await storage.serve(req, res, "photos/" + req.params.photo, "image/webp");
   });
   app.get("/audio/:track", async (req, res) => {
+    const shared = await db
+      .prepare("SELECT * FROM library_tracks WHERE id=?")
+      .get(req.params.track);
+    if (shared) {
+      if (!req.session) {
+        const events = await db
+          .prepare("SELECT data FROM events WHERE status='ready'")
+          .all();
+        if (
+          !events.some((e) => JSON.parse(e.data).music === "track:" + shared.id)
+        )
+          return res.sendStatus(404);
+      }
+      return storage.serve(req, res, "audio/" + shared.id, shared.mime);
+    }
     const track = await db
       .prepare(
         "SELECT tracks.*,events.owner,events.status,events.data FROM tracks JOIN events ON events.id=tracks.event_id WHERE tracks.id=?",
@@ -367,7 +480,7 @@ function installMedia(app, db, { auth, own, fail, dataDir, storage, limits }) {
   app.delete("/api/events/:id/photos/:photo", auth, (req, res) =>
     remove(req, res, "photos", req.params.photo),
   );
-  app.delete("/api/events/:id/tracks/:track", auth, (req, res) =>
+  app.delete("/api/events/:id/tracks/:track", admin, (req, res) =>
     remove(req, res, "audio", req.params.track),
   );
   app.delete("/api/events/:id", auth, async (req, res) => {

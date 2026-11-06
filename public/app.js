@@ -91,7 +91,7 @@ async function api(url, options = {}) {
 }
 const logo = '<a href="/dashboard" class="brand">temu<span>✳</span></a>';
 function shell(content) {
-  root.innerHTML = `<aside>${logo}<div class="workspace">RUANG PERNIKAHAN ANDA</div><nav><button class="nav active" id="dashboardLink">▦ <span>Undangan saya</span></button></nav><div class="aside-bottom"><div class="tiny-flower">✳</div><h3>Awal cerita indah.</h3><p>Satu undangan, sejuta kenangan.</p></div><div class="user"><span class="avatar">${esc((me.name || "U")[0])}</span><div><strong>${esc(me.name)}</strong><small>Akun pribadi</small></div><button id="logout" title="Keluar akun" aria-label="Keluar akun"><span aria-hidden="true">↗</span> Keluar akun</button></div></aside><div class="main"><header><span>Ruang pribadi <i>/</i> <b>Undangan saya</b></span><span class="header-note">Dibuat dengan sepenuh hati ♡</span></header>${content}<footer>temu ✳ <span>Tempat cerita bahagia dimulai.</span><small>Undangan pernikahan digital</small></footer></div>`;
+  root.innerHTML = `<aside>${logo}<div class="workspace">RUANG PERNIKAHAN ANDA</div><nav><button class="nav active" id="dashboardLink">▦ <span>Undangan saya</span></button>${me.isAdmin ? '<a class="nav admin-link" href="/admin">Panel admin</a>' : ""}</nav><div class="aside-bottom"><div class="tiny-flower">✳</div><h3>Awal cerita indah.</h3><p>Satu undangan, sejuta kenangan.</p></div><div class="user"><span class="avatar">${esc((me.name || "U")[0])}</span><div><strong>${esc(me.name)}</strong><small>Akun pribadi</small></div><button id="logout" title="Keluar akun" aria-label="Keluar akun"><span aria-hidden="true">↗</span> Keluar akun</button>${me.isAdmin ? '<a class="admin-mobile-link" href="/admin">Panel admin</a>' : ""}</div></aside><div class="main"><header><span>Ruang pribadi <i>/</i> <b>Undangan saya</b></span><span class="header-note">Dibuat dengan sepenuh hati ♡</span></header>${content}<footer>temu ✳ <span>Tempat cerita bahagia dimulai.</span><small>Undangan pernikahan digital</small></footer></div>`;
   document.querySelector("#dashboardLink").onclick = () => leave(dashboard);
   document.querySelector("#logout").onclick = async () =>
     leave(async () => {
@@ -482,6 +482,18 @@ window.addEventListener("beforeunload", (e) => {
         return;
       }
       return renderLogin(info, parts[1] === "daftar");
+    }
+    if (parts[1] === "admin") {
+      if (!me) {
+        location.replace("/login");
+        return;
+      }
+      if (!me.isAdmin) {
+        root.innerHTML =
+          '<main><h1>Akses terbatas</h1><p>Halaman ini hanya untuk admin pemilik.</p><a href="/dashboard">Kembali ke dashboard</a></main>';
+        return;
+      }
+      return renderAdmin();
     }
     if (parts[1] === "dashboard") {
       if (!me) {

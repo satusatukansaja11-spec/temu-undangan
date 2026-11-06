@@ -25,7 +25,12 @@ async function main() {
     if (mode === "sync" && storage.driver !== "s3")
       throw Error("Mode sync memerlukan STORAGE_DRIVER=s3.");
     const photos = await db.prepare("SELECT id,size_bytes FROM photos").all(),
-      tracks = await db.prepare("SELECT id,size_bytes,mime FROM tracks").all();
+      tracks = [
+        ...(await db.prepare("SELECT id,size_bytes,mime FROM tracks").all()),
+        ...(await db
+          .prepare("SELECT id,size_bytes,mime FROM library_tracks")
+          .all()),
+      ];
     for (const item of [
       ...photos.map((row) => ({
         ...row,
