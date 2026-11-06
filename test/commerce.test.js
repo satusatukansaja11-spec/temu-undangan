@@ -78,9 +78,25 @@ test("Paid themes: manual verification, private proof, one wedding and expiry", 
     await db
       .prepare("INSERT INTO admin_users VALUES(?,?)")
       .run("admin", new Date().toISOString());
+    const draftResponse = await call("/api/events", {
+      method: "POST",
+      body: { name: "Draft belum dibayar" },
+    });
+    assert.equal(draftResponse.status, 201);
+    const draft = await draftResponse.json();
+    assert.equal(draft.license.paid, false);
     assert.equal(
-      (await call("/api/events", { method: "POST", body: {} })).status,
+      (
+        await call("/api/events/" + draft.id + "/activate", {
+          method: "POST",
+          body: { date: "2027-06-20", timezone: "Asia/Jakarta", confirm: true },
+        })
+      ).status,
       402,
+    );
+    assert.equal(
+      (await call("/api/events/" + draft.id, { method: "DELETE" })).status,
+      200,
     );
     assert.equal(
       (await call("/api/themes/sakura/preview", { user: null })).status,

@@ -95,8 +95,20 @@ function shell(content) {
   document.querySelector("#dashboardLink").onclick = () => leave(dashboard);
   document.querySelector("#logout").onclick = async () =>
     leave(async () => {
-      await api("/api/logout", { method: "POST" });
-      location.href = "/";
+      const button = document.querySelector("#logout");
+      button.disabled = true;
+      try {
+        await api("/api/logout", { method: "POST" });
+        me = null;
+        csrf = null;
+        sessionStorage.removeItem("pendingTheme");
+        sessionStorage.removeItem("pendingEvent");
+        dirty = false;
+        location.replace("/login");
+      } catch (error) {
+        button.disabled = false;
+        toast(error.message);
+      }
     });
 }
 function leave(fn) {
@@ -107,7 +119,9 @@ function leave(fn) {
   )
     return;
   dirty = false;
-  fn();
+  return Promise.resolve()
+    .then(fn)
+    .catch((error) => toast(error.message));
 }
 function login(info = {}) {
   renderLogin(info);
@@ -148,13 +162,8 @@ function cards() {
       (e.name || "Undangan baru").toLowerCase().includes(query.toLowerCase()),
   );
   document.querySelector("#cards").innerHTML =
-    list
-      .map(
-        (e) =>
-          `<article class="card"><div class="card-cover">${e.cover ? `<img src="${esc(e.cover)}" alt="Sampul ${esc(e.name)}">` : '<div class="blank-cover">✳<small>YOUR STORY STARTS HERE</small></div>'}<span class="status ${e.status}">${e.status === "expired" ? "● Masa aktif berakhir" : e.status === "ready" ? "● Siap Dibagikan" : "● Draft"}</span><button class="delete" data-delete="${e.id}" aria-label="Hapus ${esc(e.name || "undangan")}"><span aria-hidden="true">⌫</span> Hapus undangan</button></div><div class="card-body"><p class="eyebrow">PERNIKAHAN</p><h3>${esc(e.name || "Undangan baru")}</h3><p class="card-date">◷ &nbsp; ${e.date ? date(e.date) : "Tanggal belum ditentukan"}</p><div class="card-actions"><button data-edit="${e.id}">✎ &nbsp; ${e.status === "expired" ? "Lihat arsip" : "Edit undangan"}</button><a href="/preview/${e.id}" target="_blank" aria-label="Pratinjau ${esc(e.name)}"><span aria-hidden="true">◉</span> Preview</a><button ${e.status === "expired" ? "disabled" : ""} data-share="${e.id}" aria-label="Bagikan ${esc(e.name)}"><span aria-hidden="true">↗</span> Bagikan</button></div></div></article>`,
-      )
-      .join("") +
-    `<button class="new-card" id="newCard"><span>＋</span><h3>Mulai cerita baru</h3><p>Buat undangan pernikahan<br>yang terasa seperti Anda.</p><b>Tambah acara &nbsp; ↗</b></button>`;
+    list.map(eventDashboardCard).join("") +
+    `<button class="new-card" id="newCard"><span>＋</span><h3>Tambah acara baru</h3><p>Kelola pernikahan lain dari akun ini.<br>Satu acara, satu pembayaran.</p><b>Buat acara →</b></button>`;
   if (!list.length && events.length)
     document
       .querySelector("#cards")
@@ -177,7 +186,7 @@ function cards() {
     );
 }
 async function add() {
-  location.href = "/pesanan";
+  return openNewEvent();
 }
 
 function date(d) {
@@ -254,7 +263,7 @@ function renderEditor() {
   if (step === 3) body += photoLibrary();
   if (step >= 5) body = weddingExtraForm();
   shell(
-    `<main><button id="back" class="text-button">← Semua undangan</button><div class="page-heading"><div><p class="eyebrow">RANGKAI CERITA ANDA</p><h1>${esc(current.name || "Undangan baru")}</h1><p id="saveStatus">${current.status === "ready" ? "Siap Dibagikan" : "Draft — lengkapi informasi untuk membagikan"}</p></div><a class="button" target="_blank" href="/preview/${current.id}">Pratinjau ↗</a></div>${current.license && !current.license.legacy ? `<div class="notice">${current.license.lockedDate ? `Tanggal dikunci: ${esc(current.license.lockedDate)}. Koreksi hanya melalui admin. Masa aktif sampai ${esc(new Date(current.license.expiresAt).toLocaleString("id-ID", { timeZone: current.license.timezone }))}.` : '<p>Isi dan simpan tanggal pernikahan, lalu konfirmasikan aktivasi sekali pakai sebelum undangan dapat dibagikan.</p><button type="button" id="activateDate">Aktifkan & kunci tanggal</button>'}</div>` : ""}<div class="editor-tabs">${steps.map((s, i) => `<button data-step="${i}" class="${i === step ? "selected" : ""}"><span>${i + 1}</span>${s}</button>`).join("")}</div><form id="editor" class="editor"><div class="section-heading"><span>0${step + 1}</span><div><h2>${steps[step]}</h2><p>Anda dapat menyimpan draft kapan saja.</p></div></div>${body}<p class="form-error" id="formError" role="alert"></p><div class="savebar"><span id="dirtyText">Perubahan disimpan saat Anda menekan Simpan.</span><div><button type="button" id="next">${step === steps.length - 1 ? "← Sebelumnya" : "Lanjut →"}</button><button class="primary" type="submit" id="save">Simpan</button></div></div></form></main>`,
+    `<main><button id="back" class="text-button">← Semua undangan</button><div class="page-heading"><div><p class="eyebrow">RANGKAI CERITA ANDA</p><h1>${esc(current.name || "Undangan baru")}</h1><p id="saveStatus">${current.status === "ready" ? "Siap Dibagikan" : "Draft — lengkapi informasi untuk membagikan"}</p></div><a class="button" target="_blank" href="/preview/${current.id}">Pratinjau ↗</a></div>${current.license && !current.license.legacy ? `<div class="notice">${!current.license.paid ? `<p>Acara ini belum aktif. Isi data acara terlebih dahulu, lalu pilih tema dan lakukan pembayaran khusus untuk acara ini.</p><a class="button" href="/pesanan?acara=${esc(current.id)}">Pilih tema / Bayar acara ini</a>` : current.license.lockedDate ? `Tanggal dikunci: ${esc(current.license.lockedDate)}. Koreksi hanya melalui admin. Masa aktif sampai ${esc(new Date(current.license.expiresAt).toLocaleString("id-ID", { timeZone: current.license.timezone }))}.` : '<p>Isi dan simpan tanggal pernikahan, lalu konfirmasikan aktivasi sekali pakai sebelum undangan dapat dibagikan.</p><button type="button" id="activateDate">Aktifkan & kunci tanggal</button>'}</div>` : ""}<div class="editor-tabs">${steps.map((s, i) => `<button data-step="${i}" class="${i === step ? "selected" : ""}"><span>${i + 1}</span>${s}</button>`).join("")}</div><form id="editor" class="editor"><div class="section-heading"><span>0${step + 1}</span><div><h2>${steps[step]}</h2><p>Anda dapat menyimpan draft kapan saja.</p></div></div>${body}<p class="form-error" id="formError" role="alert"></p><div class="savebar"><span id="dirtyText">Perubahan disimpan saat Anda menekan Simpan.</span><div><button type="button" id="next">${step === steps.length - 1 ? "← Sebelumnya" : "Lanjut →"}</button><button class="primary" type="submit" id="save">Simpan</button></div></div></form></main>`,
   );
   const activate = document.querySelector("#activateDate");
   if (activate) activate.onclick = activateWeddingDate;
@@ -471,6 +480,7 @@ window.addEventListener("beforeunload", (e) => {
   try {
     const info = await api("/api/me");
     me = info.user;
+    window.appOrigin = info.appOrigin;
     csrf = info.csrf;
     appLimits = { ...appLimits, ...info.limits };
     const parts = location.pathname.split("/");
@@ -490,7 +500,11 @@ window.addEventListener("beforeunload", (e) => {
         location.replace(
           sessionStorage.getItem("pendingTheme")
             ? "/pesanan?tema=" +
-                encodeURIComponent(sessionStorage.getItem("pendingTheme"))
+                (encodeURIComponent(sessionStorage.getItem("pendingTheme")) +
+                  (sessionStorage.getItem("pendingEvent")
+                    ? "&acara=" +
+                      encodeURIComponent(sessionStorage.getItem("pendingEvent"))
+                    : ""))
             : "/dashboard",
         );
         return;
@@ -502,11 +516,7 @@ window.addEventListener("beforeunload", (e) => {
         location.replace("/login");
         return;
       }
-      if (!me.isAdmin) {
-        root.innerHTML =
-          '<main><h1>Akses terbatas</h1><p>Halaman ini hanya untuk admin pemilik.</p><a href="/dashboard">Kembali ke dashboard</a></main>';
-        return;
-      }
+      if (!me.isAdmin) return renderAdminAccess();
       return renderAdmin();
     }
     if (parts[1] === "dashboard") {

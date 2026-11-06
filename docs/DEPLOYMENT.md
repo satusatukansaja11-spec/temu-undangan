@@ -219,14 +219,27 @@ Lagu bersama disimpan di storage local/S3 yang sudah dipilih. Metadata, peran ad
 ## Penjualan tema, transfer manual dan migrasi 005
 
 1. Backup database serta seluruh media (termasuk bukti pembayaran privat), lalu deploy seluruh kode terbaru. Jangan menghapus volume data atau mengganti .env/database ketika update.
-2. Jalankan `npm run db:migrate` pada database produksi; SQLite AUTO_MIGRATE=true melakukannya saat startup. Migrasi 005 menandai undangan lama sebagai legacy agar tetap berfungsi. Perintah tidak memberi akses gratis untuk undangan baru.
+2. Jalankan `npm run db:migrate` pada database produksi; SQLite AUTO_MIGRATE=true melakukannya saat startup. Migrasi 005 menandai undangan lama sebagai legacy agar tetap berfungsi. Draft baru tetap dapat dibuat tanpa pembayaran; perintah tidak memberi akses aktivasi/publikasi gratis.
 3. Login pemilik ke `/admin` dengan peran admin yang sudah diberikan melalui `admin:grant`. Hak admin lama tetap dipertahankan. Jika belum, daftarkan akun sendiri lalu gunakan perintah grant pada bagian sebelumnya.
 4. Pada **Rekening dan harga produk**, isi bank, nomor rekening asli, nama pemilik rekening, petunjuk transfer, harga rupiah masing-masing tema dan batas waktu pembayaran. WhatsApp awal `6282137665266` dapat diganti. Harga 0 berarti tema belum dijual. Aktifkan checkbox penjualan hanya sesudah rekening dan harga diperiksa.
 5. Order tampil pada **Pesanan produk**. Gunakan Perbarui untuk melihat order baru. Pelanggan mengirim konfirmasi melalui aplikasi dan dapat melanjutkan chat WhatsApp. Link WhatsApp tidak mengirim otomatis.
 6. Periksa dana melalui mutasi bank sebenarnya. Klik Periksa pembayaran, masukkan nominal dan referensi transaksi bank unik, centang dana sudah diperiksa, lalu Setujui & aktifkan. Bukti transfer saja tidak membuktikan dana masuk. Gunakan alasan untuk penolakan; transfer terlambat memerlukan alasan tambahan saat disetujui.
-7. Pelanggan membuka undangan yang dibuat dari satu order tersebut, menyimpan tanggal/zona waktu, lalu menekan Aktifkan & kunci tanggal. Setelah aktivasi, perubahan tanggal hanya melalui admin selama masa aktif. Seluruh jadwal tambahan pada undangan baru berada di tanggal yang sama.
+7. Pelanggan membuka draft acara yang terkait dengan satu order tersebut, menyimpan tanggal/zona waktu, lalu menekan Aktifkan & kunci tanggal. Setelah aktivasi, perubahan tanggal hanya melalui admin selama masa aktif. Seluruh jadwal tambahan pada undangan baru berada di tanggal yang sama.
 8. Masa aktif berakhir tepat pukul 00.00 hari berikutnya pada zona WIB/WITA/WIT terpilih. Pemeriksaan berlangsung pada request server, tidak memerlukan cron. Undangan lama legacy tidak mengikuti expiry baru sampai kebijakan migrasi tersendiri ditentukan. Undangan expired menjadi arsip baca saja, bukan dihapus.
 
 Bukti foto maksimal 5 MB, JPEG/PNG/WebP, disimpan sebagai objek privat di prefix photos/ yang sama tanpa dimasukkan ke tabel foto publik. Akses hanya pemilik order/admin melalui endpoint terotorisasi. `storage:sync` mencakup bukti; backup database dan storage tetap dua hal berbeda. Impor SQLite ke PostgreSQL mempertahankan order, hak akses, kunci tanggal, konfigurasi penjualan dan referensi bukti. Pada sumber lama tanpa lisensi, undangan yang diimpor ditandai legacy.
 
 Harga/rekening pada screenshot dan fixture adalah fiktif. Tidak ada pembayaran bank sungguhan dijalankan pada pengujian kode. Refund otomatis dan notifikasi WhatsApp/email otomatis belum disediakan; proses admin dan tombol WhatsApp manual yang digunakan.
+
+
+## Pembaruan banyak acara dan perbaikan localhost
+
+Pembaruan ini tidak menambah migrasi SQL baru di atas 005. Tetap jalankan `npm run db:migrate` setelah memperbarui seluruh kode jika versi sebelumnya belum lengkap. Rekening, harga, order lama, dan hak admin tidak direset.
+
+- **Tambah Acara** membuat draft belum aktif. Pelanggan dapat memasukkan nama pasangan lain dan tanggal rencana, lalu memilih tema untuk acara tersebut. Order menyimpan event_id sejak checkout. Admin menyetujui acara yang sama, bukan membuat acara baru. Order lama tanpa event_id tetap kompatibel dan dibuatkan satu acara saat pertama disetujui.
+- Persetujuan pembayaran A tidak membuka acara B. Acara dengan pending order lain tidak dideduplikasi hanya berdasarkan tema. Klien mengirim eventId yang dimiliki akun; server memeriksa pemilik dan status pembayaran. Draft belum dibayar tidak dapat diaktifkan atau dipublikasikan.
+- Untuk menghapus draft yang masih memiliki order, batalkan order dahulu. Konfirmasi awaiting_verification harus ditinjau admin terlebih dahulu agar tidak menghapus acara saat pemeriksaan transfer berlangsung.
+- Harga jual dan harga normal opsional diatur di kartu per tema pada /admin#themePricing. Pengaturan lama yang belum memiliki comparePrices diperlakukan tanpa promo. Perubahan harga tidak mengganti snapshot invoice yang sudah dibuat.
+- Localhost menggunakan Node.js 24+ dan APP_URL yang sama persis dengan alamat browser (contoh http://localhost:3000), NODE_ENV=development. Folder proyek boleh berada di XAMPP tetapi server PHP tidak menjalankan aplikasi Node ini. Restart Node sesudah mengubah .env.
+- Pemberian hak admin harus dilakukan di folder proyek dengan DATA_DIR/DATABASE_URL yang sama: `npm run admin:grant -- email-anda@example.com`. Tidak cukup memiliki akun dengan nama Admin. Jika localhost dan produksi memakai database berbeda, berikan peran secara terpisah pada akun pemilik masing-masing. Halaman /admin menyediakan panduan dan pemeriksaan ulang peran tanpa harus logout.
+- Logout memerlukan asal request yang sama dengan APP_URL atau origin host aplikasi aktual serta CSRF sesi yang valid. Untuk sesi yang sudah habis, logout tetap membersihkan cookie. Token salah dan origin lintas situs tetap ditolak. Frontend menampilkan kegagalan dan mengaktifkan kembali tombol agar bisa dicoba ulang.

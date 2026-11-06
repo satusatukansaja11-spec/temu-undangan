@@ -118,7 +118,12 @@ function installAdmin(app, db, { admin, fail, read, missing, commerce }) {
         .prepare("UPDATE events SET data=?,status=?,updated=? WHERE id=?")
         .run(
           JSON.stringify(data),
-          missing(data).length ? "draft" : "ready",
+          missing(data).length ||
+            (license &&
+              !license.legacy &&
+              (!license.paid || !license.locked_date))
+            ? "draft"
+            : "ready",
           now,
           event.id,
         );

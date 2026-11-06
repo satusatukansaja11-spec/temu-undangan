@@ -506,6 +506,17 @@ function installMedia(
     await db.transaction(async () => {
       if (!(await db.lockEvent(req.params.id, req.session.user_id)))
         throw fail(404, "Acara tidak ditemukan.");
+
+      const pending = await db
+        .prepare(
+          "SELECT id FROM theme_orders WHERE event_id=? AND status NOT IN ('paid','cancelled')",
+        )
+        .get(req.params.id);
+      if (pending)
+        throw fail(
+          409,
+          "Batalkan pesanan pembayaran acara terlebih dahulu. Konfirmasi yang sedang diperiksa perlu ditinjau admin.",
+        );
       const photos = await db
           .prepare("SELECT id FROM photos WHERE event_id=?")
           .all(req.params.id),

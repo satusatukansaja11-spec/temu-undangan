@@ -6,7 +6,7 @@ Aturan produk ini telah diterapkan pada kode: katalog dua tema, transfer bank ma
 
 - Pengunjung dapat melihat katalog dan mencoba Preview tanpa membeli.
 - Pengguna dapat membuat akun dan masuk sebelum melakukan pembayaran.
-- Pengguna wajib membeli tema sebelum dapat menerapkannya pada undangan miliknya.
+- Pengguna boleh membuat banyak draft acara dan mengisi data pasangan lain dalam satu akun. Setiap acara wajib memiliki pembayaran sendiri sebelum tema aktif, preview pribadi, atau publikasi dibuka. Preview tema dengan data ilustrasi tetap gratis.
 - Satu pembelian berlaku untuk satu akun, satu tema, dan satu undangan dengan tanggal pernikahan yang ditetapkan. Pembelian tidak membuka tema lain dan tidak dapat dipakai membuat undangan pernikahan lain.
 - Server wajib memeriksa kepemilikan pembelian pada setiap tindakan memilih, menyimpan, mengganti, dan memublikasikan tema. Menyembunyikan tombol di frontend saja tidak cukup.
 - Preview memakai data ilustrasi dan tidak memberikan akses mengedit atau memublikasikan undangan dengan tema berbayar.
@@ -27,7 +27,7 @@ Aturan produk ini telah diterapkan pada kode: katalog dua tema, transfer bank ma
 
 Alur utama:
 
-`Katalog → Preview (opsional) → Select → Login bila diperlukan → Buat order → Transfer bank → Konfirmasi pembayaran → Admin memeriksa mutasi → Aktivasi → Tetapkan tanggal → Edit dan bagikan undangan`
+`Login → Tambah/pilih acara → Isi draft → Pilih tema / Preview (opsional) → Order khusus acara → Transfer bank → Konfirmasi → Admin memeriksa mutasi → Pembayaran acara aktif → Kunci tanggal → Bagikan undangan`
 
 ### Rekening pembayaran produk
 
@@ -128,7 +128,7 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 ## 7. Kriteria penerimaan
 
 - Pengunjung dapat Preview tanpa memperoleh hak akses tema.
-- Pengguna tanpa pembelian tidak dapat menerapkan/memublikasikan tema melalui UI maupun permintaan API langsung.
+- Pengguna tanpa pembelian dapat mengisi draft dan memilih tema untuk penawaran, tetapi tidak dapat mengaktifkan tema/preview pribadi/publikasi melalui UI maupun API.
 - Select tema belum dibeli membuka order transfer bank; tema hanya aktif setelah admin memverifikasi dana masuk dan server menyimpan hak akses.
 - Pembayaran gagal, dibatalkan, kedaluwarsa, nominal salah, atau notifikasi palsu tidak membuka tema.
 - Konfirmasi/klik persetujuan berulang dan muat ulang halaman tidak menyebabkan transaksi/hak akses ganda.
@@ -139,7 +139,7 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 ## 8. Undangan sekali pakai dan tanggal pernikahan
 
 - Satu order paid hanya mengaktifkan satu undangan untuk satu pernikahan; jangan memberi lisensi tema yang dapat dipakai berulang untuk acara berbeda.
-- Setelah pembayaran disetujui, pengguna menetapkan tanggal pernikahan dan zona waktu acara. Sebelum aktivasi/publikasi pertama, tampilkan konfirmasi bahwa tanggal tersebut menentukan masa aktif dan pemakaian hanya untuk satu pernikahan.
+- Tanggal rencana boleh diisi pada draft sebelum pembayaran. Setelah pembayaran disetujui, pengguna mengonfirmasi tanggal pernikahan dan zona waktu acara untuk aktivasi. Sebelum aktivasi/publikasi pertama, tampilkan konfirmasi bahwa tanggal tersebut menentukan masa aktif dan pemakaian hanya untuk satu pernikahan.
 - Untuk mencegah pemakaian ulang dengan terus memajukan tanggal, tanggal dikunci saat pengguna mengonfirmasi aktivasi pertama. Setelah dikunci, pengguna tidak dapat mengganti tanggal utama atau memindahkan jadwal tambahan ke hari lain untuk memperpanjang masa aktif.
 - Sebelum masa aktif berakhir, data lain seperti foto, teks, lokasi, dan musik tetap dapat diedit sesuai fitur yang dibeli. Kebutuhan perubahan tanggal yang sah ditangani admin dengan alasan dan catatan audit; prosedur rinci ditetapkan sebelum peluncuran.
 - Masa aktif berakhir pada pukul 00.00 hari setelah tanggal pernikahan, berdasarkan zona waktu acara yang disimpan (WIB/WITA/WIT). Gunakan waktu server, bukan jam perangkat pengguna. Zona waktu juga dikunci bersama tanggal.
@@ -183,3 +183,16 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Koreksi admin pada undangan berbayar hanya selama masa aktif, disertai alasan, konflik versi dicegah, dan tenggat diperbarui sesuai tanggal/zona waktu terkunci. Arsip expired tidak dapat diaktifkan ulang melalui koreksi tanggal.
 - Admin memperoleh pemberitahuan melalui daftar/jumlah pesanan dan tombol Perbarui di panel. Tautan WhatsApp memerlukan pelanggan menekan Kirim; tidak ada pengiriman WhatsApp/email otomatis.
 - Refund/pencabutan transaksi paid tidak disediakan sebagai tindakan otomatis. Kebijakan refund perlu ditetapkan pemilik dan diproses dengan pencatatan yang sesuai sebelum fitur tersebut ditambahkan.
+
+
+## 11. Banyak acara per akun, harga per tema, dan akses lokal
+
+- Satu akun dapat membuat dan mengelola acara untuk pasangan lain. Identitas pemilik akun tidak harus sama dengan nama mempelai.
+- Tambah Acara membuat draft, bukan memberikan hak tema gratis. Setiap draft memiliki identitas acara sendiri dan dapat diisi sebelum dibayar; status tetap Belum aktif.
+- Order baru wajib dikaitkan ke acara yang dipilih pada alur antarmuka. Dua acara dengan tema sama memiliki dua order dan dua pembayaran terpisah. Klik ulang pada acara/order yang sama tidak membuat tagihan ganda.
+- Pembayaran hanya mengaktifkan acara terkait, tidak membuat salinan acara dan tidak membuka seluruh tema/acara dalam akun tersebut. Acara yang sudah dibayar tidak dapat ditagih ulang; untuk acara berbeda buat draft baru.
+- Dashboard menampilkan kartu masing-masing acara: nama, foto, tanggal rencana, tema, status, Edit form, Preview, dan Aktifkan/Bayar atau Bagikan sesuai status.
+- Select tetap dapat dibuka saat harga/rekening belum siap. Halaman menjelaskan alasan pembayaran belum tersedia; server tetap menolak checkout/aktivasi sampai konfigurasi valid.
+- Admin mengatur harga jual dan harga normal opsional pada kartu per tema. Harga normal 0 berarti tanpa promo; diskon/pencoretan hanya ditampilkan jika harga normal lebih besar dari harga jual. Harga tidak dipinjam dari gambar contoh.
+- Halaman /admin untuk akun tanpa peran admin menampilkan panduan pemberian hak melalui terminal server. Tidak ada promosi otomatis, password admin bawaan, atau endpoint publik untuk menjadikan diri admin. Localhost dan hosting masing-masing memakai database serta konfigurasi yang sesuai.
+- Logout mencabut sesi server dan menghapus cookie. Sesi habis tetap dapat logout; kegagalan jaringan ditampilkan dengan opsi mencoba ulang, bukan membiarkan tombol diam. CSRF dan pemeriksaan asal request tetap diberlakukan.

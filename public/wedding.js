@@ -122,6 +122,10 @@ async function renderWedding(preview, id, themeDemo = false) {
             : "/api/public/" + id,
       ),
       zone = weddingZone(e)[1];
+    if (!themeDemo && preview && e.license && !e.license.paid) {
+      root.innerHTML = `<main><h1>Tema acara belum aktif</h1><p>Preview tema dapat dicoba dengan data ilustrasi. Preview pribadi dan publikasi tersedia setelah pembayaran acara disetujui.</p><a class="button" href="/tema/${esc(e.theme)}">Preview tema</a><a class="button" href="/pesanan?acara=${esc(id)}">Pilih tema & bayar acara</a><a href="/dashboard">Dashboard</a></main>`;
+      return;
+    }
     const calendarUrl = preview
       ? `/api/events/${id}/calendar.ics`
       : `/api/public/${id}/calendar.ics`;

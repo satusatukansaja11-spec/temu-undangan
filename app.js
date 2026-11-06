@@ -29,7 +29,7 @@ async function createApp(opts = {}) {
     const storage = opts.storage || createStorage({ dataDir: dir });
     const limits = mediaLimits();
     const app = express(),
-      origin = process.env.APP_URL || "http://localhost:3000",
+      origin = new URL(process.env.APP_URL || "http://localhost:3000").origin,
       token = () => randomBytes(32).toString("hex");
     app.disable("x-powered-by");
     const hops = Number(process.env.TRUST_PROXY || 0);
@@ -110,6 +110,7 @@ async function createApp(opts = {}) {
             }
           : null,
         csrf: req.session?.csrf,
+        appOrigin: origin,
         appleConfigured: appleConfigured(origin),
         limits,
         database: db.driver,
@@ -131,11 +132,30 @@ async function createApp(opts = {}) {
       await session(res, "local-demo");
       res.json({ ok: true });
     });
-    app.post("/api/logout", auth, async (req, res) => {
-      await db
-        .prepare("DELETE FROM sessions WHERE token=?")
-        .run(req.session.token);
-      res.clearCookie("sid");
+    app.post("/api/logout", async (req, res, next) => {
+      // Same-site request + session CSRF remain required, even when APP_URL differs locally.
+      const actualOrigin = req.protocol + "://" + req.get("host");
+      if (
+        !req.headers.origin ||
+        ![origin, actualOrigin].includes(req.headers.origin)
+      )
+        return next(
+          fail(403, "Permintaan keluar akun tidak sah. Muat ulang halaman."),
+        );
+      if (req.session && req.headers["x-csrf-token"] !== req.session.csrf)
+        return next(
+          fail(403, "Sesi berubah. Muat ulang halaman lalu keluar kembali."),
+        );
+      if (req.session)
+        await db
+          .prepare("DELETE FROM sessions WHERE token=?")
+          .run(req.session.token);
+      res.clearCookie("sid", {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: origin.startsWith("https:"),
+      });
       res.json({ ok: true });
     });
     function read(e) {
@@ -300,18 +320,52 @@ async function createApp(opts = {}) {
       ),
     );
     app.post("/api/events", auth, async (req, res) => {
-      if (!commerce.allowUnpaidCreation)
-        throw fail(
-          402,
-          "Pilih tema dan lakukan pembayaran melalui katalog terlebih dahulu.",
-        );
+      const input = req.body || {};
+      const name = typeof input.name === "string" ? input.name.trim() : "";
+      if (name.length > 120)
+        throw fail(400, "Nama acara maksimal 120 karakter.");
+      const date = input.date || "";
+      if (
+        date &&
+        (typeof date !== "string" ||
+          !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
+          !Number.isFinite(Date.parse(date)) ||
+          new Date(date).toISOString().slice(0, 10) !== date)
+      )
+        throw fail(400, "Tanggal tidak valid.");
       const id = randomBytes(16).toString("hex"),
         slug = "pernikahan-" + randomBytes(9).toString("hex"),
         now = new Date().toISOString();
-      await db
-        .prepare("INSERT INTO events VALUES(?,?,?,?,?,?,?)")
-        .run(id, req.session.user_id, slug, "draft", "{}", now, now);
-      res.status(201).json({ id, slug, status: "draft" });
+      const data = commerce.allowUnpaidCreation
+        ? {}
+        : { name, date, theme: "navy" };
+      await db.transaction(async () => {
+        await db
+          .prepare("INSERT INTO events VALUES(?,?,?,?,?,?,?)")
+          .run(
+            id,
+            req.session.user_id,
+            slug,
+            "draft",
+            JSON.stringify(data),
+            now,
+            now,
+          );
+        if (!commerce.allowUnpaidCreation)
+          await db
+            .prepare(
+              "INSERT INTO event_licenses(event_id,theme_id,legacy,created) VALUES(?,'navy',0,?)",
+            )
+            .run(id, now);
+      });
+      res
+        .status(201)
+        .json(
+          await commerce.describe(
+            { id },
+            { id, slug, status: "draft", ...data },
+          ),
+        );
     });
     app.get("/api/events/:id", auth, async (req, res) =>
       res.json(await commerce.describe(await own(req), read(await own(req)))),
@@ -330,7 +384,9 @@ async function createApp(opts = {}) {
           l = await commerce.validateLicense(latest, d),
           m = missing(d),
           status =
-            m.length || (l && !l.legacy && !l.locked_date) ? "draft" : "ready";
+            m.length || (l && !l.legacy && (!l.paid || !l.locked_date))
+              ? "draft"
+              : "ready";
         await db
           .prepare(
             "UPDATE events SET data=?,status=?,updated=? WHERE id=? AND owner=?",

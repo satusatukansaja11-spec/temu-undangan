@@ -60,13 +60,19 @@ function createCommerce(
       (await db.prepare("SELECT data FROM shop_settings WHERE id=1").get())
         .data,
     );
-  const license = (id) =>
-    db.prepare("SELECT * FROM event_licenses WHERE event_id=?").get(id);
+  const license = async (id) => {
+    const l = await db
+      .prepare(
+        "SELECT l.*,o.status AS payment_status,o.amount AS order_amount FROM event_licenses l LEFT JOIN theme_orders o ON o.id=l.order_id WHERE l.event_id=?",
+      )
+      .get(id);
+    return l ? { ...l, paid: !!l.legacy || l.payment_status === "paid" } : null;
+  };
   const expired = (l) => !!(l?.expires_at && l.expires_at <= now());
   async function available(event) {
     const l = await license(event.id);
     return !!(
-      (l?.legacy || l?.locked_date || allowUnpaidCreation) &&
+      (l?.legacy || (l?.paid && l?.locked_date) || allowUnpaidCreation) &&
       !expired(l)
     );
   }
@@ -92,6 +98,10 @@ function createCommerce(
       license: l
         ? {
             legacy: !!l.legacy,
+            paid: l.paid,
+            orderId: l.order_id,
+            orderStatus: l.payment_status || null,
+            amount: l.order_amount || null,
             lockedDate: l.locked_date,
             timezone: l.locked_timezone,
             expiresAt: l.expires_at,
@@ -103,7 +113,9 @@ function createCommerce(
   }
   async function ownOrder(req) {
     const o = await db
-      .prepare("SELECT * FROM theme_orders WHERE id=? AND owner=?")
+      .prepare(
+        "SELECT o.*,e.data AS event_data FROM theme_orders o LEFT JOIN events e ON e.id=o.event_id WHERE o.id=? AND o.owner=?",
+      )
       .get(req.params.order, req.session.user_id);
     if (!o) throw fail(404, "Pesanan tidak ditemukan.");
     return o;
@@ -113,6 +125,8 @@ function createCommerce(
       ["pending_payment", "rejected"].includes(o.status) && o.deadline <= now();
     return {
       ...o,
+      eventName: JSON.parse(o.event_data || "{}").name || "",
+      event_data: undefined,
       status: pending ? "expired" : o.status,
       bank: JSON.parse(o.bank_snapshot),
       confirmation: JSON.parse(o.confirmation),
@@ -132,7 +146,7 @@ function createCommerce(
     const owned = req.session
       ? await db
           .prepare(
-            "SELECT l.*,e.updated FROM event_licenses l JOIN events e ON e.id=l.event_id WHERE e.owner=? ORDER BY e.updated DESC",
+            "SELECT l.*,e.updated,CASE WHEN l.legacy=1 OR o.status='paid' THEN 1 ELSE 0 END AS paid FROM event_licenses l JOIN events e ON e.id=l.event_id LEFT JOIN theme_orders o ON o.id=l.order_id WHERE e.owner=? ORDER BY e.updated DESC",
           )
           .all(req.session.user_id)
       : [];
@@ -146,9 +160,10 @@ function createCommerce(
       themes: THEMES.map((t) => ({
         ...t,
         price: cfg.prices[t.id],
+        comparePrice: cfg.comparePrices?.[t.id] || 0,
         ownedEvent:
-          owned.find((l) => l.theme_id === t.id && !expired(l))?.event_id ||
-          null,
+          owned.find((l) => l.theme_id === t.id && l.paid && !expired(l))
+            ?.event_id || null,
         previouslyExpired: owned.some((l) => l.theme_id === t.id && expired(l)),
         purchasable: !!(
           cfg.enabled &&
@@ -222,11 +237,24 @@ function createCommerce(
     if (!Number.isInteger(cfg.hours) || cfg.hours < 1 || cfg.hours > 168)
       throw fail(400, "Batas pembayaran 1–168 jam.");
     cfg.prices = {};
+    cfg.comparePrices = {};
     for (const t of THEMES) {
       const price = Number(d.prices?.[t.id]);
       if (!Number.isInteger(price) || price < 0 || price > 100000000)
         throw fail(400, "Harga harus rupiah bulat, maksimal 100 juta.");
       cfg.prices[t.id] = price;
+      const compare = Number(d.comparePrices?.[t.id] || 0);
+      if (
+        !Number.isInteger(compare) ||
+        compare < 0 ||
+        compare > 100000000 ||
+        (compare > 0 && compare < price)
+      )
+        throw fail(
+          400,
+          "Harga normal harus nol atau minimal sama dengan harga jual.",
+        );
+      cfg.comparePrices[t.id] = compare;
     }
     if (
       cfg.enabled &&
@@ -258,6 +286,41 @@ function createCommerce(
       await db
         .prepare("SELECT id FROM users WHERE id=?" + lock)
         .get(req.session.user_id);
+      const eventId = req.body?.eventId;
+      if (eventId !== undefined && typeof eventId !== "string")
+        throw fail(400, "Acara tidak valid.");
+      let target;
+      if (eventId) {
+        target = await db
+          .prepare("SELECT * FROM events WHERE id=? AND owner=?" + lock)
+          .get(eventId, req.session.user_id);
+        if (!target) throw fail(404, "Acara tidak ditemukan.");
+        const current = await license(eventId);
+        if (!current || current.paid)
+          throw fail(
+            409,
+            "Acara ini sudah dibayar. Buat acara baru untuk pembayaran lain.",
+          );
+        if (current.order_id) {
+          const active = await db
+            .prepare("SELECT * FROM theme_orders WHERE id=?")
+            .get(current.order_id);
+          if (
+            active &&
+            (active.status === "awaiting_verification" ||
+              (["pending_payment", "rejected"].includes(active.status) &&
+                active.deadline > now()))
+          ) {
+            if (active.theme_id !== theme.id)
+              throw fail(
+                409,
+                "Batalkan pesanan sebelumnya sebelum mengganti tema acara ini.",
+              );
+            result = active;
+            return;
+          }
+        }
+      }
       const cfg = await settings();
       if (
         !cfg.enabled ||
@@ -272,9 +335,11 @@ function createCommerce(
           "SELECT * FROM theme_orders WHERE owner=? AND theme_id=? AND status IN ('pending_payment','awaiting_verification','rejected') ORDER BY created DESC",
         )
         .all(req.session.user_id, theme.id);
-      result = existing.find(
-        (o) => o.status === "awaiting_verification" || o.deadline > now(),
-      );
+      result =
+        !eventId &&
+        existing.find(
+          (o) => o.status === "awaiting_verification" || o.deadline > now(),
+        );
       if (result) return;
       const id = "TEMU-" + randomBytes(10).toString("hex").toUpperCase(),
         created = now(),
@@ -302,6 +367,21 @@ function createCommerce(
           created,
           deadline,
         );
+      if (eventId) {
+        await db
+          .prepare("UPDATE theme_orders SET event_id=? WHERE id=?")
+          .run(eventId, id);
+        await db
+          .prepare(
+            "UPDATE event_licenses SET order_id=?,theme_id=? WHERE event_id=?",
+          )
+          .run(id, theme.id, eventId);
+        const data = JSON.parse(target.data);
+        data.theme = theme.id;
+        await db
+          .prepare("UPDATE events SET data=?,updated=? WHERE id=?")
+          .run(JSON.stringify(data), now(), eventId);
+      }
       result = await db
         .prepare("SELECT * FROM theme_orders WHERE id=?")
         .get(id);
@@ -313,7 +393,7 @@ function createCommerce(
       (
         await db
           .prepare(
-            "SELECT * FROM theme_orders WHERE owner=? ORDER BY created DESC LIMIT 100",
+            "SELECT o.*,e.data AS event_data FROM theme_orders o LEFT JOIN events e ON e.id=o.event_id WHERE o.owner=? ORDER BY o.created DESC LIMIT 100",
           )
           .all(req.session.user_id)
       ).map(orderView),
@@ -517,7 +597,7 @@ function createCommerce(
     ).total;
     const rows = await db
       .prepare(
-        "SELECT o.*,u.name customer_name,u.email customer_email FROM theme_orders o JOIN users u ON u.id=o.owner" +
+        "SELECT o.*,u.name customer_name,u.email customer_email,e.data AS event_data FROM theme_orders o JOIN users u ON u.id=o.owner LEFT JOIN events e ON e.id=o.event_id" +
           where +
           " ORDER BY o.created DESC,o.id LIMIT 20 OFFSET ?",
       )
@@ -600,25 +680,35 @@ function createCommerce(
             409,
             "Referensi mutasi sudah digunakan oleh pesanan lain.",
           );
-        eventId = randomBytes(16).toString("hex");
-        const created = now(),
-          data = JSON.stringify({ theme: o.theme_id });
-        await db
-          .prepare("INSERT INTO events VALUES(?,?,?,?,?,?,?)")
-          .run(
-            eventId,
-            o.owner,
-            "pernikahan-" + randomBytes(9).toString("hex"),
-            "draft",
-            data,
-            created,
-            created,
-          );
-        await db
-          .prepare(
-            "INSERT INTO event_licenses(event_id,order_id,theme_id,legacy,created) VALUES(?,?,?,0,?)",
-          )
-          .run(eventId, o.id, o.theme_id, created);
+        const created = now();
+        if (o.event_id) {
+          const event = await db
+            .prepare("SELECT * FROM events WHERE id=? AND owner=?" + lock)
+            .get(o.event_id, o.owner);
+          const l = await license(o.event_id);
+          if (!event || !l || l.order_id !== o.id || l.paid)
+            throw fail(409, "Pesanan tidak lagi sesuai dengan acara ini.");
+          eventId = event.id;
+        } else {
+          eventId = randomBytes(16).toString("hex");
+          const data = JSON.stringify({ theme: o.theme_id });
+          await db
+            .prepare("INSERT INTO events VALUES(?,?,?,?,?,?,?)")
+            .run(
+              eventId,
+              o.owner,
+              "pernikahan-" + randomBytes(9).toString("hex"),
+              "draft",
+              data,
+              created,
+              created,
+            );
+          await db
+            .prepare(
+              "INSERT INTO event_licenses(event_id,order_id,theme_id,legacy,created) VALUES(?,?,?,0,?)",
+            )
+            .run(eventId, o.id, o.theme_id, created);
+        }
         await db
           .prepare(
             "UPDATE theme_orders SET status='paid',event_id=?,verified_by=?,verified_at=?,transfer_ref=?,reason='' WHERE id=?",
@@ -659,6 +749,11 @@ function createCommerce(
         .get(req.params.id, req.session.user_id);
       if (!event) throw fail(404, "Undangan tidak ditemukan.");
       const l = await writable(event);
+      if (l && !l.paid)
+        throw fail(
+          402,
+          "Bayar pesanan acara ini dan tunggu verifikasi admin sebelum aktivasi.",
+        );
       if (!l || l.legacy)
         throw fail(400, "Undangan lama tidak memerlukan aktivasi tanggal.");
       if (l.locked_date)

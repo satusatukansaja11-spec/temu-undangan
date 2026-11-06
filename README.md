@@ -255,12 +255,25 @@ Ganti email contoh dengan akun pribadi yang sudah terdaftar. Muat ulang/login da
 
 Katalog berisi **Navy Ivory** dan **Sakura & Butterfly**, masing-masing dengan Preview publik dan Select. Ilustrasi Sakura merupakan SVG orisinal terinspirasi referensi, dengan cabang bergoyang dan kupu-kupu mengepak; reduced motion menampilkan ornamen diam. Preview memakai data ilustrasi dan tidak mengirim RSVP atau memberikan hak akses.
 
-Alur pelanggan: Select → login/daftar → pesanan → transfer → konfirmasi di aplikasi (bukti foto opsional) / WhatsApp → pemeriksaan mutasi oleh admin → satu undangan baru → isi data → Aktifkan & kunci tanggal. Konfirmasi pelanggan sendiri tidak membuka tema. Harga/rekening order disimpan sebagai snapshot. Persetujuan idempoten dan referensi mutasi yang sama tidak bisa membayar dua order.
+Alur pelanggan: Select → login/daftar → pilih/buat draft acara → pesanan khusus acara → transfer → konfirmasi di aplikasi (bukti foto opsional) / WhatsApp → pemeriksaan mutasi oleh admin → acara terkait diaktifkan → Aktifkan & kunci tanggal. Konfirmasi pelanggan sendiri tidak membuka tema. Harga/rekening order disimpan sebagai snapshot. Persetujuan idempoten dan referensi mutasi yang sama tidak bisa membayar dua order.
 
 Di `/admin`, pemilik mengisi **Rekening dan harga produk**, memeriksa isinya lalu mengaktifkan penjualan. Default: penjualan mati, rekening kosong, harga belum ditetapkan, WhatsApp `6282137665266` (dapat diganti). Rekening ini berbeda dari rekening hadiah mempelai. Tidak ada harga/rekening contoh yang diaktifkan di produksi. Pesanan baru terlihat di panel; WhatsApp membuka pesan siap kirim dan bukan notifikasi otomatis.
 
 Setelah aktivasi, tanggal/zona waktu dikunci. Pelanggan dapat mengubah data lain sampai pukul 00.00 hari setelah tanggal pernikahan di WIB/WITA/WIT yang dipilih. Sesudahnya, server menolak edit, publikasi, RSVP dan media publik undangan tersebut. Akun, riwayat dan arsip tetap dapat dibaca. Acara baru memerlukan pembelian baru. Admin dapat mengoreksi tanggal selama masa aktif dengan alasan dan audit; koreksi tidak menghidupkan kembali arsip kedaluwarsa.
 
-Migrasi 005 mempertahankan semua undangan yang sudah ada sebagai **legacy**; tidak menutup undangan lama secara retroaktif. Undangan baru harus berasal dari pembayaran yang disetujui. Lihat [aturan lengkap](rules.md) dan [panduan deployment](docs/DEPLOYMENT.md#penjualan-tema-transfer-manual-dan-migrasi-005).
+Migrasi 005 mempertahankan semua undangan yang sudah ada sebagai **legacy**; tidak menutup undangan lama secara retroaktif. Draft acara baru boleh dibuat sebelum pembayaran; aktivasi dan publikasi memerlukan pembayaran terpisah per acara. Lihat [aturan lengkap](rules.md) dan [panduan deployment](docs/DEPLOYMENT.md#penjualan-tema-transfer-manual-dan-migrasi-005).
 
 Screenshot [katalog](docs/images/catalog-desktop.png), [Sakura di HP](docs/images/sakura-preview-mobile.png), dan [pesanan HP](docs/images/payment-order-mobile.png) menggunakan data/harga/rekening QA fiktif; bukan instruksi pembayaran nyata.
+
+
+## Banyak acara dalam satu akun dan harga per tema
+
+Dashboard menampilkan kartu acara tersendiri. **Tambah Acara** membuka formulir nama/tanggal rencana, lalu editor draft. Nama mempelai boleh berbeda dari pemilik akun: pengguna dapat mengelola undangan orang lain. Pembayaran hanya mengaktifkan satu acara yang dipilih. Dua acara bertema Sakura sekalipun memperoleh invoice berbeda; persetujuan tidak membuat acara duplikat. Preview pribadi/publikasi baru dibuka setelah pembayaran; Preview tema tetap memakai ilustrasi.
+
+Di panel admin, kartu tiap tema menyediakan harga jual, harga normal opsional (0 tanpa promo), dan Preview. Harga yang dicoret dan persentase diskon mengikuti nilai yang benar-benar diatur admin. Select selalu membuka alur pemilihan; jika rekening/harga/penjualan belum siap, halaman memberi penjelasan dan tidak mengaktifkan pembayaran.
+
+Untuk admin di localhost, jalankan Node.js dari folder proyek dan buka `http://localhost:3000/admin`, bukan URL folder XAMPP. Daftarkan/login akun pribadi, kemudian jalankan `npm run admin:grant -- email-anda@example.com` pada folder/database yang sama. Halaman tanpa hak admin menampilkan perintah dan tombol periksa ulang. Pada .env lokal gunakan APP_URL=http://localhost:3000 dan NODE_ENV=development; jangan mengganti .env hosting atau menghapus data saat memperbaiki localhost.
+
+Logout kini menghapus sesi/cookie, mendukung sesi yang sudah habis, dan memberi umpan balik jika jaringan gagal. Permintaan lintas situs atau token CSRF salah tetap ditolak. Tidak ada akun admin bawaan.
+
+[Dashboard banyak acara](docs/images/multi-event-dashboard.png) · [HP](docs/images/multi-event-mobile.png) · [Harga per tema](docs/images/theme-pricing-admin.png). Semua data/harga/rekening pada screenshot adalah contoh QA.

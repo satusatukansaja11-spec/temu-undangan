@@ -95,7 +95,11 @@ function renderLogin(info = {}, register = false) {
       });
       location.href = sessionStorage.getItem("pendingTheme")
         ? "/pesanan?tema=" +
-          encodeURIComponent(sessionStorage.getItem("pendingTheme"))
+          (encodeURIComponent(sessionStorage.getItem("pendingTheme")) +
+            (sessionStorage.getItem("pendingEvent")
+              ? "&acara=" +
+                encodeURIComponent(sessionStorage.getItem("pendingEvent"))
+              : ""))
         : "/dashboard";
     } catch (e) {
       error.textContent = e.message;
@@ -115,7 +119,11 @@ function renderLogin(info = {}, register = false) {
         await api("/auth/demo", { method: "POST" });
         location.href = sessionStorage.getItem("pendingTheme")
           ? "/pesanan?tema=" +
-            encodeURIComponent(sessionStorage.getItem("pendingTheme"))
+            (encodeURIComponent(sessionStorage.getItem("pendingTheme")) +
+              (sessionStorage.getItem("pendingEvent")
+                ? "&acara=" +
+                  encodeURIComponent(sessionStorage.getItem("pendingEvent"))
+                : ""))
           : "/dashboard";
       } catch (e) {
         toast(e.message);
