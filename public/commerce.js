@@ -22,7 +22,14 @@ const orderStatuses = {
 };
 const themeNames = { navy: "Navy Ivory", sakura: "Sakura & Butterfly" };
 function themePrice(t) {
-  return `<strong>${t.price ? rupiah(t.price) : "Harga belum ditetapkan"}</strong>${t.comparePrice > t.price && t.price > 0 ? ` <del>${rupiah(t.comparePrice)}</del><span class="discount-badge">${Math.round(((t.comparePrice - t.price) / t.comparePrice) * 100)}%</span>` : ""}`;
+  if (!t.price)
+    return '<span class="theme-price-pending">Harga belum ditetapkan</span>';
+  const price = (n) =>
+    "Rp. " +
+    new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(
+      Number(n),
+    );
+  return `<div class="theme-price-line"><strong class="theme-sale-price">${price(t.price)}</strong>${t.comparePrice > t.price ? `<del class="theme-original-price">${price(t.comparePrice)}</del>` : ""}</div>`;
 }
 function catalogCards(themes, eventId = "") {
   return `<div class="catalog-grid">${themes.map((t) => `<article class="theme-product"><a href="/tema/${esc(t.id)}" aria-label="Preview ${esc(t.name)}"><img src="${esc(t.image)}" alt="Ilustrasi tema ${esc(t.name)}" loading="lazy"></a><div><h3>${esc(t.name)}</h3><p>${esc(t.description)}</p>${themePrice(t)}<p>${eventId ? "Pembayaran berlaku hanya untuk acara yang dipilih." : t.ownedEvent ? "Ada acara yang sudah memakai tema ini. Anda tetap dapat memesan untuk acara lain." : t.purchasable ? "Satu acara untuk satu pembayaran." : "Tema dapat dipilih; pembayaran menunggu harga dan rekening dari pemilik."}</p><div class="catalog-actions"><a class="site-button" href="/tema/${esc(t.id)}">Preview</a><a class="site-button secondary" href="/pesanan?tema=${esc(t.id)}${eventId ? "&acara=" + esc(eventId) : ""}">Select</a></div>${!eventId && t.ownedEvent ? `<p><a href="/dashboard?event=${esc(t.ownedEvent)}">Buka acara yang sudah dibayar</a></p>` : ""}</div></article>`).join("")}</div>`;

@@ -212,6 +212,16 @@ function remove(id) {
   };
 }
 function share(e) {
+  if (e.status === "expired")
+    return toast("Masa aktif undangan telah berakhir.");
+  if (e.license && !e.license.paid)
+    return toast(
+      "Pembayaran acara perlu disetujui sebelum undangan dibagikan.",
+    );
+  if (e.license && !e.license.legacy && !e.license.lockedDate)
+    return toast(
+      "Klik Tetapkan tanggal, simpan dan aktifkan tanggal pernikahan sebelum membagikan undangan.",
+    );
   if (e.status !== "ready")
     return toast(
       "Lengkapi dan simpan undangan terlebih dahulu: " +
