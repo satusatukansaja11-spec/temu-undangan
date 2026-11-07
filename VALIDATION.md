@@ -153,3 +153,7 @@ Pengujian backend baru memeriksa consent eksplisit (default privat), penolakan t
 Chromium memeriksa logo cincin Temu pada penutup tanpa simbol ✳, tidak ada tautan Layar Tamu di beranda, katalog tiga tema, upload dua gambar lewat admin, kedua URL dipakai renderer Meihua, scroll 20 kartu per halaman dan count, private default lalu opt-in publik, escaping markup pada ucapan, pagination dan moderasi pemilik, serta lebar 320/390/1440 tanpa overflow atau page error. Screenshot memakai data sintetis dan ilustrasi vektor contoh yang dikonversi menjadi file unggahan QA. Berkas asli dua gambar chat belum tersedia di workspace; gambar asli perlu diunggah di panel admin, sehingga hasil tidak diklaim memakai gambar sumber persis.
 
 Hasil akhir revisi ini: 49 tes lulus, 0 gagal, 2 tes layanan PostgreSQL/S3 eksternal dilewati. Syntax check dan git diff check lulus. Tidak ada transfer nyata, pengiriman WhatsApp, atau deployment Hostinger dari lingkungan ini; .env pribadi tidak dimasukkan ke commit.
+
+## Katalog ringkas satu baris — 7 November 2026
+
+Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul 20–22 px dan padding lebih ringkas. Chromium memeriksa posisi vertikal ketiga kartu tetap sama pada 320/390/768/1024/1440, semua kartu muat di desktop, gulir horizontal pada HP, tidak ada overflow halaman atau page error, serta tiga tombol Select tetap tersedia. Screenshot menggunakan harga contoh, bukan perubahan harga tersimpan. git diff check lulus. Backend tidak berubah; suite backend tidak diulang.

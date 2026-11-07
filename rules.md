@@ -223,3 +223,9 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Pengirim dapat menarik persetujuan melalui cookie browser yang sama. Pemilik dapat menyembunyikan ucapan yang tidak sesuai; memperbarui ucapan tidak otomatis menampilkan kembali yang sudah dimoderasi.
 - Terapkan pemeriksaan origin, panjang input, batas pengiriman, kepemilikan, dan escaping teks. Konten ucapan adalah teks, bukan HTML yang dapat dieksekusi.
 - Draft, undangan kedaluwarsa, atau RSVP dinonaktifkan tidak membuka endpoint ucapan publik. Arsip dan moderasi tetap mengikuti aturan akses pemilik yang berlaku.
+
+## 15. Katalog tema satu baris
+
+- Kecilkan kartu katalog, gambar, judul dan jarak antar elemen agar tiga tema tampil dalam satu baris pada laptop/desktop.
+- Pada layar kecil, pertahankan satu baris dengan gulir horizontal; kartu tidak ditumpuk ke baris berikutnya dan halaman tidak melebar keluar viewport.
+- Tombol Preview/Select tetap berlabel jelas dan nyaman disentuh. Harga jual merah serta harga normal abu-abu dicoret tetap mengikuti konfigurasi admin.
