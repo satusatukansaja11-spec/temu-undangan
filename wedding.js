@@ -197,6 +197,7 @@ function installWedding(
   app.get("/api/events/:id/calendar.ics", auth, async (req, res) =>
     sendCalendar(res, await own(req)),
   );
+  require("./wishes").installWishes(app, db, { auth, own, fail, published });
   const cookieName = (event) => "rsvp_" + event.slug;
   const mine = async (req, event) => {
     const token = req.cookies[cookieName(event)];
@@ -206,9 +207,14 @@ function installWedding(
           .get(event.id, hash(token))
       : null;
   };
-  const safe = (row) =>
+  const safe = async (row) =>
     row
       ? {
+          publishMessage: !!(
+            await db
+              .prepare("SELECT published FROM wish_visibility WHERE rsvp_id=?")
+              .get(row.id)
+          )?.published,
           name: row.name,
           attendance: row.attendance,
           guests: row.guests,
@@ -220,7 +226,7 @@ function installWedding(
     const event = await published(req);
     if (JSON.parse(event.data).rsvpEnabled === false)
       throw fail(403, "RSVP untuk undangan ini dinonaktifkan.");
-    res.json({ response: safe(await mine(req, event)) });
+    res.json({ response: await safe(await mine(req, event)) });
   });
   app.post("/api/public/:slug/rsvp", async (req, res) => {
     if (req.headers.origin !== origin)
@@ -255,6 +261,13 @@ function installWedding(
       (typeof body.message !== "string" || body.message.length > 1000)
     )
       throw fail(400, "Ucapan maksimal 1000 karakter.");
+    if (
+      body.publishMessage !== undefined &&
+      typeof body.publishMessage !== "boolean"
+    )
+      throw fail(400, "Persetujuan publikasi tidak valid.");
+    if (body.publishMessage === true && !body.message?.trim())
+      throw fail(400, "Tulis ucapan sebelum menyetujui publikasi.");
     const now = Date.now();
     await db
       .prepare("DELETE FROM rsvp_limits WHERE starts<?")
@@ -285,20 +298,32 @@ function installWedding(
         429,
         "Batas respons untuk acara ini telah tercapai. Hubungi penyelenggara.",
       );
-    await db
-      .prepare(
-        "INSERT INTO rsvps VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(token_hash) DO UPDATE SET name=excluded.name,attendance=excluded.attendance,guests=excluded.guests,message=excluded.message,updated=excluded.updated",
-      )
-      .run(
-        previous?.id || randomBytes(16).toString("hex"),
-        event.id,
-        hash(token),
-        body.name.trim(),
-        body.attendance,
-        body.guests,
-        (body.message || "").trim(),
-        new Date().toISOString(),
-      );
+    const responseId = previous?.id || randomBytes(16).toString("hex");
+    await db.transaction(async () => {
+      await db
+        .prepare(
+          "INSERT INTO rsvps VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(token_hash) DO UPDATE SET name=excluded.name,attendance=excluded.attendance,guests=excluded.guests,message=excluded.message,updated=excluded.updated",
+        )
+        .run(
+          responseId,
+          event.id,
+          hash(token),
+          body.name.trim(),
+          body.attendance,
+          body.guests,
+          (body.message || "").trim(),
+          new Date().toISOString(),
+        );
+      await db
+        .prepare(
+          "INSERT INTO wish_visibility VALUES(?,?,0,?) ON CONFLICT(rsvp_id) DO UPDATE SET published=excluded.published",
+        )
+        .run(
+          responseId,
+          body.publishMessage === true ? 1 : 0,
+          new Date().toISOString(),
+        );
+    });
     res.cookie(cookieName(event), token, {
       httpOnly: true,
       secure: origin.startsWith("https:"),
@@ -307,7 +332,7 @@ function installWedding(
       maxAge: 180 * 86400000,
     });
     res.status(previous ? 200 : 201).json({
-      response: safe(
+      response: await safe(
         await mine({ cookies: { [cookieName(event)]: token } }, event),
       ),
       updated: !!previous,

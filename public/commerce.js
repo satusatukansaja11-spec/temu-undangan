@@ -2,7 +2,7 @@ function adminThemePricing(cfg) {
   return `<div class="admin-theme-prices">${Object.entries(themeNames)
     .map(
       ([id, name]) =>
-        `<article><img src="${id === "sakura" ? "/assets/sakura-landscape.svg" : "/assets/navy-pavilion.webp"}" alt="Tema ${esc(name)}"><div><h3>${esc(name)}</h3><strong data-price-summary="${id}">${cfg.prices[id] ? rupiah(cfg.prices[id]) : "Belum dijual"}</strong><label>Harga jual ${esc(name)} (rupiah)<input name="price_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.prices[id]}" required></label><label>Harga normal sebelum promo (opsional)<input name="compare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.comparePrices?.[id] || 0}"></label><p>Isi 0 pada harga normal jika tidak ada promo. Harga jual 0 berarti pembayaran tema belum dibuka.</p><a class="button" href="/tema/${id}" target="_blank" rel="noopener">Preview</a></div></article>`,
+        `<article><img src="${id === "meihua" ? "/assets/meihua-cover.svg" : id === "sakura" ? "/assets/sakura-landscape.svg" : "/assets/navy-pavilion.webp"}" alt="Tema ${esc(name)}"><div><h3>${esc(name)}</h3><strong data-price-summary="${id}">${cfg.prices[id] ? rupiah(cfg.prices[id]) : "Belum dijual"}</strong><label>Harga jual ${esc(name)} (rupiah)<input name="price_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.prices[id] || 0}" required></label><label>Harga normal sebelum promo (opsional)<input name="compare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.comparePrices?.[id] || 0}"></label><p>Isi 0 pada harga normal jika tidak ada promo. Harga jual 0 berarti pembayaran tema belum dibuka.</p><a class="button" href="/tema/${id}" target="_blank" rel="noopener">Preview</a></div></article>`,
     )
     .join("")}</div>`;
 }
@@ -20,7 +20,11 @@ const orderStatuses = {
   expired: "Batas pembayaran berakhir",
   cancelled: "Dibatalkan",
 };
-const themeNames = { navy: "Navy Ivory", sakura: "Sakura & Butterfly" };
+const themeNames = {
+  navy: "Navy Ivory",
+  sakura: "Sakura & Butterfly",
+  meihua: "Meihua Pavilion",
+};
 function themePrice(t) {
   if (!t.price)
     return '<span class="theme-price-pending">Harga belum ditetapkan</span>';
@@ -272,8 +276,12 @@ async function mountAdminShop() {
     e.preventDefault();
     const d = Object.fromEntries(new FormData(e.target));
     d.enabled = e.target.elements.enabled.checked;
-    d.prices = { navy: d.price_navy, sakura: d.price_sakura };
-    d.comparePrices = { navy: d.compare_navy, sakura: d.compare_sakura };
+    d.prices = Object.fromEntries(
+      Object.keys(themeNames).map((id) => [id, d["price_" + id]]),
+    );
+    d.comparePrices = Object.fromEntries(
+      Object.keys(themeNames).map((id) => [id, d["compare_" + id]]),
+    );
     const b = e.target.querySelector("button");
     b.disabled = true;
     try {

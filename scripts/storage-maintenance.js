@@ -34,7 +34,15 @@ async function main() {
     const proofs = await db
       .prepare("SELECT proof_id FROM theme_orders WHERE proof_id IS NOT NULL")
       .all();
+    const themeImages = await db.prepare("SELECT id FROM theme_assets").all();
     for (const item of [
+      ...themeImages.map((row) => ({
+        id: row.id,
+        key: "photos/" + row.id,
+        mime: "image/webp",
+        folder: "uploads",
+        proof: true,
+      })),
       ...proofs.map((row) => ({
         id: row.proof_id.slice(7),
         key: row.proof_id,

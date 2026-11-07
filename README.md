@@ -85,12 +85,12 @@ Hasil pengujian otomatis dan browser selama pengerjaan dirangkum dalam `VALIDATI
 
 ## Halaman awal dan akun (pembaruan 24 Oktober 2026)
 
-Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan halaman awal putih/hijau/sage dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
+Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan halaman awal putih/hijau/sage dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
 
-- Tema menampilkan katalog **Navy Ivory** dan **Sakura & Butterfly**. Preview memakai data ilustrasi, bukan acara pelanggan.
+- Tema menampilkan katalog **Navy Ivory**, **Sakura & Butterfly**, dan **Meihua Pavilion**. Preview memakai data ilustrasi, bukan acara pelanggan.
 - Harga diatur pemilik melalui panel admin. Checkout transfer bank baru tersedia setelah rekening dan harga diaktifkan.
 - Menu dan bagian Download kode aplikasi sudah dihapus dari beranda.
-- Layar Tamu (`/layar-tamu`) menampilkan nama yang diketik petugas dan dapat dibuka layar penuh. Nama hanya berada dalam memori halaman perangkat, tanpa database tamu, RSVP atau sinkronisasi.
+- Menu dan bagian Layar Tamu di beranda sudah dihapus. Route lama dipertahankan untuk kompatibilitas tautan yang sudah tersimpan.
 - Form login email, toggle tampil/sembunyikan password, Apple, dan tautan pendaftaran akun.
 - Pendaftaran email menggunakan nama, email, password 12–128 karakter. Password menggunakan scrypt asinkron dengan salt acak per akun. Tabel `credentials` dan `auth_limits` ditambahkan secara idempoten pada database yang sama. Password tidak disimpan sebagai plaintext.
 - Pembatasan login/daftar: 10 percobaan per email dan 30 per alamat socket IP dalam 15 menit; pasang juga rate limit di reverse proxy. Semua pengguna di belakang reverse proxy dapat berbagi alamat socket IP yang sama; pertimbangkan konfigurasi pembatasan ingress untuk deployment Anda.
@@ -253,7 +253,7 @@ Ganti email contoh dengan akun pribadi yang sudah terdaftar. Muat ulang/login da
 
 ## Pembelian tema dan undangan sekali pakai
 
-Katalog berisi **Navy Ivory** dan **Sakura & Butterfly**, masing-masing dengan Preview publik dan Select. Ilustrasi Sakura merupakan SVG orisinal terinspirasi referensi, dengan cabang bergoyang dan kupu-kupu mengepak; reduced motion menampilkan ornamen diam. Preview memakai data ilustrasi dan tidak mengirim RSVP atau memberikan hak akses.
+Katalog berisi **Navy Ivory**, **Sakura & Butterfly**, dan **Meihua Pavilion**, masing-masing dengan Preview publik dan Select. Ilustrasi Sakura merupakan SVG orisinal terinspirasi referensi, dengan cabang bergoyang dan kupu-kupu mengepak; reduced motion menampilkan ornamen diam. Preview memakai data ilustrasi dan tidak mengirim RSVP atau memberikan hak akses.
 
 Alur pelanggan: Select → login/daftar → pilih/buat draft acara → pesanan khusus acara → transfer → konfirmasi di aplikasi (bukti foto opsional) / WhatsApp → pemeriksaan mutasi oleh admin → acara terkait diaktifkan → Aktifkan & kunci tanggal. Konfirmasi pelanggan sendiri tidak membuka tema. Harga/rekening order disimpan sebagai snapshot. Persetujuan idempoten dan referensi mutasi yang sama tidak bisa membayar dua order.
 
@@ -277,3 +277,14 @@ Untuk admin di localhost, jalankan Node.js dari folder proyek dan buka `http://l
 Logout kini menghapus sesi/cookie, mendukung sesi yang sudah habis, dan memberi umpan balik jika jaringan gagal. Permintaan lintas situs atau token CSRF salah tetap ditolak. Tidak ada akun admin bawaan.
 
 [Dashboard banyak acara](docs/images/multi-event-dashboard.png) · [HP](docs/images/multi-event-mobile.png) · [Harga per tema](docs/images/theme-pricing-admin.png). Semua data/harga/rekening pada screenshot adalah contoh QA.
+
+
+## Logo penutup, tema Meihua dan ucapan publik
+
+Penutup seluruh tema menampilkan logo cincin dan tulisan Temu yang sama dengan merek beranda, menggantikan simbol ✳. Menu/bagian Layar Tamu tidak lagi ada di beranda.
+
+Tema ketiga **Meihua Pavilion** memakai dua latar terpisah: sampul untuk bunga plum merah, isi untuk pegunungan/paviliun. Melalui `/admin → Latar Meihua Pavilion`, unggah JPG/PNG/WebP maksimal 10 MB untuk setiap slot; gambar dioptimalkan, metadata dibuang dan disimpan melalui storage local/S3. Katalog, preview, dan undangan mengikuti unggahan tersebut. Harga tema baru default 0 sampai ditentukan admin. Tanpa unggahan, gambar yang tampil merupakan ilustrasi SVG orisinal contoh, bukan kedua gambar asli dari pesan pengguna. Berkas sumber JPG/PNG gambar asli belum tersedia di workspace saat revisi dibuat.
+
+Bagian **Ucapan dan Doa Para Tamu** menampilkan kartu yang bisa digulir, jumlah ucapan publik, agregat tamu hadir, tanggal, dan pagination. Checkbox persetujuan pada RSVP tidak dicentang otomatis. Nama/ucapan hanya dipublikasikan bila tamu menyetujuinya; konfirmasi kehadiran per tamu tetap privat. Ucapan lama tidak dibuka otomatis oleh migrasi. Pengirim dapat mengubah atau menarik persetujuan dari browser yang sama selama cookie tersedia. Pemilik undangan dapat menyembunyikan/menampilkan kembali ucapan melalui editor → RSVP. Edit oleh pengirim tidak membatalkan keputusan moderasi pemilik.
+
+Deploy seluruh kode dan jalankan `npm run db:migrate` (migrasi 006). Backup database/media mencakup persetujuan, moderasi dan gambar tema; skrip impor/sinkronisasi sudah mencakupnya. Endpoint publik ucapan mengikuti batas publikasi/expiry yang sama dengan RSVP. Screenshot [ucapan HP](docs/images/public-wishes-mobile.png) dan [logo penutup](docs/images/closing-rings-mobile.png) memakai data sintetis dan ilustrasi contoh.

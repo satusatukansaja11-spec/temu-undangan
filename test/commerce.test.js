@@ -456,6 +456,7 @@ test("Paid themes: manual verification, private proof, one wedding and expiry", 
       "/api/public/" + event.slug,
       "/api/public/" + event.slug + "/calendar.ics",
       "/api/public/" + event.slug + "/rsvp",
+      "/api/public/" + event.slug + "/wishes",
     ])
       assert.equal((await call(url, { user: null })).status, 410, url);
     assert.equal((await call("/u/" + event.slug, { user: null })).status, 410);

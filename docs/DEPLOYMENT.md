@@ -243,3 +243,14 @@ Pembaruan ini tidak menambah migrasi SQL baru di atas 005. Tetap jalankan `npm r
 - Localhost menggunakan Node.js 24+ dan APP_URL yang sama persis dengan alamat browser (contoh http://localhost:3000), NODE_ENV=development. Folder proyek boleh berada di XAMPP tetapi server PHP tidak menjalankan aplikasi Node ini. Restart Node sesudah mengubah .env.
 - Pemberian hak admin harus dilakukan di folder proyek dengan DATA_DIR/DATABASE_URL yang sama: `npm run admin:grant -- email-anda@example.com`. Tidak cukup memiliki akun dengan nama Admin. Jika localhost dan produksi memakai database berbeda, berikan peran secara terpisah pada akun pemilik masing-masing. Halaman /admin menyediakan panduan dan pemeriksaan ulang peran tanpa harus logout.
 - Logout memerlukan asal request yang sama dengan APP_URL atau origin host aplikasi aktual serta CSRF sesi yang valid. Untuk sesi yang sudah habis, logout tetap membersihkan cookie. Token salah dan origin lintas situs tetap ditolak. Frontend menampilkan kegagalan dan mengaktifkan kembali tombol agar bisa dicoba ulang.
+
+
+## Migrasi 006: latar tema dan ucapan publik
+
+Deploy semua berkas terbaru, backup data/media, dan jalankan `npm run db:migrate`. Migrasi 006 menambahkan theme_assets dan wish_visibility. SQLite AUTO_MIGRATE=true juga menerapkannya saat startup. Migrasi tidak memublikasikan ulang pesan privat lama.
+
+Admin dapat menentukan harga **Meihua Pavilion** di kartu harga tema. Isi dua gambar melalui **Latar Meihua Pavilion**: gambar pertama untuk cover, gambar kedua untuk isi. Unggah file JPG/PNG/WebP asli, masing-masing maksimal 10 MB. File dirotasi sesuai orientasi, metadata dibuang dan dioptimalkan menjadi WebP. Kedua gambar asli yang tampil pada pesan chat belum tersedia sebagai berkas proyek; default kode menggunakan ilustrasi vektor contoh dan dapat diganti lewat slot tersebut tanpa mengubah kode. Harga/rekening yang sudah ada tidak direset saat penambahan tema ketiga.
+
+Gambar tema global adalah materi publik untuk katalog dan preview, disajikan melalui /theme-assets/:id. Metadata disimpan di theme_assets, objek di prefix photos/ pada storage yang sama. Foto pernikahan pribadi dan bukti transfer tetap memakai kontrol akses masing-masing. Penggantian gambar menjadwalkan objek lama untuk dibersihkan; storage:sync dan impor database mencakup aset tema serta catatan persetujuan ucapan.
+
+Ucapan publik berasal dari RSVP dengan publishMessage=true secara eksplisit. Checkbox pada formulir dimulai tidak dicentang. Nama, ucapan dan waktu tampil di daftar publik; detail konfirmasi kehadiran individu tetap privat. Jumlah orang hadir merupakan agregat. Pemilik dapat memoderasi dari editor → RSVP → Ucapan yang disetujui untuk publik. Hindari mengubah tabel persetujuan secara massal untuk membuka ucapan privat lama. Endpoint tetap mengikuti status publikasi, RSVP enabled dan masa aktif.

@@ -13,6 +13,13 @@ const THEMES = [
     description: "Lanskap danau, sakura lembut dan kupu-kupu yang bergerak.",
     image: "/assets/sakura-landscape.svg",
   },
+  {
+    id: "meihua",
+    name: "Meihua Pavilion",
+    description:
+      "Bunga plum merah, pegunungan berkabut dan paviliun bergaya oriental.",
+    image: "/assets/meihua-cover.svg",
+  },
 ];
 const ZONES = { "Asia/Jakarta": 7, "Asia/Makassar": 8, "Asia/Jayapura": 9 };
 function endOfWedding(date, zone) {
@@ -55,11 +62,30 @@ function createCommerce(
         JSON.stringify(details),
         now(),
       );
-  const settings = async () =>
-    JSON.parse(
+  const settings = async () => {
+    const cfg = JSON.parse(
       (await db.prepare("SELECT data FROM shop_settings WHERE id=1").get())
         .data,
     );
+    for (const t of THEMES) {
+      cfg.prices[t.id] ??= 0;
+    }
+    return cfg;
+  };
+  const themeImages = async (id) => {
+    const rows = await db
+      .prepare("SELECT slot,id FROM theme_assets WHERE theme_id=?")
+      .all(id);
+    return Object.fromEntries(
+      rows.map((row) => [row.slot, "/theme-assets/" + row.id]),
+    );
+  };
+  require("./theme-assets").installThemeAssets(app, db, {
+    admin,
+    fail,
+    storage,
+    dataDir,
+  });
   const license = async (id) => {
     const l = await db
       .prepare(
@@ -95,6 +121,7 @@ function createCommerce(
     return {
       ...data,
       theme: l?.theme_id || "navy",
+      themeImages: await themeImages(l?.theme_id || "navy"),
       license: l
         ? {
             legacy: !!l.legacy,
@@ -157,29 +184,35 @@ function createCommerce(
         !!cfg.bank &&
         !!cfg.account &&
         !!cfg.holder,
-      themes: THEMES.map((t) => ({
-        ...t,
-        price: cfg.prices[t.id],
-        comparePrice: cfg.comparePrices?.[t.id] || 0,
-        ownedEvent:
-          owned.find((l) => l.theme_id === t.id && l.paid && !expired(l))
-            ?.event_id || null,
-        previouslyExpired: owned.some((l) => l.theme_id === t.id && expired(l)),
-        purchasable: !!(
-          cfg.enabled &&
-          cfg.prices[t.id] > 0 &&
-          cfg.bank &&
-          cfg.account &&
-          cfg.holder
-        ),
-      })),
+      themes: await Promise.all(
+        THEMES.map(async (t) => ({
+          ...t,
+          image: (await themeImages(t.id)).cover || t.image,
+          price: cfg.prices[t.id],
+          comparePrice: cfg.comparePrices?.[t.id] || 0,
+          ownedEvent:
+            owned.find((l) => l.theme_id === t.id && l.paid && !expired(l))
+              ?.event_id || null,
+          previouslyExpired: owned.some(
+            (l) => l.theme_id === t.id && expired(l),
+          ),
+          purchasable: !!(
+            cfg.enabled &&
+            cfg.prices[t.id] > 0 &&
+            cfg.bank &&
+            cfg.account &&
+            cfg.holder
+          ),
+        })),
+      ),
     });
   });
-  app.get("/api/themes/:theme/preview", (req, res) => {
+  app.get("/api/themes/:theme/preview", async (req, res) => {
     const theme = THEMES.find((t) => t.id === req.params.theme);
     if (!theme) throw fail(404, "Tema tidak ditemukan.");
     res.json({
       theme: theme.id,
+      themeImages: await themeImages(theme.id),
       name: "Contoh Undangan — Data Ilustrasi",
       groomNick: "Arif",
       groomName: "Arif Pratama",
@@ -236,14 +269,17 @@ function createCommerce(
     cfg.hours = Number(d.hours);
     if (!Number.isInteger(cfg.hours) || cfg.hours < 1 || cfg.hours > 168)
       throw fail(400, "Batas pembayaran 1–168 jam.");
+    const previous = await settings();
     cfg.prices = {};
     cfg.comparePrices = {};
     for (const t of THEMES) {
-      const price = Number(d.prices?.[t.id]);
+      const price = Number(d.prices?.[t.id] ?? previous.prices[t.id] ?? 0);
       if (!Number.isInteger(price) || price < 0 || price > 100000000)
         throw fail(400, "Harga harus rupiah bulat, maksimal 100 juta.");
       cfg.prices[t.id] = price;
-      const compare = Number(d.comparePrices?.[t.id] || 0);
+      const compare = Number(
+        d.comparePrices?.[t.id] ?? previous.comparePrices?.[t.id] ?? 0,
+      );
       if (
         !Number.isInteger(compare) ||
         compare < 0 ||
@@ -834,6 +870,7 @@ function createCommerce(
     }
   });
   return {
+    themeImages,
     license,
     expired,
     available,

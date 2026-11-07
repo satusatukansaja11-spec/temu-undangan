@@ -1,7 +1,7 @@
 const siteBrand =
   '<a class="site-brand" href="/" aria-label="Temu — beranda"><span class="brand-rings" aria-hidden="true"></span><span>temu<small>undangan untuk cerita Anda</small></span></a>';
 function siteHeader(info = {}) {
-  return `<header class="site-header">${siteBrand}<button class="menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav">☰</button><nav id="siteNav" aria-label="Navigasi utama"><a href="/#beranda">Beranda</a><a href="/#tema">Tema</a><a href="/#fitur">Fitur</a><a href="/#harga">Harga</a><a href="/layar-tamu">Layar Tamu</a><a class="site-button" href="${info.user ? "/dashboard" : "/login"}">${info.user ? "Dashboard" : "Login"}</a></nav></header>`;
+  return `<header class="site-header">${siteBrand}<button class="menu-toggle" id="menuToggle" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav">☰</button><nav id="siteNav" aria-label="Navigasi utama"><a href="/#beranda">Beranda</a><a href="/#tema">Tema</a><a href="/#fitur">Fitur</a><a href="/#harga">Harga</a><a class="site-button" href="${info.user ? "/dashboard" : "/login"}">${info.user ? "Dashboard" : "Login"}</a></nav></header>`;
 }
 function bindSiteMenu() {
   const b = document.querySelector("#menuToggle");
@@ -57,7 +57,7 @@ function renderLanding(info) {
     )
     .join(
       "",
-    )}</div></section><section class="site-section theme-section" id="tema"><p class="site-kicker">KATALOG TEMA</p><h2>Pilih suasana hari bahagia Anda.</h2><p role="status">Memuat katalog dan harga…</p></section><section class="site-section pricing-section" id="harga"><p class="site-kicker">HARGA</p><h2>Satu undangan untuk satu hari bahagia.</h2><p>Harga mengikuti katalog. Pembayaran melalui transfer bank dan pemeriksaan admin.</p><a class="site-button" href="#tema">Lihat katalog</a></section><section class="site-section guest-intro"><p class="site-kicker">LAYAR TAMU</p><h2>Sambut dengan nama.<br>Hangatkan setiap kedatangan.</h2><p>Tampilkan sapaan dan nama tamu di layar penyambutan.<br>Coba tampilan layar penuh untuk menyambut orang tersayang.</p><a class="site-button" href="/layar-tamu">Buka Layar Tamu <svg class="site-arrow" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M5 5h14v14"/></svg></a></section></main><footer class="site-footer">${siteBrand}<p>Tempat cerita bahagia dimulai.</p><small>© ${new Date().getFullYear()} Temu</small></footer></div>`;
+    )}</div></section><section class="site-section theme-section" id="tema"><p class="site-kicker">KATALOG TEMA</p><h2>Pilih suasana hari bahagia Anda.</h2><p role="status">Memuat katalog dan harga…</p></section><section class="site-section pricing-section" id="harga"><p class="site-kicker">HARGA</p><h2>Satu undangan untuk satu hari bahagia.</h2><p>Harga mengikuti katalog. Pembayaran melalui transfer bank dan pemeriksaan admin.</p><a class="site-button" href="#tema">Lihat katalog</a></section></main><footer class="site-footer">${siteBrand}<p>Tempat cerita bahagia dimulai.</p><small>© ${new Date().getFullYear()} Temu</small></footer></div>`;
   bindSiteMenu();
   if (location.hash)
     requestAnimationFrame(() =>

@@ -155,6 +155,7 @@ async function renderAdmin() {
         }),
     );
     await mountAdminShop();
+    await mountThemeAssets();
     if (location.hash)
       document
         .getElementById(location.hash.slice(1))

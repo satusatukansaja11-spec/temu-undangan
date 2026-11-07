@@ -1,6 +1,6 @@
 # Aturan Produk Temu Undangan
 
-Aturan produk ini telah diterapkan pada kode: katalog dua tema, transfer bank manual, pemeriksaan admin, satu pembelian untuk satu undangan, aktivasi tanggal, serta kedaluwarsa berdasarkan zona waktu. Penjualan tetap nonaktif secara default sampai rekening asli dan harga disimpan serta diaktifkan pemilik melalui panel admin. Dokumen ini menjelaskan perilaku produk, bukan instruksi untuk menjalankan perintah atau mengubah konfigurasi server.
+Aturan produk ini telah diterapkan pada kode: katalog tiga tema, transfer bank manual, pemeriksaan admin, satu pembelian untuk satu undangan, aktivasi tanggal, serta kedaluwarsa berdasarkan zona waktu. Penjualan tetap nonaktif secara default sampai rekening asli dan harga disimpan serta diaktifkan pemilik melalui panel admin. Dokumen ini menjelaskan perilaku produk, bukan instruksi untuk menjalankan perintah atau mengubah konfigurasi server.
 
 ## 1. Pembelian dan hak akses tema
 
@@ -176,7 +176,7 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 ## 10. Kebijakan penerapan dan batas yang diputuskan
 
 - Migrasi 005 menandai seluruh undangan yang sudah ada sebagai legacy. Undangan tersebut mempertahankan tema Navy dan perilaku lamanya, tanpa penguncian/expiry retroaktif. Pembelian dan sekali pakai wajib untuk undangan baru setelah pembaruan ini.
-- Penjualan awal nonaktif, harga kedua tema 0 (belum ditetapkan), rekening kosong, WhatsApp 6282137665266. Nomor rekening dan harga contoh pada screenshot pengujian bukan konfigurasi penjualan.
+- Penjualan awal nonaktif, harga awal setiap tema 0 (belum ditetapkan), rekening kosong, WhatsApp 6282137665266. Nomor rekening dan harga contoh pada screenshot pengujian bukan konfigurasi penjualan.
 - Batas pembayaran awal 24 jam, dapat diatur 1–168 jam. Transfer terlambat hanya dapat disetujui admin dengan alasan tambahan; tidak otomatis mengaktifkan tema.
 - Konfirmasi dalam aplikasi meminta nama pengirim, bank, waktu dan nominal transfer. Bukti foto opsional maksimal 5 MB (JPEG/PNG/WebP), bersifat privat. PDF belum didukung.
 - Pengguna mengunci tanggal secara eksplisit melalui Aktivasi; sebelum itu undangan berbayar tetap draft walaupun isian lengkap. Semua jadwal pada undangan baru harus berada pada satu tanggal pernikahan yang dibeli.
@@ -201,6 +201,25 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 
 - Ganti aksen pink/magenta pada halaman awal website dengan palet hijau yang sudah digunakan dashboard.
 - Gunakan hijau utama dashboard `#385345` untuk tombol utama, tautan aktif, dan aksen merek; hijau gelap `#263f32` untuk hover; serta sage `#e8eddf` dan latar lembut `#f8f9f5` untuk area pendukung.
-- Terapkan secara konsisten pada header/navigasi, tombol Login, tombol ajakan utama, bagian fitur, katalog tema, harga, Layar Tamu, serta footer halaman awal. Pertahankan keterbacaan teks dan indikator fokus keyboard pada layar HP maupun laptop.
+- Terapkan secara konsisten pada header/navigasi, tombol Login, tombol ajakan utama, bagian fitur, katalog tema, harga, serta footer halaman awal. Pertahankan keterbacaan teks dan indikator fokus keyboard pada layar HP maupun laptop.
 - Harga jual tetap merah dan harga normal tetap abu-abu dicoret sesuai aturan tampilan harga pengguna. Warna ilustrasi/foto tema undangan tetap mengikuti tema masing-masing.
 - Palet hijau/sage sudah diterapkan pada halaman awal, termasuk navigasi HP, logo cincin, ilustrasi fitur, tombol dan footer. Implementasi dibatasi pada halaman awal; ilustrasi/foto tema undangan dan warna harga jual tetap mengikuti aturan masing-masing.
+
+
+## 13. Penutup Temu, menu dan tema ketiga
+
+- Penutup undangan memakai logo dua cincin beserta tulisan Temu; simbol ✳ diganti pada penutup seluruh tema.
+- Menu Layar Tamu dan bagian promosinya di beranda dihapus. Route lama boleh dipertahankan sebagai kompatibilitas tanpa tautan menu baru.
+- Tambahkan **Meihua Pavilion** sebagai tema ketiga, dengan gambar pertama bunga plum merah untuk sampul dan gambar kedua pegunungan/paviliun untuk halaman isi. Dua slot latar dapat diunggah oleh admin; pelanggan biasa tidak dapat mengganti aset tema global.
+- Bila berkas referensi asli belum tersedia, gunakan ilustrasi contoh yang diberi penjelasan di panel admin, dan jangan mengklaim bahwa ilustrasi itu gambar asli pengguna. Kedua file JPG/PNG/WebP dapat dimasukkan melalui panel admin. Harga baru default belum ditetapkan, tidak menggunakan harga dari gambar contoh.
+- Aset tema di katalog/preview/undangan mengikuti konfigurasi yang sama; penggantian gambar tidak menghapus foto pribadi mempelai. Unggahan harus berupa gambar valid, maksimal 10 MB, dioptimalkan dan disimpan dengan identitas acak.
+
+## 14. Ucapan dan doa yang dapat ditampilkan publik
+
+- Tampilkan kartu nama, ucapan dan waktu pada area yang bisa digulir, dengan jumlah ucapan publik, agregat tamu hadir, dan pagination. Jangan menampilkan ucapan contoh sebagai respons tamu sungguhan.
+- Persetujuan publikasi merupakan checkbox yang tidak dicentang otomatis. Tanpa persetujuan, nama/ucapan RSVP hanya tersedia bagi pemilik sebagaimana perilaku sebelumnya.
+- Jangan membuka ucapan privat lama secara retroaktif. Migrasi persetujuan dimulai kosong, tidak menyalin semua RSVP lama ke daftar publik.
+- Respons kehadiran per orang, token, ID internal, dan identitas sesi tidak dimasukkan ke respons daftar ucapan publik. Jumlah hadir hanya agregat.
+- Pengirim dapat menarik persetujuan melalui cookie browser yang sama. Pemilik dapat menyembunyikan ucapan yang tidak sesuai; memperbarui ucapan tidak otomatis menampilkan kembali yang sudah dimoderasi.
+- Terapkan pemeriksaan origin, panjang input, batas pengiriman, kepemilikan, dan escaping teks. Konten ucapan adalah teks, bukan HTML yang dapat dieksekusi.
+- Draft, undangan kedaluwarsa, atau RSVP dinonaktifkan tidak membuka endpoint ucapan publik. Arsip dan moderasi tetap mengikuti aturan akses pemilik yang berlaku.

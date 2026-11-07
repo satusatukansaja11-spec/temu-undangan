@@ -432,6 +432,9 @@ async function createApp(opts = {}) {
       res.json({
         ...JSON.parse(e.data),
         theme: (await commerce.license(e.id))?.theme_id || "navy",
+        themeImages: await commerce.themeImages(
+          (await commerce.license(e.id))?.theme_id || "navy",
+        ),
       });
     });
     app.get("/music/piano.wav", (req, res) => {
