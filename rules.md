@@ -196,3 +196,11 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Admin mengatur harga jual dan harga normal opsional pada kartu per tema. Harga normal 0 berarti tanpa promo; diskon/pencoretan hanya ditampilkan jika harga normal lebih besar dari harga jual. Harga tidak dipinjam dari gambar contoh.
 - Halaman /admin untuk akun tanpa peran admin menampilkan panduan pemberian hak melalui terminal server. Tidak ada promosi otomatis, password admin bawaan, atau endpoint publik untuk menjadikan diri admin. Localhost dan hosting masing-masing memakai database serta konfigurasi yang sesuai.
 - Logout mencabut sesi server dan menghapus cookie. Sesi habis tetap dapat logout; kegagalan jaringan ditampilkan dengan opsi mencoba ulang, bukan membiarkan tombol diam. CSRF dan pemeriksaan asal request tetap diberlakukan.
+
+## 12. Warna halaman awal mengikuti dashboard
+
+- Ganti aksen pink/magenta pada halaman awal website dengan palet hijau yang sudah digunakan dashboard.
+- Gunakan hijau utama dashboard `#385345` untuk tombol utama, tautan aktif, dan aksen merek; hijau gelap `#263f32` untuk hover; serta sage `#e8eddf` dan latar lembut `#f8f9f5` untuk area pendukung.
+- Terapkan secara konsisten pada header/navigasi, tombol Login, tombol ajakan utama, bagian fitur, katalog tema, harga, Layar Tamu, serta footer halaman awal. Pertahankan keterbacaan teks dan indikator fokus keyboard pada layar HP maupun laptop.
+- Harga jual tetap merah dan harga normal tetap abu-abu dicoret sesuai aturan tampilan harga pengguna. Warna ilustrasi/foto tema undangan tetap mengikuti tema masing-masing.
+- Bagian ini merupakan aturan perubahan desain. Pembaruan dokumen saja belum mengubah CSS atau warna website; implementasi tampilan harus mengikuti aturan ini ketika dikerjakan.
