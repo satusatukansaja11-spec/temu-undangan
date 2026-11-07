@@ -203,4 +203,4 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Gunakan hijau utama dashboard `#385345` untuk tombol utama, tautan aktif, dan aksen merek; hijau gelap `#263f32` untuk hover; serta sage `#e8eddf` dan latar lembut `#f8f9f5` untuk area pendukung.
 - Terapkan secara konsisten pada header/navigasi, tombol Login, tombol ajakan utama, bagian fitur, katalog tema, harga, Layar Tamu, serta footer halaman awal. Pertahankan keterbacaan teks dan indikator fokus keyboard pada layar HP maupun laptop.
 - Harga jual tetap merah dan harga normal tetap abu-abu dicoret sesuai aturan tampilan harga pengguna. Warna ilustrasi/foto tema undangan tetap mengikuti tema masing-masing.
-- Bagian ini merupakan aturan perubahan desain. Pembaruan dokumen saja belum mengubah CSS atau warna website; implementasi tampilan harus mengikuti aturan ini ketika dikerjakan.
+- Palet hijau/sage sudah diterapkan pada halaman awal, termasuk navigasi HP, logo cincin, ilustrasi fitur, tombol dan footer. Implementasi dibatasi pada halaman awal; ilustrasi/foto tema undangan dan warna harga jual tetap mengikuti aturan masing-masing.

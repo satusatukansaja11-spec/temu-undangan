@@ -85,7 +85,7 @@ Hasil pengujian otomatis dan browser selama pengerjaan dirangkum dalam `VALIDATI
 
 ## Halaman awal dan akun (pembaruan 24 Oktober 2026)
 
-Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan publik putih/magenta dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
+Halaman `/` kini merupakan beranda publik. Menu: **Beranda, Tema, Fitur, Harga, Layar Tamu, Login**. Menu section memakai anchor; Login menuju `/login`, Buat Akun Baru menuju `/daftar`, dan dashboard ada di `/dashboard`. Identitas Temu dipertahankan, dengan tampilan halaman awal putih/hijau/sage dan kartu login mengikuti referensi pengguna. Dashboard dan undangan yang sudah ada tetap tersedia.
 
 - Tema menampilkan katalog **Navy Ivory** dan **Sakura & Butterfly**. Preview memakai data ilustrasi, bukan acara pelanggan.
 - Harga diatur pemilik melalui panel admin. Checkout transfer bank baru tersedia setelah rekening dan harga diaktifkan.
