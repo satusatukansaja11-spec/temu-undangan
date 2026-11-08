@@ -66,3 +66,10 @@ Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, da
 - Dashboard khusus pemilik mengambil susunan dari referensi: sidebar kiri, area kerja putih dengan ilustrasi geometris pastel dan ringkasan angka, serta panel kanan untuk verifikasi, pembayaran disetujui, musik dan aktivitas. Palet lavender hanya berlaku pada admin; halaman utama/pengguna tetap hijau.
 - Menu admin: Ringkasan, Pesanan, Undangan, Pustaka musik, Rekening & harga, Menu latar, Aktivitas. Setiap menu terhubung dengan fitur asli; angka memakai API admin yang dilindungi otorisasi pemilik.
 - Pada layar sempit, navigasi berubah menjadi baris menu geser, area kerja satu kolom dan ringkasan di bawah. Pembatasan akses pengguna biasa tetap berlaku.
+
+## Ornamen bergerak dan countdown semua tema
+
+- Admin → Menu latar → pilih tema → Gambar bergerak menyediakan unggahan beberapa PNG/WebP transparan. Maksimal 12 gambar per tema dan 5 MB per gambar; gambar dioptimalkan menjadi WebP maksimal 640 px tanpa membuang transparansi.
+- Setiap ornamen memiliki halaman (sampul, nama, mempelai, acara, lokasi atau galeri), posisi empat sudut, ukuran 60–240 px, durasi 4–20 detik serta pilihan berayun/melayang/diam. Dapat dinonaktifkan, diedit dan dihapus. Tema yang tidak diberi ornamen tambahan tetap menggunakan desain sebelumnya.
+- Ornamen berada di belakang konten, tidak menangkap klik, dan bukan bagian dari foto pribadi. Animasi berhenti di luar layar atau ketika tab disembunyikan, serta tampil diam pada prefers-reduced-motion.
+- Semua countdown memiliki empat kotak berwarna dengan angka dan label putih: navy, rose Sakura, merah Meihua, cokelat Jawa, emerald Islami. Tema baru mewarisi `--countdown-bg`, `--countdown-text` dan `--countdown-border`, dengan fallback ke token warna tema. Ukuran menyesuaikan layar 320 px tanpa mengubah perhitungan zona waktu.

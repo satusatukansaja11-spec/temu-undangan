@@ -1031,3 +1031,220 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Countdown untuk semua tema, dengan fallback warna tema bagi tema baru. */
+.wedding-v2 {
+  --countdown-bg: var(--skin-accent, var(--w-ink, #385345));
+  --countdown-text: #fff;
+  --countdown-border: var(--skin-gold, var(--w-line, #d8e0d0));
+}
+.wedding-navy {
+  --countdown-bg: #34415b;
+  --countdown-border: #aa9b67;
+}
+.wedding-sakura {
+  --countdown-bg: #784952;
+  --countdown-border: #c9a37a;
+}
+.wedding-meihua {
+  --countdown-bg: #853c43;
+  --countdown-border: #b98f72;
+}
+.wedding-jawa {
+  --countdown-bg: #59432f;
+  --countdown-border: #b49558;
+}
+.wedding-islami {
+  --countdown-bg: #184d42;
+  --countdown-border: #c7a45c;
+}
+.wedding-v2 .countdown {
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+.wedding-v2 .countdown > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 92px;
+  padding: 14px 5px;
+  border: 1px solid var(--countdown-border);
+  border-radius: 12px;
+  background: var(--countdown-bg);
+  box-shadow: 0 5px 12px #34290d15;
+}
+.wedding-v2 .countdown > div:first-child {
+  border-left: 1px solid var(--countdown-border);
+}
+.wedding-v2 .countdown > div strong {
+  font-size: 30px;
+  line-height: 1.2;
+  color: var(--countdown-text);
+}
+.wedding-v2 .countdown > div span {
+  font: 11px/1.6 Arial;
+  color: var(--countdown-text);
+  margin-top: 7px;
+  letter-spacing: 0.4px;
+}
+/* Ornamen transparan terpisah dari foto/latar; gerakan berhenti di luar layar. */
+.theme-decoration-host {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.theme-decoration-host > :not(.theme-decoration):not(.theme-scenery) {
+  position: relative;
+  z-index: 1;
+}
+.theme-decoration {
+  position: absolute;
+  z-index: 0;
+  width: min(var(--ornament-size), 42%);
+  pointer-events: none;
+  user-select: none;
+}
+.theme-decoration img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  object-fit: contain;
+  animation-duration: var(--ornament-duration, 7s);
+  animation-delay: var(--ornament-delay, 0s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-play-state: paused;
+}
+.ornament-top-left {
+  top: 0;
+  left: 0;
+}
+.ornament-top-right {
+  top: 0;
+  right: 0;
+}
+.ornament-bottom-left {
+  bottom: 0;
+  left: 0;
+}
+.ornament-bottom-right {
+  bottom: 0;
+  right: 0;
+}
+.ornament-top-left img {
+  transform-origin: top left;
+}
+.ornament-top-right img {
+  transform-origin: top right;
+}
+.ornament-bottom-left img {
+  transform-origin: bottom left;
+}
+.ornament-bottom-right img {
+  transform-origin: bottom right;
+}
+.ornament-motion-sway {
+  animation-name: ornament-sway;
+}
+.ornament-motion-float {
+  animation-name: ornament-float;
+}
+.ornament-in-view .theme-decoration img {
+  animation-play-state: running;
+}
+.ornaments-paused .theme-decoration img {
+  animation-play-state: paused;
+}
+.ornament-settings {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.ornament-settings label {
+  min-width: 0;
+}
+.ornament-settings :is(select, input) {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  min-height: 44px;
+  margin: 6px 0;
+}
+.ornament-thumb {
+  width: 95px;
+  height: 95px;
+  object-fit: contain;
+  background: repeating-conic-gradient(#f2eff8 0% 25%, #fff 0% 50%) 0/16px 16px;
+  border: 1px solid #dedbea;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+.ornament-list > form,
+#ornamentUpload {
+  border: 1px solid #e6e2ed;
+  padding: 16px;
+  border-radius: 12px;
+  margin: 16px 0;
+}
+#ornamentEditor {
+  margin-top: 30px;
+  border-top: 1px solid #e8e2ef;
+  padding-top: 24px;
+}
+#ornamentEditor p {
+  font-size: 12px;
+  line-height: 1.8;
+}
+#ornamentEditor input[type="file"] {
+  width: 100%;
+  font-size: 12px;
+}
+#ornamentEditor .actions {
+  flex-wrap: wrap;
+}
+@keyframes ornament-sway {
+  from {
+    transform: rotate(-3deg);
+  }
+  to {
+    transform: rotate(3deg);
+  }
+}
+@keyframes ornament-float {
+  from {
+    transform: translateY(0) rotate(-2deg);
+  }
+  to {
+    transform: translateY(-12px) rotate(2deg);
+  }
+}
+@media (max-width: 390px) {
+  .wedding-v2 .countdown {
+    gap: 6px;
+  }
+  .wedding-v2 .countdown > div {
+    min-height: 80px;
+    padding: 12px 3px;
+  }
+  .wedding-v2 .countdown > div strong {
+    font-size: 25px;
+  }
+  .wedding-v2 .countdown > div span {
+    font-size: 10px;
+  }
+  .ornament-settings {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-decoration img {
+    animation: none !important;
+    transform: none !important;
+  }
+}
+.wedding-v2 .countdown > div span {
+  color: var(--countdown-text) !important;
+}

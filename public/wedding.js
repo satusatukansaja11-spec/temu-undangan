@@ -178,6 +178,7 @@ async function renderWedding(preview, id, themeDemo = false) {
     applyNavyTheme(e);
     if (e.theme === "sakura") applySakuraTheme();
     applyDesignedTheme(e);
+    applyThemeOrnaments(e);
     if (themeDemo) {
       const banner = document.querySelector(".preview-banner");
       banner.insertAdjacentHTML(

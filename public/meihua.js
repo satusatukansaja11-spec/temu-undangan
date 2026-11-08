@@ -79,7 +79,8 @@ async function mountThemeAssets() {
           );
           return `<form data-theme-image="${slot}" data-theme="${id}"><h3>${label}</h3><img class="theme-image-preview" src="${current ? "/theme-assets/" + esc(current.id) : design[slot]}" alt="Latar ${esc(design.name)} — ${label}"><label>File latar<input name="image" type="file" accept="image/jpeg,image/png,image/webp" required></label><button class="primary">Unggah latar</button><p role="status"></p></form>`;
         })
-        .join("")}</div>`;
+        .join("")}</div><div id="ornamentEditor"></div>`;
+    mountOrnamentEditor(id);
     host.querySelectorAll("[data-theme-image]").forEach(
       (form) =>
         (form.onsubmit = async (e) => {

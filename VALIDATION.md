@@ -173,3 +173,12 @@ Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul
 - Preview Jawa/Islami diperiksa pada HP dan laptop; bingkai foto, latar, judul, timeline dan navigasi mengikuti `desain.MD`. Kartu katalog menampilkan keterangan jumlah penggunaan nyata dan empat kartu lebih kecil pada desktop.
 - Screenshot: `admin-studio-desktop.png`, `admin-studio-mobile.png`, `catalog-compact-studio.png`, `user-cards-compact.png`, serta `jawa-*-refined.png` dan `islami-*-refined.png` di `docs/images/`.
 - Tidak ada perubahan skema SQL. `.env`, data pelanggan dan kredensial hosting tidak dikirim ke GitHub. Deploy hosting masih dilakukan pemilik setelah kode terbaru tersedia.
+
+## Ornamen per tema dan countdown — 8 November 2026
+
+- `npm test`: 53 pengujian; 51 lulus, 2 integrasi PostgreSQL/S3 dilewati karena layanan pengujian tidak dikonfigurasi, 0 gagal.
+- Pengujian ornamen mencakup akses admin/CSRF, format dan transparansi gambar, konfigurasi, batas 12 aset per tema, isolasi antar tema, nonaktifkan/aktifkan, hapus dan kebersihan file sementara. Migrasi SQLite 007 diuji bersama data lama; versi PostgreSQL disediakan dengan skema yang sama.
+- Chromium: unggah dua PNG sekaligus, edit lokasi/posisi/gerakan, hapus, isolasi Navy/Islami, dan prefers-reduced-motion diperiksa. Semua kotak countdown kelima tema memiliki latar berwarna serta angka/label putih. Tidak ada error JavaScript atau overflow halaman pada lebar 320, 390 dan 1440 px.
+- Screenshot `docs/images/countdown-{navy,sakura,meihua,jawa,islami}.png`, `ornamen-admin.png`, dan `ornamen-lokasi.png`. Daun pada screenshot adalah fixture QA, bukan gambar yang otomatis dipasang di produksi.
+- Ornamen memakai tabel theme_assets untuk penyimpanan dan sinkronisasi, dengan konfigurasi pada theme_ornaments. Skrip impor SQLite → PostgreSQL menyertakan tabel baru sesuai urutan dependensi.
+- Pengujian menggunakan database/direktori sementara. Tidak mengubah data hosting dan tidak mengirim `.env` ke GitHub.

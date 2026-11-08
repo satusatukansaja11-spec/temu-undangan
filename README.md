@@ -304,3 +304,14 @@ Daftar rekening disimpan dalam JSON konfigurasi `shop_settings` yang sudah ada; 
 Panel `/admin` memiliki menu Ringkasan, Pesanan, Undangan, Pustaka musik, Rekening & harga, Menu latar, serta Aktivitas. Ringkasan menampilkan jumlah undangan, akun, pesanan, total pembayaran disetujui dan konfirmasi yang perlu diperiksa dari database. Hak akses tetap menggunakan `npm run admin:grant -- email-pemilik`.
 
 Katalog menampilkan jumlah penggunaan setiap tema berdasarkan lisensi yang dibayar atau lisensi lama valid. Angka tidak ditambah secara fiktif ke 20; pesanan belum dibayar tidak dihitung. Tidak ada perubahan skema database untuk pembaruan ini. Deploy ulang dari kode GitHub agar `studio.css` dan tampilan admin baru tersedia di hosting.
+
+### Mengunggah gambar bergerak untuk tema tertentu
+
+1. Buka **Admin → Menu latar**, lalu pilih tema.
+2. Di **Gambar bergerak**, pilih satu atau beberapa PNG/WebP berlatar transparan. Daun yang menyatu dengan gambar latar perlu dipisahkan lebih dahulu menggunakan editor gambar.
+3. Tentukan halaman, sudut, gerakan, ukuran dan durasi, lalu tekan **Tambah gambar bergerak**. Maksimal 12 gambar per tema, 5 MB per gambar. Gambar disimpan sebagai WebP yang dioptimalkan.
+4. Edit pengaturan setiap gambar, nonaktifkan sementara, atau hapus sesuai kebutuhan. **Preview gerakan tema** membuka hasilnya. Gambar tidak otomatis ditambahkan ke tema lain.
+
+Pembaruan menggunakan migrasi **007_theme_ornaments.sql** untuk SQLite dan PostgreSQL. Jalankan `npm run db:migrate` sebelum restart jika migrasi otomatis dinonaktifkan; konfigurasi `AUTO_MIGRATE=true` menjalankannya saat startup. Backup database sebelum pembaruan. Tidak perlu mengunggah `.env` ke GitHub. Skrip impor SQLite ke PostgreSQL dan sinkronisasi penyimpanan menyertakan aset ornamen.
+
+Kotak countdown mengikuti warna masing-masing tema. Untuk tema baru, gunakan token CSS `--countdown-bg`, `--countdown-text` dan `--countdown-border`; warna dasar tersedia sebagai fallback. Animasi dekorasi menghormati pengaturan pengurangan gerakan perangkat.

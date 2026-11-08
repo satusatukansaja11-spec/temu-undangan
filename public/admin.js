@@ -14,6 +14,9 @@ function adminAuditDetails(entry) {
 }
 const adminActionNames = {
   "event.date": "Koreksi tanggal undangan",
+  "theme.ornament.add": "Ornamen tema ditambahkan",
+  "theme.ornament.update": "Ornamen tema diperbarui",
+  "theme.ornament.delete": "Ornamen tema dihapus",
   "music.upload": "Lagu ditambahkan",
   "music.delete": "Lagu dihapus",
   "admin.grant": "Akses admin diberikan",

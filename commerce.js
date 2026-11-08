@@ -1,3 +1,4 @@
+const { installThemeOrnaments, listOrnaments } = require("./theme-ornaments");
 const { randomBytes } = require("node:crypto");
 const { queueDeletion, drainDeletions } = require("./storage");
 const {
@@ -93,13 +94,22 @@ function createCommerce(
   };
   const themeImages = async (id) => {
     const rows = await db
-      .prepare("SELECT slot,id FROM theme_assets WHERE theme_id=?")
+      .prepare(
+        "SELECT slot,id FROM theme_assets WHERE theme_id=? AND slot IN ('cover','inside')",
+      )
       .all(id);
     return Object.fromEntries(
       rows.map((row) => [row.slot, "/theme-assets/" + row.id]),
     );
   };
   require("./theme-assets").installThemeAssets(app, db, {
+    admin,
+    fail,
+    storage,
+    dataDir,
+    themes: THEMES.map((t) => t.id),
+  });
+  installThemeOrnaments(app, db, {
     admin,
     fail,
     storage,
@@ -142,6 +152,9 @@ function createCommerce(
       ...data,
       theme: l?.theme_id || "navy",
       themeImages: await themeImages(l?.theme_id || "navy"),
+      themeOrnaments: (await listOrnaments(db, l?.theme_id || "navy")).filter(
+        (o) => o.enabled,
+      ),
       license: l
         ? {
             legacy: !!l.legacy,
@@ -241,6 +254,9 @@ function createCommerce(
     res.json({
       theme: theme.id,
       themeImages: await themeImages(theme.id),
+      themeOrnaments: (await listOrnaments(db, theme.id)).filter(
+        (o) => o.enabled,
+      ),
       name: "Contoh Undangan — Data Ilustrasi",
       groomNick: "Arif",
       groomName: "Arif Pratama",

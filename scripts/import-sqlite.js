@@ -5,6 +5,7 @@ const { connectDatabase, migrate } = require("../db");
 const tables = {
   wish_visibility: ["rsvp_id", "published", "hidden", "created"],
   theme_assets: ["theme_id", "slot", "id", "mime", "created"],
+  theme_ornaments: ["id", "theme_id", "asset_id", "config", "created"],
   theme_orders: [
     "id",
     "owner",
@@ -97,6 +98,7 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "event_licenses",
             "wish_visibility",
             "theme_assets",
+            "theme_ornaments",
           ].indexOf(a) -
           [
             "users",
@@ -114,6 +116,7 @@ async function importSqlite({ sourceFile, targetUrl }) {
             "event_licenses",
             "wish_visibility",
             "theme_assets",
+            "theme_ornaments",
           ].indexOf(b),
       )) {
         counts[table] = 0;

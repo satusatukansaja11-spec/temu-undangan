@@ -245,3 +245,10 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Kartu undangan/katalog/pesanan diperkecil pada semua menu, sambil mempertahankan ukuran tombol yang nyaman di HP.
 - Keterangan jumlah penggunaan tema menghitung undangan berlisensi yang sudah dibayar atau lisensi lama valid. Jangan menampilkan angka awal 20 sebagai fakta bila belum didukung data penggunaan nyata.
 - Jawa Heritage dan Islamic Serenity menggunakan palet, bingkai, navigasi serta timeline masing-masing sesuai `desain.MD`, termasuk dalam preview dan undangan pelanggan yang sudah membeli.
+
+## 18. Ornamen per tema dan countdown berwarna
+
+- Hanya pemilik admin yang dapat mengunggah, mengedit, menonaktifkan dan menghapus ornamen tema global. Pilihan tema wajib membatasi ornamen pada tema tersebut; tidak mengubah foto, galeri atau latar pengguna.
+- Mendukung beberapa gambar transparan PNG/WebP, maksimal 12 per tema dan 5 MB per gambar. Server memeriksa isi gambar, ukuran piksel, format dan transparansi, lalu mengoptimalkan WebP. SVG mentah tidak diterima sebagai unggahan.
+- Ornamen dapat ditempatkan di halaman dan sudut tertentu, bergerak berayun/melayang atau diam. Tidak menutup kontrol; animasi berhenti di luar layar, saat tab disembunyikan, dan ketika pengguna memilih reduced motion.
+- Countdown seluruh tema memiliki empat kotak dengan warna tema, angka dan label yang terbaca. Tema baru menggunakan token warna bersama sehingga mengikuti pola yang sama tanpa mengubah logika tanggal/zona waktu.
