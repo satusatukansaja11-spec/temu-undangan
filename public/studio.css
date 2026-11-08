@@ -1,0 +1,1033 @@
+/* Kartu ringkas di katalog, dashboard pengguna, checkout dan panel pemilik. */
+.catalog-grid {
+  grid-auto-columns: calc((100% - 54px) / 4);
+  gap: 18px;
+}
+.catalog-grid .theme-product img {
+  height: 174px;
+}
+.catalog-grid .theme-product > div {
+  padding: 13px;
+}
+.catalog-grid .theme-product h3 {
+  font-size: 18px;
+  margin-bottom: 9px;
+}
+.catalog-grid .theme-price-line {
+  font-size: 16px;
+  gap: 3px 7px;
+  margin-bottom: 7px;
+  flex-wrap: wrap;
+}
+.catalog-grid .theme-original-price {
+  font-size: 13px;
+  margin-left: 0;
+}
+.catalog-grid .catalog-actions {
+  gap: 7px;
+  padding-top: 8px;
+}
+.catalog-grid .catalog-actions .site-button {
+  font-size: 11px;
+  padding: 9px 10px;
+}
+.theme-usage {
+  display: block;
+  font-size: 10px;
+  line-height: 1.6;
+  color: #687366;
+  margin-bottom: 8px;
+}
+.cards {
+  gap: 14px;
+}
+.event-card {
+  padding: 15px;
+}
+.event-card > h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+.event-summary {
+  min-height: 96px;
+  gap: 10px;
+}
+.event-portrait {
+  width: 72px;
+  height: 72px;
+}
+.event-summary p,
+.event-summary a,
+.event-links a {
+  font-size: 11px;
+}
+.event-links {
+  margin: 12px 0;
+  gap: 10px;
+}
+.event-card-actions {
+  margin-top: 12px;
+  gap: 6px;
+}
+.event-card-actions button,
+.event-card-actions .button {
+  font-size: 11px;
+  padding: 8px;
+  min-height: 44px;
+}
+.new-card {
+  min-height: 240px;
+}
+.order-card {
+  padding: 18px;
+  margin: 14px 0;
+}
+.order-card h2 {
+  font-size: 23px;
+}
+.order-card h3 {
+  font-size: 17px;
+}
+.admin-theme-prices {
+  gap: 14px;
+}
+.admin-theme-prices img {
+  height: 145px;
+}
+.admin-theme-prices article > div {
+  padding: 15px;
+}
+.admin-theme-prices strong {
+  font-size: 18px;
+  margin-bottom: 12px;
+}
+.admin-theme-prices h3 {
+  font-size: 17px;
+}
+.theme-image-preview {
+  height: 190px;
+}
+@media (min-width: 1550px) {
+  .cards {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .catalog-grid {
+    grid-auto-columns: calc((100% - 36px) / 3);
+  }
+}
+@media (max-width: 760px) {
+  .catalog-grid {
+    grid-auto-columns: 230px;
+    gap: 12px;
+  }
+  .catalog-grid .theme-product img {
+    height: 160px;
+  }
+  .catalog-grid .theme-product h3 {
+    font-size: 17px;
+  }
+  .catalog-grid .theme-product > div {
+    padding: 12px;
+  }
+  .event-card {
+    padding: 14px;
+  }
+  .event-portrait {
+    width: 68px;
+    height: 68px;
+  }
+  .event-summary {
+    min-height: 90px;
+  }
+  .admin-theme-prices {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-theme-prices article > div {
+    padding: 12px;
+  }
+  .admin-theme-prices img {
+    height: 140px;
+  }
+}
+@media (max-width: 450px) {
+  .admin-theme-prices {
+    grid-template-columns: 1fr;
+  }
+}
+/* Tema Jawa dan Islami mengikuti desain.MD pada seluruh komponen undangan. */
+.wedding-jawa {
+  --w-ink: #59432f;
+  --w-muted: #705d49;
+  --w-sage: #f1e3c9;
+  --w-line: #d4be91;
+  --theme-paper: #fff7e8;
+}
+.wedding-islami {
+  --w-ink: #184d42;
+  --w-muted: #46665a;
+  --w-sage: #e8eee4;
+  --w-line: #c7cbb0;
+  --theme-paper: #fffaf0;
+}
+:is(.wedding-jawa, .wedding-islami) .w-section {
+  border-color: var(--skin-gold);
+  color: var(--w-ink);
+}
+:is(.wedding-jawa, .wedding-islami) .w-section > h2 {
+  position: relative;
+  padding-top: 24px;
+}
+:is(.wedding-jawa, .wedding-islami) .w-section > h2:before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: 0;
+  left: calc(50% - 24px);
+  width: 48px;
+  height: 9px;
+  border-top: 1px solid var(--skin-gold);
+  border-bottom: 1px solid var(--skin-gold);
+}
+.wedding-jawa .w-section > h2:before {
+  border-radius: 50%;
+}
+.wedding-islami .w-section > h2:before {
+  width: 10px;
+  height: 10px;
+  left: calc(50% - 5px);
+  border: 1px solid var(--skin-gold);
+  transform: rotate(45deg);
+}
+:is(.wedding-jawa, .wedding-islami)
+  :is(
+    .w-eyebrow,
+    .guest-salutation,
+    .cover-guest,
+    .wedding-title > p:first-of-type,
+    .wedding-title h1 i
+  ) {
+  color: var(--skin-ink) !important;
+}
+:is(.wedding-jawa, .wedding-islami) .cover-portrait {
+  border-color: var(--skin-gold);
+  box-shadow: 0 9px 24px #32250c24;
+}
+.wedding-jawa .cover-portrait {
+  border-radius: 110px 110px 12px 12px;
+  border-width: 4px;
+}
+.wedding-islami .cover-portrait {
+  border-radius: 50% 50% 10px 10px;
+  border-width: 4px;
+  outline: 1px solid var(--skin-gold);
+  outline-offset: 6px;
+}
+:is(.wedding-jawa, .wedding-islami) .w-couple {
+  border-width: 1px;
+  border-radius: 190px 190px 20px 20px;
+  background: transparent;
+}
+.wedding-jawa .partner-photo {
+  border-radius: 110px 110px 16px 16px;
+}
+.wedding-islami .partner-photo {
+  border-radius: 50% 50% 10px 10px;
+}
+:is(.wedding-jawa, .wedding-islami) .schedule-section {
+  border: 1px solid var(--skin-gold);
+  border-radius: 130px 130px 12px 12px;
+  margin: 18px 18px 0;
+  padding-top: 65px;
+}
+:is(.wedding-jawa, .wedding-islami) .schedule-timeline:before {
+  background: var(--skin-gold);
+}
+:is(.wedding-jawa, .wedding-islami)
+  :is(
+    .agenda-marker,
+    .agenda-time,
+    .schedule-timeline h3,
+    .agenda-details > p
+  ) {
+  color: var(--skin-ink);
+  border-color: var(--skin-gold);
+}
+:is(.wedding-jawa, .wedding-islami) .agenda-marker {
+  background: var(--theme-paper);
+}
+:is(.wedding-jawa, .wedding-islami)
+  .schedule-timeline
+  .agenda-details
+  > .prose {
+  color: var(--w-muted);
+}
+:is(.wedding-jawa, .wedding-islami)
+  :is(.button.primary, #sendRsvp, .wedding-open) {
+  background: var(--skin-accent);
+  border-color: var(--skin-accent);
+  color: white !important;
+}
+:is(.wedding-jawa, .wedding-islami) .countdown > div {
+  background: var(--theme-paper);
+  border-color: var(--skin-gold);
+}
+:is(.wedding-jawa, .wedding-islami) .countdown strong {
+  color: var(--skin-ink);
+}
+:is(.wedding-jawa, .wedding-islami) .wedding-nav {
+  background: var(--theme-paper);
+  border-color: var(--skin-gold);
+}
+:is(.wedding-jawa, .wedding-islami) .wedding-nav a {
+  color: var(--skin-ink);
+}
+:is(.wedding-jawa, .wedding-islami) .wedding-nav a.active {
+  background: var(--w-sage);
+  color: var(--skin-ink);
+}
+:is(.wedding-jawa, .wedding-islami) :is(.wish-totals span, .wedding-audio) {
+  background: var(--w-sage);
+  border-color: var(--skin-gold);
+  color: var(--skin-ink);
+}
+:is(.wedding-jawa, .wedding-islami) :is(input, textarea, select):focus-visible {
+  outline-color: var(--skin-accent);
+}
+/* Owner Studio: navigasi kiri, ruang kerja, dan panel ringkasan seperti referensi. */
+.admin-shell {
+  --ink: #26243c;
+  --green: #6559d9;
+  --muted: #6f7084;
+  --line: #e8e7f1;
+  --paper: #f6f6fb;
+  --sage: #efedfc;
+  background: radial-gradient(at left top, #eee5fa, transparent 55%), #f4f9fa;
+  min-height: 100vh;
+}
+.admin-shell svg {
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+.admin-shell > aside {
+  width: 218px;
+  padding: 34px 20px;
+  background: #ffffff6b;
+  border: 0;
+  backdrop-filter: blur(8px);
+  overflow-y: auto;
+}
+.admin-shell .brand {
+  font-size: 38px;
+  color: #292739;
+}
+.admin-shell .brand span {
+  color: #6559d9;
+}
+.admin-shell .workspace {
+  margin: 32px 0 15px;
+  font-size: 9px;
+  color: #77748f;
+}
+.admin-shell .admin-nav {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 46px;
+  padding: 11px 13px;
+  margin: 5px 0;
+  border-radius: 10px;
+  color: #68677d;
+  text-decoration: none;
+  font-size: 12px;
+}
+.admin-shell .admin-nav:hover {
+  background: #ece9fc;
+}
+.admin-shell .admin-nav.active {
+  background: #6559d9;
+  color: #fff;
+  box-shadow: 0 7px 16px #6559d91a;
+}
+.admin-nav b {
+  margin-left: auto;
+  background: #fff2;
+  border-radius: 20px;
+  padding: 1px 7px;
+  font-size: 10px;
+}
+.admin-shell .customer-dashboard {
+  margin-top: 24px;
+  font-size: 11px;
+}
+.admin-shell .aside-bottom {
+  padding: 8px 12px 20px;
+  border: 0;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 9px 15px #25203b0b;
+  text-align: center;
+  margin: 35px 0 20px;
+}
+.admin-shell .aside-bottom img {
+  max-width: 100%;
+  height: auto;
+}
+.admin-shell .aside-bottom h3 {
+  font: 600 12px Arial;
+  color: #45415e;
+}
+.admin-shell .aside-bottom a {
+  font-size: 11px;
+  color: #6559d9;
+  text-decoration: none;
+}
+.admin-shell .user {
+  flex-wrap: wrap;
+}
+.admin-shell .user button {
+  min-height: 44px;
+  font-size: 10px;
+}
+.admin-shell > .main {
+  margin-left: 218px;
+  background: transparent;
+}
+.admin-shell header {
+  background: transparent;
+  border: 0;
+  padding: 0 30px;
+  height: 78px;
+  gap: 20px;
+  font-size: 12px;
+}
+.admin-owner {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  text-decoration: none;
+  font-size: 12px;
+}
+.admin-owner .avatar {
+  background: #6559d9;
+  color: white;
+}
+.admin-shell .admin-panel {
+  padding: 0 28px 28px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+.admin-topline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+.admin-topline p {
+  margin: 0;
+  color: #6d6597;
+}
+.admin-topline time {
+  font-size: 11px;
+  color: #79758a;
+}
+.admin-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 26px;
+  align-items: start;
+}
+.admin-center {
+  min-width: 0;
+  background: #fff;
+  border-radius: 26px;
+  padding: 27px;
+}
+.admin-welcome {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 290px;
+}
+.admin-welcome > div {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+}
+.admin-welcome h1 {
+  font:
+    600 clamp(28px, 2.6vw, 40px)/1.15 Arial,
+    sans-serif;
+  letter-spacing: -1.5px;
+  margin: 10px 0 14px;
+  color: #222132;
+}
+.admin-welcome p {
+  font-size: 12px;
+  line-height: 1.6;
+  color: #777387;
+}
+.admin-welcome > img {
+  width: 46%;
+  height: auto;
+  margin-right: -15px;
+}
+.admin-shell .primary {
+  background: #6559d9;
+  border-color: #6559d9;
+  color: #fff;
+}
+.admin-shell .primary:hover {
+  background: #5044c0;
+}
+.admin-welcome .button {
+  font-size: 11px;
+  gap: 12px;
+  border-radius: 8px;
+  margin-top: 4px;
+}
+.admin-welcome .button svg {
+  width: 16px;
+}
+.admin-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 10px 0 26px;
+}
+.admin-metrics > div {
+  padding: 14px;
+  background: #f2f0fc;
+  border-radius: 12px;
+}
+.admin-metrics > div:nth-child(2) {
+  background: #edf6fc;
+}
+.admin-metrics > div:nth-child(3) {
+  background: #fff1ed;
+}
+.admin-metrics span {
+  display: block;
+  font-size: 10px;
+  color: #6f6986;
+}
+.admin-metrics strong {
+  font: 600 25px/1.5 Arial;
+  color: #34314a;
+}
+.admin-shell .admin-detail {
+  position: static;
+  inset: auto;
+  display: block;
+  width: auto;
+  padding: 25px 0;
+  border: 0;
+  background: transparent;
+  z-index: auto;
+  overflow-wrap: anywhere;
+}
+.admin-detail .eyebrow {
+  font-size: 9px;
+  color: #6559d9;
+  margin-bottom: 20px;
+}
+.admin-detail h2 {
+  font: 600 30px/1.2 Arial;
+  letter-spacing: -1px;
+  margin-bottom: 18px;
+  color: #282337;
+}
+.admin-detail > p:not(.eyebrow) {
+  font-size: 11px;
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+.admin-detail-stat {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 24px 0;
+}
+.admin-detail-stat > svg {
+  box-sizing: content-box;
+  padding: 12px;
+  border-radius: 12px;
+  background: #dceefe;
+  color: #5d65d8;
+}
+.admin-detail-stat:nth-of-type(2) > svg {
+  background: #ffe7ed;
+  color: #cc5577;
+}
+.admin-detail-stat:nth-of-type(3) > svg {
+  background: #ffe5c9;
+  color: #bf7628;
+}
+.admin-detail-stat small {
+  display: block;
+  color: #7a7589;
+  font-size: 10px;
+}
+.admin-detail-stat strong {
+  font-size: 13px;
+  color: #342e45;
+}
+.admin-detail > .button {
+  font-size: 11px;
+  min-height: 44px;
+  border-radius: 9px;
+  margin: 12px 0;
+}
+.admin-recent {
+  border-top: 1px solid #e2e1ed;
+  margin-top: 24px;
+  padding-top: 24px;
+}
+.admin-recent h3 {
+  font-size: 13px;
+}
+.admin-recent p {
+  font-size: 11px;
+}
+.admin-recent small {
+  display: block;
+  font-size: 9px;
+  margin-top: 3px;
+}
+.admin-recent strong {
+  color: #4a445f;
+  font-weight: 500;
+}
+.admin-shell .admin-section {
+  padding: 22px 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid #eeecf6;
+  border-radius: 0;
+  background: #fff;
+  min-width: 0;
+}
+.admin-section[hidden],
+.admin-welcome[hidden] {
+  display: none !important;
+}
+.admin-shell .admin-section h2 {
+  font: 600 21px/1.3 Arial;
+  letter-spacing: -0.6px;
+  margin-bottom: 10px;
+}
+.admin-shell .admin-section > p {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.admin-shell .order-card {
+  background: #f5f2fe;
+  border: 0;
+  border-left: 4px solid #8f83e6;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+}
+.admin-shell .order-card:nth-child(even) {
+  background: #edf6fc;
+  border-left-color: #87badd;
+}
+.admin-shell .order-card h3 {
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.admin-shell .order-card p {
+  font-size: 11px;
+  line-height: 1.8;
+  margin-bottom: 9px;
+}
+.admin-shell .order-card button,
+.admin-shell .order-card .button {
+  font-size: 11px;
+  min-height: 44px;
+}
+.admin-shell .order-badge {
+  background: #eeeafd;
+  color: #5145a9;
+  font-size: 10px;
+  padding: 4px 8px;
+  vertical-align: middle;
+}
+.admin-shell .admin-event-list article {
+  background: #f7f6fc;
+  border: 0;
+  border-left: 3px solid #d7d0f3;
+  border-radius: 10px;
+  margin: 10px 0;
+  padding: 14px;
+}
+.admin-shell .admin-event-list h3 {
+  font-size: 14px;
+}
+.admin-shell .admin-event-list p {
+  font-size: 11px;
+}
+.admin-shell .admin-event-list button {
+  min-height: 44px;
+  font-size: 11px;
+}
+.admin-shell .admin-pagination {
+  flex-wrap: wrap;
+  font-size: 11px;
+  gap: 7px;
+}
+.admin-shell .admin-pagination button {
+  min-height: 44px;
+  padding: 8px 12px;
+  font-size: 10px;
+}
+.admin-shell .admin-search {
+  gap: 8px;
+}
+.admin-shell .admin-search input {
+  min-width: 0;
+}
+.admin-shell .admin-search button {
+  font-size: 11px;
+}
+.admin-shell :is(input, select, textarea) {
+  border-color: #dedbea;
+  border-radius: 8px;
+  background: #fdfcff;
+  max-width: 100%;
+  min-width: 0;
+}
+.admin-shell label {
+  font-size: 12px;
+}
+.admin-shell :is(button, .button):focus-visible,
+.admin-shell a:focus-visible {
+  outline: 2px solid #6559d9;
+  outline-offset: 3px;
+}
+.admin-shell .main > footer {
+  font-size: 12px;
+  padding: 15px 30px;
+}
+.admin-shell .admin-track-list article {
+  padding: 15px;
+}
+.admin-shell .admin-track-list audio {
+  max-width: 100%;
+  width: 100%;
+}
+.admin-shell .admin-theme-prices label {
+  font-size: 11px;
+}
+.admin-shell .admin-theme-prices h3 {
+  font-size: 15px;
+}
+.admin-shell .admin-theme-prices p {
+  font-size: 10px;
+}
+.admin-shell .admin-theme-prices input {
+  padding: 9px;
+}
+.admin-shell .admin-theme-prices .button {
+  min-height: 44px;
+  font-size: 11px;
+}
+.admin-shell .theme-upload-grid {
+  gap: 16px;
+}
+.admin-shell .theme-upload-grid h3 {
+  font-size: 14px;
+}
+.admin-shell .theme-upload-grid input[type="file"] {
+  width: 100%;
+  font-size: 10px;
+}
+.admin-shell #adminContent {
+  min-width: 0;
+}
+.admin-shell .admin-audit article {
+  padding: 13px;
+  font-size: 11px;
+}
+.admin-shell .admin-audit small {
+  font-size: 10px;
+}
+@media (min-width: 1600px) {
+  .admin-workspace {
+    grid-template-columns: minmax(0, 1fr) 285px;
+    gap: 36px;
+  }
+  .admin-center {
+    padding: 35px;
+  }
+}
+@media (max-width: 1190px) {
+  .admin-workspace {
+    grid-template-columns: minmax(0, 1fr) 210px;
+    gap: 20px;
+  }
+  .admin-shell > aside {
+    width: 190px;
+    padding: 28px 13px;
+  }
+  .admin-shell > .main {
+    margin-left: 190px;
+  }
+  .admin-shell .admin-panel {
+    padding: 0 20px 20px;
+  }
+  .admin-center {
+    padding: 22px;
+  }
+  .admin-welcome h1 {
+    font-size: 28px;
+  }
+  .admin-welcome > img {
+    width: 40%;
+  }
+  .admin-detail h2 {
+    font-size: 25px;
+  }
+}
+@media (max-width: 1000px) {
+  .admin-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .admin-shell .admin-detail {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 20px;
+  }
+  .admin-detail > .eyebrow,
+  .admin-detail > h2,
+  .admin-detail > p,
+  .admin-detail > .button,
+  .admin-recent {
+    grid-column: 1/-1;
+  }
+  .admin-detail > h2 {
+    font-size: 25px;
+    margin-bottom: 0;
+  }
+  .admin-detail > p:not(.eyebrow) {
+    margin-bottom: 0;
+  }
+  .admin-detail-stat {
+    margin: 4px 0;
+    gap: 8px;
+  }
+  .admin-detail-stat > svg {
+    padding: 8px;
+  }
+  .admin-detail .eyebrow {
+    margin-bottom: 0;
+  }
+  .admin-detail > .button {
+    justify-self: start;
+  }
+  .admin-recent {
+    margin-top: 4px;
+  }
+  .admin-recent p {
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 20px;
+  }
+}
+@media (max-width: 760px) {
+  .admin-shell > aside {
+    position: static;
+    width: 100%;
+    padding: 18px;
+    background: #fff9;
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+  .admin-shell .brand {
+    font-size: 31px;
+  }
+  .admin-shell .workspace {
+    margin: 12px 0 4px;
+  }
+  .admin-shell > aside nav {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 4px;
+    width: 100%;
+    white-space: nowrap;
+  }
+  .admin-shell .admin-nav {
+    flex: none;
+    margin: 0;
+    font-size: 11px;
+    padding: 9px 11px;
+    min-height: 44px;
+  }
+  .admin-shell .customer-dashboard {
+    margin: 0;
+  }
+  .admin-shell .aside-bottom {
+    display: none;
+  }
+  .admin-shell .user {
+    display: flex;
+    margin-top: 10px;
+    padding-top: 10px;
+  }
+  .admin-shell .user > div {
+    display: block;
+  }
+  .admin-shell .user small {
+    display: none;
+  }
+  .admin-shell .user strong {
+    font-size: 11px;
+  }
+  .admin-shell .user .admin-mobile-link {
+    display: none;
+  }
+  .admin-shell > .main {
+    margin-left: 0;
+  }
+  .admin-shell header {
+    height: 55px;
+    padding: 0 18px;
+  }
+  .admin-shell .admin-panel {
+    padding: 0 12px 16px;
+  }
+  .admin-topline {
+    padding: 0 6px;
+    margin-bottom: 12px;
+  }
+  .admin-topline time {
+    font-size: 10px;
+  }
+  .admin-topline .eyebrow {
+    font-size: 8px;
+  }
+  .admin-center {
+    padding: 18px;
+    border-radius: 20px;
+  }
+  .admin-welcome {
+    min-height: 250px;
+  }
+  .admin-welcome h1 {
+    font-size: 29px;
+  }
+  .admin-welcome p {
+    font-size: 11px;
+  }
+  .admin-welcome > img {
+    width: 38%;
+    margin-right: -12px;
+  }
+  .admin-shell .admin-section h2 {
+    font-size: 19px;
+  }
+  .admin-shell .admin-event-list article {
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .admin-shell .admin-detail {
+    grid-template-columns: 1fr;
+    padding: 20px 12px;
+  }
+  .admin-detail-stat {
+    grid-column: 1/-1;
+  }
+  .admin-metrics {
+    gap: 8px;
+  }
+  .admin-metrics > div {
+    padding: 12px;
+  }
+  .admin-metrics strong {
+    font-size: 23px;
+  }
+  .admin-owner {
+    font-size: 10px;
+  }
+  .admin-owner .avatar {
+    width: 28px;
+    height: 28px;
+  }
+  .admin-shell .admin-search {
+    flex-wrap: wrap;
+  }
+  .admin-shell .admin-search label {
+    width: 100%;
+  }
+  .admin-shell .admin-search button {
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .admin-shell * {
+    scroll-behavior: auto;
+    transition: none;
+  }
+}
+.admin-shell .admin-center {
+  container-type: inline-size;
+}
+.admin-shell .admin-orders {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+.admin-shell .admin-orders .order-card {
+  margin: 0;
+  padding: 14px;
+}
+.admin-shell .order-card p {
+  margin-bottom: 6px;
+}
+.admin-shell .order-card h3 {
+  margin-bottom: 10px;
+}
+.admin-shell[data-admin-screen="overview"] .admin-orders {
+  max-height: 440px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #bab1ef #f3f1fc;
+}
+.admin-shell[data-admin-screen="overview"] .admin-event-list {
+  max-height: 350px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: #bab1ef #f3f1fc;
+}
+.admin-shell .admin-section h2,
+.admin-shell .admin-section h3 {
+  color: #343047;
+}
+.admin-shell .user small {
+  color: #706a86;
+}
+.admin-shell .brand span {
+  color: #6559d9 !important;
+}
+@container (min-width:620px) {
+  .admin-shell .admin-orders {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -44,7 +44,7 @@ async function mountThemeAssets() {
     host = document.querySelector("#adminContent");
   host.insertAdjacentHTML(
     "beforeend",
-    `<section class="admin-section"><h2>Menu Latar</h2><label for="adminThemeSelect">Pilih tema<select id="adminThemeSelect">${Object.entries(
+    `<section class="admin-section" id="adminBackgrounds"><h2>Menu Latar</h2><label for="adminThemeSelect">Pilih tema<select id="adminThemeSelect">${Object.entries(
       themeNames,
     )
       .map(

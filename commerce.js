@@ -190,6 +190,11 @@ function createCommerce(
   };
   app.get("/api/themes", async (req, res) => {
     const cfg = await settings();
+    const usage = await db
+      .prepare(
+        "SELECT l.theme_id,COUNT(*) total FROM event_licenses l LEFT JOIN theme_orders o ON o.id=l.order_id WHERE l.legacy=1 OR o.status='paid' GROUP BY l.theme_id",
+      )
+      .all();
     const owned = req.session
       ? await db
           .prepare(
@@ -208,6 +213,9 @@ function createCommerce(
         THEMES.map(async (t) => ({
           ...t,
           image: (await themeImages(t.id)).cover || t.image,
+          usageCount: Number(
+            usage.find((row) => row.theme_id === t.id)?.total || 0,
+          ),
           price: cfg.prices[t.id],
           comparePrice: cfg.comparePrices?.[t.id] || 0,
           ownedEvent:

@@ -54,6 +54,7 @@ test("Admin: roles, shared audio, date correction and audit", async () => {
     assert.equal((await call("/api/admin/events", { user: null })).status, 401);
     for (const url of [
       "/api/admin/events",
+      "/api/admin/overview",
       "/api/admin/music",
       "/api/admin/audit",
     ])
@@ -82,6 +83,13 @@ test("Admin: roles, shared audio, date correction and audit", async () => {
     const event = await (
       await call("/api/events", { method: "POST", body: {} })
     ).json();
+    const overview = await (
+      await call("/api/admin/overview", { user: "owner" })
+    ).json();
+    assert.equal(overview.events, 1);
+    assert.equal(overview.customers, 1);
+    assert.equal(overview.pending, 0);
+    assert.equal(overview.revenue, 0);
     assert.equal(
       (
         await call(`/api/events/${event.id}/tracks`, {

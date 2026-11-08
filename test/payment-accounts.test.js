@@ -176,6 +176,21 @@ test("Multiple payment banks: selection, immutable invoice, ownership and state 
     assert.ok(navy.themeImages.inside.startsWith("/theme-assets/"));
     const themes = await (await call("/api/themes")).json();
     assert.equal(themes.themes.length, 5);
+    assert.ok(
+      themes.themes.every((t) => t.usageCount === 0),
+      "Unpaid orders do not inflate usage counts",
+    );
+    const draft = await (
+      await call("/api/events", "POST", { name: "QA usage" })
+    ).json();
+    await db
+      .prepare(
+        "UPDATE event_licenses SET legacy=1,theme_id='jawa' WHERE event_id=?",
+      )
+      .run(draft.id);
+    const counted = await (await call("/api/themes")).json();
+    assert.equal(counted.themes.find((t) => t.id === "jawa").usageCount, 1);
+    assert.equal(counted.themes.find((t) => t.id === "islami").usageCount, 0);
   } finally {
     await new Promise((r) => server.close(r));
     await db.close();

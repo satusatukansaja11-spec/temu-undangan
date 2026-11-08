@@ -298,3 +298,9 @@ Di **Admin → Rekening dan harga per tema**, isi rekening utama dan gunakan **T
 Di **Admin → Menu Latar**, pilih tema melalui dropdown lalu unggah sampul dan/atau latar isi (JPG/PNG/WebP, maksimal 10 MB). Aset berlaku pada preview dan undangan tema tersebut. Foto pribadi mempelai tidak diganti. Dua tema baru belum dijual sampai harga diisi admin.
 
 Daftar rekening disimpan dalam JSON konfigurasi `shop_settings` yang sudah ada; pembaruan ini tidak memerlukan migrasi SQL baru. Pengaturan lama dengan satu rekening tetap didukung. `.env` tetap privat dan tidak perlu dikirim ke GitHub.
+
+### Owner Studio dan jumlah penggunaan tema
+
+Panel `/admin` memiliki menu Ringkasan, Pesanan, Undangan, Pustaka musik, Rekening & harga, Menu latar, serta Aktivitas. Ringkasan menampilkan jumlah undangan, akun, pesanan, total pembayaran disetujui dan konfirmasi yang perlu diperiksa dari database. Hak akses tetap menggunakan `npm run admin:grant -- email-pemilik`.
+
+Katalog menampilkan jumlah penggunaan setiap tema berdasarkan lisensi yang dibayar atau lisensi lama valid. Angka tidak ditambah secara fiktif ke 20; pesanan belum dibayar tidak dihitung. Tidak ada perubahan skema database untuk pembaruan ini. Deploy ulang dari kode GitHub agar `studio.css` dan tampilan admin baru tersedia di hosting.

@@ -21,6 +21,27 @@ function makeAdminGuard(db, auth, fail) {
     });
 }
 function installAdmin(app, db, { admin, fail, read, missing, commerce }) {
+  app.get("/api/admin/overview", admin, async (req, res) => {
+    const events = await db.prepare("SELECT COUNT(*) total FROM events").get();
+    const customers = await db
+      .prepare(
+        "SELECT COUNT(*) total FROM users u WHERE NOT EXISTS (SELECT 1 FROM admin_users a WHERE a.user_id=u.id)",
+      )
+      .get();
+    const orders = await db
+      .prepare(
+        "SELECT COUNT(*) total,COALESCE(SUM(CASE WHEN status='paid' THEN amount ELSE 0 END),0) revenue,COALESCE(SUM(CASE WHEN status='awaiting_verification' THEN 1 ELSE 0 END),0) pending FROM theme_orders",
+      )
+      .get();
+    res.json({
+      events: Number(events.total),
+      customers: Number(customers.total),
+      orders: Number(orders.total),
+      revenue: Number(orders.revenue),
+      pending: Number(orders.pending),
+    });
+  });
+
   app.get("/api/admin/events", admin, async (req, res) => {
     const page = Math.max(1, Math.min(100000, Number(req.query.page) || 1));
     const q = String(req.query.q || "")

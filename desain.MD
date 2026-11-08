@@ -56,3 +56,13 @@ Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, da
 - Admin dapat menambahkan hingga 10 rekening yang valid. Pembeli memilih bank tujuan sebelum membuat/mengonfirmasi tagihan. Daftar ini terpisah dari Titip Hadiah mempelai.
 - Tagihan menyimpan snapshot rekening yang dipilih. Mengubah/menghapus rekening di admin tidak mengubah tujuan pada tagihan lama diam-diam.
 - Perubahan pilihan bank untuk tagihan hanya tersedia sebelum konfirmasi pembayaran. Nominal/harga/deadline tetap mengikuti tagihan awal; setelah konfirmasi atau paid, bank dikunci.
+
+## Penyempurnaan komponen dan Owner Studio
+
+- Jawa Heritage menerapkan cokelat/emas pada timeline, judul, tombol, navigasi, countdown dan bingkai foto. Foto memakai sudut lengkung atas dengan dasar persegi; kawung, gunungan dan pendopo tetap menjadi latar dekoratif.
+- Islamic Serenity menerapkan emerald/emas pada komponen yang sama, dengan foto berbingkai lengkung mihrab dan pemisah judul geometris. Data acara, nama, galeri, musik, RSVP serta hadiah menggunakan alur aplikasi yang sama.
+- Kartu katalog lebih kecil: empat kolom terlihat pada desktop, gambar 174 px; HP menampilkan kartu 230 px dalam satu baris geser. Kartu acara pengguna, daftar pesanan dan pengaturan harga admin juga dipadatkan tanpa mengurangi target tombol 44 px.
+- Keterangan penggunaan di katalog berasal dari jumlah lisensi per tema yang sudah dibayar atau lisensi lama yang valid. Draft dan pembayaran yang belum disetujui tidak dihitung. Tidak mengisi angka awal 20 secara fiktif; angka 20 ke atas muncul saat jumlah sebenarnya tercapai.
+- Dashboard khusus pemilik mengambil susunan dari referensi: sidebar kiri, area kerja putih dengan ilustrasi geometris pastel dan ringkasan angka, serta panel kanan untuk verifikasi, pembayaran disetujui, musik dan aktivitas. Palet lavender hanya berlaku pada admin; halaman utama/pengguna tetap hijau.
+- Menu admin: Ringkasan, Pesanan, Undangan, Pustaka musik, Rekening & harga, Menu latar, Aktivitas. Setiap menu terhubung dengan fitur asli; angka memakai API admin yang dilindungi otorisasi pemilik.
+- Pada layar sempit, navigasi berubah menjadi baris menu geser, area kerja satu kolom dan ringkasan di bawah. Pembatasan akses pengguna biasa tetap berlaku.

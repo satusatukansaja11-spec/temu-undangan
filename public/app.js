@@ -91,6 +91,8 @@ async function api(url, options = {}) {
 }
 const logo = '<a href="/dashboard" class="brand">temu<span>✳</span></a>';
 function shell(content) {
+  root.classList.remove("admin-shell");
+  delete root.dataset.adminScreen;
   root.innerHTML = `<aside>${logo}<div class="workspace">RUANG PERNIKAHAN ANDA</div><nav><a class="nav admin-link" href="/pesanan">Pesanan & tema</a><button class="nav active" id="dashboardLink">▦ <span>Undangan saya</span></button>${me.isAdmin ? '<a class="nav admin-link" href="/admin">Panel admin</a>' : ""}</nav><div class="aside-bottom"><div class="tiny-flower">✳</div><h3>Awal cerita indah.</h3><p>Satu undangan, sejuta kenangan.</p></div><div class="user"><span class="avatar">${esc((me.name || "U")[0])}</span><div><strong>${esc(me.name)}</strong><small>Akun pribadi</small></div><button id="logout" title="Keluar akun" aria-label="Keluar akun"><span aria-hidden="true">↗</span> Keluar akun</button>${me.isAdmin ? '<a class="admin-mobile-link" href="/admin">Panel admin</a>' : ""}</div></aside><div class="main"><header><span>Ruang pribadi <i>/</i> <b>Undangan saya</b></span><span class="header-note">Dibuat dengan sepenuh hati ♡</span></header>${content}<footer>temu ✳ <span>Tempat cerita bahagia dimulai.</span><small>Undangan pernikahan digital</small></footer></div>`;
   document.querySelector("#dashboardLink").onclick = () => leave(dashboard);
   document.querySelector("#logout").onclick = async () =>

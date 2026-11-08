@@ -237,3 +237,11 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Admin → Menu Latar menyediakan dropdown kelima tema, masing-masing dengan unggahan sampul dan isi. Pelanggan tidak dapat mengunggah latar global. Harga tema baru diatur admin sebelum dijual.
 - Pemilik dapat menyimpan maksimal 10 rekening pembayaran produk. Pembeli memilih rekening tujuan sebelum checkout. Daftar rekening ini terpisah dari rekening hadiah mempelai.
 - Rekening tujuan disimpan pada tagihan. Perubahan konfigurasi admin tidak mengubah tagihan sebelumnya. Pembeli hanya dapat mengganti bank pada pesanan miliknya yang belum dikonfirmasi dan belum melewati tenggat; nominal serta tenggat tetap.
+
+## 17. Owner Studio dan statistik penggunaan tema
+
+- Dashboard pemilik mengikuti acuan `desain.MD` serta referensi sidebar, area kerja utama dan panel ringkasan. Pisahkan menu agar administrasi pesanan, tanggal, musik, harga/rekening, latar serta aktivitas mudah ditemukan.
+- Ringkasan harus berasal dari database; akses API statistik admin hanya untuk pemilik.
+- Kartu undangan/katalog/pesanan diperkecil pada semua menu, sambil mempertahankan ukuran tombol yang nyaman di HP.
+- Keterangan jumlah penggunaan tema menghitung undangan berlisensi yang sudah dibayar atau lisensi lama valid. Jangan menampilkan angka awal 20 sebagai fakta bila belum didukung data penggunaan nyata.
+- Jawa Heritage dan Islamic Serenity menggunakan palet, bingkai, navigasi serta timeline masing-masing sesuai `desain.MD`, termasuk dalam preview dan undangan pelanggan yang sudah membeli.

@@ -164,3 +164,12 @@ Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul
 - Chromium: dropdown lima tema, tambah/simpan dua rekening admin, checkout Jawa dengan bank kedua lalu ganti sebelum transfer, serta katalog lima kartu tanpa deskripsi diuji. Tidak ada error JavaScript.
 - Viewport 390×844 dan 1440×1000 diperiksa. Tema baru tidak membuat overflow horizontal di HP. Screenshot tersedia pada `docs/images/katalog-lima-tema.png`, `latar-navy-admin.png`, `jawa-mobile.png` dan `islami-mobile.png`.
 - Semua transaksi QA menggunakan rekening fiktif dan penyimpanan sementara. Tidak ada transfer, pesan WhatsApp atau perubahan data hosting produksi.
+
+## Owner Studio dan penyempurnaan tema — 8 November 2026
+
+- `npm test`: 52 pengujian; 50 lulus, 2 dilewati, 0 gagal. Pengujian tambahan memeriksa API ringkasan khusus admin, akun pelanggan tanpa akun admin, serta hitungan penggunaan tema yang tidak menghitung pesanan belum dibayar.
+- Chromium memeriksa tujuh menu admin, pencarian acara, dialog koreksi tanggal, tambah/simpan rekening, dropdown latar dan logout. Pengguna biasa tetap diarahkan ke halaman akses admin, bukan Owner Studio.
+- Lebar 320, 390, 768, 1050 dan 1440 px diperiksa pada tampilan yang relevan; tidak ada overflow halaman atau error JavaScript. Ringkasan memakai data QA asli dari database sementara, bukan angka produksi atau statistik pemasaran fiktif.
+- Preview Jawa/Islami diperiksa pada HP dan laptop; bingkai foto, latar, judul, timeline dan navigasi mengikuti `desain.MD`. Kartu katalog menampilkan keterangan jumlah penggunaan nyata dan empat kartu lebih kecil pada desktop.
+- Screenshot: `admin-studio-desktop.png`, `admin-studio-mobile.png`, `catalog-compact-studio.png`, `user-cards-compact.png`, serta `jawa-*-refined.png` dan `islami-*-refined.png` di `docs/images/`.
+- Tidak ada perubahan skema SQL. `.env`, data pelanggan dan kredensial hosting tidak dikirim ke GitHub. Deploy hosting masih dilakukan pemilik setelah kode terbaru tersedia.
