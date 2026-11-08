@@ -269,9 +269,10 @@ function renderEditor() {
   if (step === 2)
     body = `${field("ceremony", "Nama rangkaian acara (contoh: Akad & Resepsi)")}${field("date", labels.date, "date")}<div class="form-grid">${field("start", labels.start, "time")}<div>${field("end", labels.end, "time")}<button type="button" id="untilFinished" aria-pressed="${current.untilFinished === true}">Sampai Selesai</button><small id="endTimeHint">Pilih jika waktu selesai belum dapat diperkirakan.</small></div></div><label class="field" for="timezone">Zona waktu acara<select id="timezone" name="timezone"><option value="Asia/Jakarta" ${(current.timezone || "Asia/Jakarta") === "Asia/Jakarta" ? "selected" : ""}>WIB — Jakarta (UTC+7)</option><option value="Asia/Makassar" ${current.timezone === "Asia/Makassar" ? "selected" : ""}>WITA — Makassar (UTC+8)</option><option value="Asia/Jayapura" ${current.timezone === "Asia/Jayapura" ? "selected" : ""}>WIT — Jayapura (UTC+9)</option></select><small>Digunakan untuk countdown dan file kalender. Berlaku juga untuk rangkaian tambahan.</small></label>${area("agendaDescription", "Deskripsi jadwal utama (opsional, maksimal 1000 karakter)")}${area("address")}${field("maps", labels.maps, "url", "Gunakan tautan HTTPS dari Google Maps atau penyedia peta Anda.")}`;
   if (step === 3)
-    body = `<p>Abadikan potongan cerita Anda. Maksimal ${appLimits.galleryPhotos} foto, masing-masing ${appLimits.imageMB} MB.</p><label class="button" for="gallery">＋ Tambah foto galeri</label><input id="gallery" class="gallery-input" type="file" multiple accept="image/jpeg,image/png,image/webp"><p id="galleryUploadStatus" role="status"></p><div class="gallery-edit">${current.gallery.map((p, i) => `<div><img loading="lazy" src="${esc(p)}" alt="Foto galeri ${i + 1}"><div><button type="button" data-up="${i}" ${!i ? "disabled" : ""} aria-label="Pindahkan foto ${i + 1} ke kiri">←</button><button type="button" data-down="${i}" ${i === current.gallery.length - 1 ? "disabled" : ""} aria-label="Pindahkan foto ${i + 1} ke kanan">→</button><button type="button" data-rm="${i}" aria-label="Hapus foto ${i + 1}">Hapus</button></div></div>`).join("")}</div>`;
+    body = `<p>Abadikan potongan cerita Anda. Maksimal ${galleryLimit()} foto, masing-masing ${appLimits.imageMB} MB.</p><label class="button" for="gallery">＋ Tambah foto galeri</label><input id="gallery" class="gallery-input" type="file" multiple accept="image/jpeg,image/png,image/webp"><p id="galleryUploadStatus" role="status"></p><div class="gallery-edit">${current.gallery.map((p, i) => `<div><img loading="lazy" src="${esc(p)}" alt="Foto galeri ${i + 1}"><div><button type="button" data-up="${i}" ${!i ? "disabled" : ""} aria-label="Pindahkan foto ${i + 1} ke kiri">←</button><button type="button" data-down="${i}" ${i === current.gallery.length - 1 ? "disabled" : ""} aria-label="Pindahkan foto ${i + 1} ke kanan">→</button><button type="button" data-rm="${i}" aria-label="Hapus foto ${i + 1}">Hapus</button></div></div>`).join("")}</div>`;
   if (step === 4)
     body = `<p class="notice">Saran salam untuk ${esc(current.religion || "agama yang belum dipilih")}. Anda bebas mengedit seluruh teks.</p><button type="button" id="suggest">Gunakan saran salam</button>${area("opening")}${area("closing")}`;
+  if (step === 0) body += premiumAppearanceForm();
   if (step === 3) body += photoLibrary();
   if (step >= 5) body = weddingExtraForm();
   shell(
@@ -341,6 +342,7 @@ function renderEditor() {
         }
       }),
   );
+  bindPremiumAppearance();
   bindWeddingEditor();
   bindMediaEditor();
   if (step === 3) {
@@ -353,8 +355,8 @@ function renderEditor() {
       let completed = 0;
       try {
         for (const [i, file] of files.entries()) {
-          if (current.gallery.length >= appLimits.galleryPhotos) {
-            toast(`Maksimal ${appLimits.galleryPhotos} foto galeri.`);
+          if (current.gallery.length >= galleryLimit()) {
+            toast(`Maksimal ${galleryLimit()} foto galeri.`);
             break;
           }
           if (progress.isConnected)

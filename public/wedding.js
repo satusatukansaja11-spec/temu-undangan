@@ -24,6 +24,12 @@ const weddingIcon = (name) => {
   return `<svg viewBox="0 0 24 24" class="w-icon" aria-hidden="true"><path d="${paths[name] || paths.heart}"/></svg>`;
 };
 function weddingExtraForm() {
+  if (
+    step === 5 &&
+    current.packageFeatures &&
+    !current.packageFeatures.loveStory
+  )
+    return `<p class="notice">Love Story tersedia pada Paket Premium. Pilih paket saat memesan acara.</p>`;
   if (step === 5)
     return `<p class="notice">Bagikan perjalanan cinta Anda. Bagian ini opsional; maksimal 12 cerita. Tidak ada cerita yang ditampilkan sebelum Anda mengisinya.</p>${(current.stories || []).map((row, i) => `<fieldset class="repeat-row"><legend>Love story ${i + 1}</legend>${extraInput("stories", i, "title", "Judul cerita", "text", 120)}${extraInput("stories", i, "date", "Tanggal (opsional)", "date")}${extraInput("stories", i, "text", "Cerita Anda", "textarea", 2000)}<button type="button" data-remove-extra="stories:${i}">Hapus cerita ${i + 1}</button></fieldset>`).join("")}<button type="button" data-add-extra="stories" ${(current.stories || []).length >= 12 ? "disabled" : ""}>＋ Tambah cerita</button>`;
   if (step === 6)
@@ -179,6 +185,7 @@ async function renderWedding(preview, id, themeDemo = false) {
     if (e.theme === "sakura") applySakuraTheme();
     applyDesignedTheme(e);
     applyThemeOrnaments(e);
+    applyPackageExperience(e);
     if (themeDemo) {
       const banner = document.querySelector(".preview-banner");
       banner.insertAdjacentHTML(

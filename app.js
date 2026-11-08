@@ -41,7 +41,7 @@ async function createApp(opts = {}) {
         "X-Content-Type-Options": "nosniff",
         "Referrer-Policy": "same-origin",
         "Content-Security-Policy":
-          "default-src 'self'; img-src 'self' blob:; style-src 'self'; script-src 'self'; media-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+          "default-src 'self'; img-src 'self' blob:; style-src 'self'; script-src 'self'; media-src 'self'; frame-src https://www.google.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
         "Cache-Control": "no-store",
       });
       let c = Object.fromEntries(
@@ -429,13 +429,11 @@ async function createApp(opts = {}) {
         return res.status(404).json({
           error: "Undangan tidak ditemukan atau belum siap dibagikan.",
         });
-      res.json({
-        ...JSON.parse(e.data),
-        theme: (await commerce.license(e.id))?.theme_id || "navy",
-        themeImages: await commerce.themeImages(
-          (await commerce.license(e.id))?.theme_id || "navy",
-        ),
-      });
+      const { license, ...publicData } = await commerce.describe(
+        e,
+        JSON.parse(e.data),
+      );
+      res.json(publicData);
     });
     app.get("/music/piano.wav", (req, res) => {
       const rate = 16000,

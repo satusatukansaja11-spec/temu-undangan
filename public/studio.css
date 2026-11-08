@@ -1248,3 +1248,542 @@
 .wedding-v2 .countdown > div span {
   color: var(--countdown-text) !important;
 }
+/* Katalog slide per kategori dengan preview dua ponsel. */
+.catalog-slider {
+  margin: 32px 0 40px;
+  min-width: 0;
+}
+.catalog-slide-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 15px;
+}
+.catalog-slide-heading > h3 {
+  font: 600 20px/1.3 Arial;
+  margin: 0;
+}
+.catalog-slide-heading > div {
+  display: flex;
+  gap: 8px;
+}
+.catalog-slide-heading button {
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  background: #fff;
+}
+.catalog-slide-heading button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.catalog-slider .catalog-grid {
+  scroll-snap-type: x mandatory;
+  padding: 2px 2px 16px;
+  grid-auto-columns: calc((100% - 54px) / 4);
+  gap: 18px;
+}
+.catalog-slider .theme-product {
+  scroll-snap-align: start;
+}
+.catalog-slider .theme-product > a {
+  display: block;
+  overflow: hidden;
+  text-decoration: none;
+}
+.catalog-slider .theme-product > div > h3 {
+  font-size: 16px;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+.catalog-slider .theme-product > div {
+  padding: 13px;
+}
+.catalog-slider .theme-price-line {
+  font-size: 15px;
+}
+.starting-price,
+.package-options-label {
+  display: block;
+  font-size: 10px;
+  color: #6c7467;
+}
+.starting-price {
+  margin-bottom: 2px;
+}
+.package-options-label {
+  margin: 4px 0 8px;
+}
+.slide-hint {
+  font-size: 10px;
+  color: #788078;
+}
+.theme-mockup {
+  height: 216px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 25px 16px 20px;
+  background: color-mix(in srgb, var(--tile) 20%, #fff);
+  overflow: hidden;
+  isolation: isolate;
+}
+.sample-phone {
+  position: relative;
+  width: 84px;
+  height: 166px;
+  background-color: var(--phone-paper);
+  background-size: cover;
+  background-position: center;
+  border: 3px solid #242629;
+  outline: 1px solid #828381;
+  border-radius: 15px;
+  box-shadow: 5px 9px 11px #0003;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 16px 5px 8px;
+  text-align: center;
+  color: var(--phone-ink);
+  flex-shrink: 0;
+}
+.sample-phone:before {
+  content: "";
+  position: absolute;
+  left: calc(50% - 13px);
+  top: 3px;
+  height: 4px;
+  width: 26px;
+  background: #222;
+  border-radius: 5px;
+}
+.phone-back {
+  transform: rotate(9deg) translateY(6px);
+}
+.phone-front {
+  transform: rotate(12deg) translateY(-7px);
+}
+.catalog-slider .sample-phone img {
+  display: block;
+  width: 47px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 28px 28px 3px 3px;
+  margin: 7px 0;
+  flex-shrink: 0;
+}
+.sample-phone small {
+  font: 5px/1.2 Georgia;
+  color: var(--phone-ink);
+}
+.sample-phone b {
+  font:
+    12px/1.3 "Great Vibes",
+    Georgia;
+  color: var(--phone-ink);
+  white-space: nowrap;
+}
+.sample-phone i {
+  font: 4px/1.5 Arial;
+  color: var(--phone-ink);
+  margin-top: 4px;
+}
+.sample-phone > span {
+  font: 4px/1.5 Arial;
+  border-radius: 3px;
+  background: var(--phone-ink);
+  color: var(--phone-paper);
+  padding: 3px 5px;
+  margin-top: 7px;
+}
+.phone-back > span {
+  background: transparent;
+  border: 1px solid var(--phone-gold);
+  color: var(--phone-ink);
+}
+.package-overview {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  max-width: 900px;
+  margin: 35px auto;
+}
+.package-overview > article {
+  padding: 28px;
+  border: 1px solid #d7dfcd;
+  border-radius: 18px;
+  text-align: left;
+  background: #f8faf4;
+}
+.package-overview > article:last-child {
+  background: #e8eddf;
+}
+.package-overview h3 {
+  font: 32px Georgia;
+  margin: 12px 0;
+}
+.package-overview strong {
+  display: block;
+  font-size: 20px;
+  color: #385345;
+}
+.package-overview p {
+  white-space: pre-line;
+  font-size: 13px;
+  line-height: 1.8;
+  margin: 18px 0;
+}
+.package-overview article > small {
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: #66745f;
+}
+.package-overview .site-button {
+  margin-top: 22px;
+}
+.package-description-settings {
+  border: 1px solid #e1ddea;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 24px 0;
+}
+.package-description-settings textarea {
+  width: 100%;
+  display: block;
+  margin: 8px 0 16px;
+}
+.admin-theme-prices strong {
+  font-size: 13px;
+  line-height: 1.7;
+}
+.bank-card .bank-chip {
+  display: block;
+  width: 58px;
+  height: 43px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  object-fit: contain;
+  margin: 12px 0;
+  position: static;
+}
+.bank-card .bank-chip:before,
+.bank-card .bank-chip:after {
+  display: none;
+}
+/* Komponen undangan untuk 15 desain baru. */
+.wedding-collection {
+  background: var(--theme-paper) !important;
+  color: var(--skin-ink);
+}
+.wedding-collection
+  :is(
+    h1,
+    h2,
+    h3,
+    .w-eyebrow,
+    .guest-salutation,
+    .cover-guest,
+    .wedding-title > p:first-of-type,
+    .wedding-title h1 i
+  ) {
+  color: var(--skin-ink) !important;
+}
+.wedding-collection .w-section {
+  border-color: var(--skin-gold);
+  color: var(--skin-ink);
+}
+.wedding-collection .w-section p {
+  color: var(--skin-ink);
+}
+.wedding-collection .has-theme-background:before {
+  background: color-mix(in srgb, var(--theme-paper) 80%, transparent);
+}
+.wedding-collection .has-theme-background.wedding-hero:before,
+.wedding-collection .has-theme-background.wedding-intro:before {
+  background: color-mix(in srgb, var(--theme-paper) 25%, transparent);
+}
+.wedding-collection :is(.cover-portrait, .partner-photo, .w-couple) {
+  border-color: var(--skin-gold);
+  box-shadow: 0 8px 22px #3228121c;
+}
+.wedding-collection .w-couple {
+  border-radius: 170px 170px 24px 24px;
+  background: transparent;
+}
+.wedding-collection :is(.wedding-open, .button.primary, #sendRsvp) {
+  background: var(--skin-accent);
+  border-color: var(--skin-accent);
+  color: var(--theme-paper) !important;
+}
+.wedding-collection .wedding-nav {
+  background: var(--theme-paper);
+  border-color: var(--skin-gold);
+}
+.wedding-collection .wedding-nav a {
+  color: var(--skin-ink);
+}
+.wedding-collection .wedding-nav a.active {
+  background: color-mix(in srgb, var(--skin-gold) 20%, var(--theme-paper));
+}
+.wedding-collection .schedule-section {
+  border: 1px solid var(--skin-gold);
+  border-radius: 130px 130px 12px 12px;
+  margin: 18px 18px 0;
+  padding-top: 65px;
+}
+.wedding-collection .schedule-timeline:before {
+  background: var(--skin-gold);
+}
+.wedding-collection
+  :is(
+    .agenda-marker,
+    .agenda-time,
+    .schedule-timeline h3,
+    .agenda-details > p
+  ) {
+  color: var(--skin-ink);
+  border-color: var(--skin-gold);
+}
+.wedding-collection .agenda-marker {
+  background: var(--theme-paper);
+}
+.wedding-collection .wish-totals span {
+  background: var(--theme-paper);
+  border-color: var(--skin-gold);
+  color: var(--skin-ink);
+}
+.wedding-collection .preview-banner {
+  background: var(--skin-ink);
+  color: var(--theme-paper);
+}
+.wedding-collection :is(input, select, textarea):focus-visible {
+  outline-color: var(--skin-ink);
+}
+.wedding-collection .w-section > h2:before {
+  content: "";
+  display: block;
+  width: 50px;
+  height: 10px;
+  border-top: 1px solid var(--skin-gold);
+  margin: 0 auto 10px;
+}
+.wedding-elegant.variant-deco :is(.cover-portrait, .partner-photo) {
+  border-radius: 8px;
+  border-width: 3px;
+  outline: 1px solid var(--skin-gold);
+  outline-offset: 6px;
+}
+.wedding-elegant.variant-arch :is(.cover-portrait, .partner-photo) {
+  border-radius: 150px 150px 8px 8px;
+  border-width: 3px;
+}
+.wedding-elegant.variant-oval :is(.cover-portrait, .partner-photo) {
+  border-radius: 50%;
+  border-width: 2px;
+}
+.wedding-flower :is(.cover-portrait, .partner-photo) {
+  border-radius: 130px 130px 30px 30px;
+  border-width: 3px;
+}
+.wedding-flower .w-section > h2:before {
+  border-radius: 50%;
+  border-bottom: 1px solid var(--skin-gold);
+}
+.wedding-islamic :is(.cover-portrait, .partner-photo) {
+  border-radius: 50% 50% 10px 10px;
+  border-width: 4px;
+  outline: 1px solid var(--skin-gold);
+  outline-offset: 5px;
+}
+.wedding-islamic .w-section > h2:before {
+  width: 10px;
+  height: 10px;
+  border: 1px solid var(--skin-gold);
+  transform: rotate(45deg);
+}
+@media (max-width: 1100px) and (min-width: 761px) {
+  .catalog-slider .catalog-grid {
+    grid-auto-columns: calc((100% - 36px) / 3);
+  }
+  .theme-mockup {
+    gap: 12px;
+  }
+}
+@media (max-width: 760px) {
+  .catalog-slider .catalog-grid {
+    grid-auto-columns: 232px;
+    gap: 12px;
+  }
+  .catalog-slide-heading > h3 {
+    font-size: 18px;
+  }
+  .theme-mockup {
+    height: 200px;
+  }
+  .package-overview {
+    grid-template-columns: 1fr;
+  }
+  .package-overview > article {
+    padding: 24px;
+  }
+  .catalog-slider {
+    margin: 25px 0;
+  }
+  .catalog-slider .catalog-actions .site-button {
+    flex: 1;
+  }
+}
+.theme-mockup:is(
+  .mockup-burgundy,
+  .mockup-onyx,
+  .mockup-taqwa,
+  .mockup-andalus
+) {
+  background: var(--tile);
+}
+.package-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0;
+}
+.package-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 12px;
+  line-height: 1.7;
+  padding: 6px 0;
+}
+.package-feature-list li > span:first-child {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #3e765c;
+  color: white;
+  font-size: 12px;
+  margin-top: 1px;
+}
+.package-feature-list .excluded {
+  color: #827c78;
+}
+.package-feature-list .excluded > span:first-child {
+  background: #a25959;
+}
+.package-feature-list small {
+  margin-left: 8px;
+  font-size: 10px;
+  color: #857b72;
+}
+.package-term {
+  font-size: 11px !important;
+  line-height: 1.7 !important;
+}
+.package-pending {
+  font-size: 11px;
+  margin: 18px 0;
+}
+.package-pending summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  text-decoration: underline;
+}
+.package-pending p {
+  font-size: 11px;
+  line-height: 1.8;
+}
+.premium-settings {
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin: 22px 0;
+  border-radius: 12px;
+}
+.premium-settings label {
+  display: block;
+  font-size: 12px;
+  margin: 16px 0;
+}
+.premium-settings :is(input:not([type="checkbox"]), select) {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+.premium-settings input[type="color"] {
+  max-width: 100px;
+  padding: 4px;
+}
+.premium-settings .check-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.premium-settings .check-row input {
+  width: 20px;
+  height: 20px;
+}
+.premium-settings > small {
+  font-size: 11px;
+}
+.event-map-embed {
+  border: 0;
+  border-radius: 12px;
+  width: 100%;
+  height: 280px;
+  margin-top: 25px;
+  position: relative;
+  z-index: 1;
+}
+.auto-scroll-control {
+  position: fixed;
+  bottom: 92px;
+  right: 15px;
+  z-index: 5;
+  background: #fff;
+  border: 1px solid var(--w-line);
+  border-radius: 24px;
+  font-size: 11px;
+  min-height: 44px;
+  padding: 10px 15px;
+  box-shadow: 0 4px 16px #0002;
+}
+.has-custom-accent :is(.button.primary, .wedding-open, #sendRsvp) {
+  background: var(--user-accent) !important;
+  border-color: var(--user-accent) !important;
+  color: var(--accent-text) !important;
+}
+.has-custom-accent .wedding-nav a.active {
+  border-bottom: 2px solid var(--user-accent);
+}
+.wedding-v2:not(.is-open) .auto-scroll-control {
+  display: none;
+}
+.checkout-package-details {
+  margin: 18px 0;
+}
+.checkout-package-details > summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+}
+.package-feature-list .excluded {
+  color: #6c645f;
+}
+.package-feature-list small {
+  color: #75695f;
+}

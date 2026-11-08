@@ -26,6 +26,29 @@ function applyMeihuaTheme(event) {
 }
 function applyDesignedTheme(event) {
   const id = event.theme || "navy";
+  const design = themeDesigns[id];
+  if (design?.family && design.family !== "existing") {
+    const root = document.querySelector(".wedding-v2");
+    root.classList.add(
+      "wedding-collection",
+      "wedding-" + design.family,
+      "variant-" + design.variant,
+    );
+    for (const [key, value] of Object.entries({
+      "--skin-ink": design.ink,
+      "--skin-accent": design.ink,
+      "--skin-gold": design.gold,
+      "--theme-paper": design.paper,
+      "--w-ink": design.ink,
+      "--w-muted": design.ink,
+      "--w-line": design.gold,
+      "--w-sage": design.paper,
+      "--countdown-bg": design.ink,
+      "--countdown-border": design.gold,
+    }))
+      root.style.setProperty(key, value);
+    return applyThemeBackgrounds(event, design, "theme-" + id);
+  }
   if (id === "meihua") return applyMeihuaTheme(event);
   if (id === "jawa" || id === "islami")
     return applyThemeBackgrounds(event, themeDesigns[id], "wedding-" + id);

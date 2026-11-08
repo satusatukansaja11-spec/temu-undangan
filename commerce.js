@@ -6,40 +6,14 @@ const {
   validateAccounts,
   bankSnapshot,
 } = require("./payment-accounts");
-const THEMES = [
-  {
-    id: "navy",
-    name: "Navy Ivory",
-    description: "Ivory, bunga navy dan paviliun yang romantis.",
-    image: "/assets/navy-pavilion.webp",
-  },
-  {
-    id: "sakura",
-    name: "Sakura & Butterfly",
-    description: "Lanskap danau, sakura lembut dan kupu-kupu yang bergerak.",
-    image: "/assets/sakura-landscape.svg",
-  },
-  {
-    id: "meihua",
-    name: "Meihua Pavilion",
-    description:
-      "Bunga plum merah, pegunungan berkabut dan paviliun bergaya oriental.",
-    image: "/assets/meihua-cover.svg",
-  },
-  {
-    id: "jawa",
-    name: "Jawa Heritage",
-    description:
-      "Nuansa kawung, gunungan dan pendopo dalam cokelat ivory emas.",
-    image: "/assets/jawa-cover.svg",
-  },
-  {
-    id: "islami",
-    name: "Islamic Serenity",
-    description: "Hijau zamrud, ivory dan ornamen geometris islami yang teduh.",
-    image: "/assets/islami-cover.svg",
-  },
-];
+const THEME_LIBRARY = require("./public/theme-library");
+const THEMES = Object.entries(THEME_LIBRARY).map(([id, d]) => ({
+  id,
+  ...d,
+  image: d.cover,
+}));
+const PACKAGES = { pro: "Paket Pro", premium: "Paket Premium" };
+
 const ZONES = { "Asia/Jakarta": 7, "Asia/Makassar": 8, "Asia/Jayapura": 9 };
 function endOfWedding(date, zone) {
   if (
@@ -87,8 +61,12 @@ function createCommerce(
         .data,
     );
     cfg.accounts = accountsFromSettings(cfg);
+    cfg.premiumPrices ||= {};
+    cfg.premiumComparePrices ||= {};
+    cfg.packageDescriptions ||= { pro: "", premium: "" };
     for (const t of THEMES) {
       cfg.prices[t.id] ??= 0;
+      cfg.premiumPrices[t.id] ??= 0;
     }
     return cfg;
   };
@@ -119,7 +97,7 @@ function createCommerce(
   const license = async (id) => {
     const l = await db
       .prepare(
-        "SELECT l.*,o.status AS payment_status,o.amount AS order_amount FROM event_licenses l LEFT JOIN theme_orders o ON o.id=l.order_id WHERE l.event_id=?",
+        "SELECT l.*,o.status AS payment_status,o.amount AS order_amount,o.package_id AS package_id FROM event_licenses l LEFT JOIN theme_orders o ON o.id=l.order_id WHERE l.event_id=?",
       )
       .get(id);
     return l ? { ...l, paid: !!l.legacy || l.payment_status === "paid" } : null;
@@ -148,8 +126,33 @@ function createCommerce(
   }
   async function describe(event, data) {
     const l = await license(event.id);
+    const galleryLimit =
+      !l || l.legacy
+        ? null
+        : Math.max(
+            l?.package_id === "premium" ? 20 : 10,
+            Number(l?.legacy_gallery || 0),
+          );
+    const loveStory =
+      !l || !!l.legacy || l?.package_id === "premium" || !!l?.legacy_story;
+    const premium = !l || !!l.legacy || l?.package_id === "premium";
     return {
       ...data,
+      stories: loveStory ? data.stories || [] : [],
+      gallery:
+        galleryLimit === null
+          ? data.gallery || []
+          : (data.gallery || []).slice(0, galleryLimit),
+      ...(!premium
+        ? {
+            videoUrl: "",
+            autoScroll: false,
+            embedMaps: false,
+            coverFont: "great-vibes",
+            themeAccent: "",
+          }
+        : {}),
+      packageFeatures: { galleryLimit, premium, loveStory },
       theme: l?.theme_id || "navy",
       themeImages: await themeImages(l?.theme_id || "navy"),
       themeOrnaments: (await listOrnaments(db, l?.theme_id || "navy")).filter(
@@ -162,6 +165,8 @@ function createCommerce(
             orderId: l.order_id,
             orderStatus: l.payment_status || null,
             amount: l.order_amount || null,
+            packageId: l.package_id || "pro",
+            packageName: PACKAGES[l.package_id || "pro"],
             lockedDate: l.locked_date,
             timezone: l.locked_timezone,
             expiresAt: l.expires_at,
@@ -185,6 +190,7 @@ function createCommerce(
       ["pending_payment", "rejected"].includes(o.status) && o.deadline <= now();
     return {
       ...o,
+      packageName: PACKAGES[o.package_id || "pro"],
       eventName: JSON.parse(o.event_data || "{}").name || "",
       event_data: undefined,
       status: pending ? "expired" : o.status,
@@ -218,7 +224,10 @@ function createCommerce(
     res.json({
       available:
         cfg.enabled &&
-        Object.values(cfg.prices).some((price) => price > 0) &&
+        [
+          ...Object.values(cfg.prices),
+          ...Object.values(cfg.premiumPrices),
+        ].some((price) => price > 0) &&
         !!cfg.bank &&
         !!cfg.account &&
         !!cfg.holder,
@@ -229,6 +238,23 @@ function createCommerce(
           usageCount: Number(
             usage.find((row) => row.theme_id === t.id)?.total || 0,
           ),
+          packages: Object.entries(PACKAGES).map(([id, name]) => ({
+            id,
+            name,
+            description: cfg.packageDescriptions[id] || "",
+            price: (id === "pro" ? cfg.prices : cfg.premiumPrices)[t.id],
+            comparePrice:
+              (id === "pro" ? cfg.comparePrices : cfg.premiumComparePrices)?.[
+                t.id
+              ] || 0,
+            purchasable: !!(
+              cfg.enabled &&
+              cfg.bank &&
+              cfg.account &&
+              cfg.holder &&
+              (id === "pro" ? cfg.prices : cfg.premiumPrices)[t.id] > 0
+            ),
+          })),
           price: cfg.prices[t.id],
           comparePrice: cfg.comparePrices?.[t.id] || 0,
           ownedEvent:
@@ -239,7 +265,7 @@ function createCommerce(
           ),
           purchasable: !!(
             cfg.enabled &&
-            cfg.prices[t.id] > 0 &&
+            (cfg.prices[t.id] > 0 || cfg.premiumPrices[t.id] > 0) &&
             cfg.bank &&
             cfg.account &&
             cfg.holder
@@ -341,13 +367,51 @@ function createCommerce(
         );
       cfg.comparePrices[t.id] = compare;
     }
+    cfg.premiumPrices = {};
+    cfg.premiumComparePrices = {};
+    cfg.packageDescriptions = {};
+    for (const id of Object.keys(PACKAGES)) {
+      const value =
+        d.packageDescriptions?.[id] ?? previous.packageDescriptions[id] ?? "";
+      if (typeof value !== "string" || value.length > 1000)
+        throw fail(400, "Keterangan paket maksimal 1000 karakter.");
+      cfg.packageDescriptions[id] = value.trim();
+    }
+    for (const t of THEMES) {
+      const price = Number(
+          d.premiumPrices?.[t.id] ?? previous.premiumPrices[t.id] ?? 0,
+        ),
+        compare = Number(
+          d.premiumComparePrices?.[t.id] ??
+            previous.premiumComparePrices[t.id] ??
+            0,
+        );
+      if (
+        !Number.isInteger(price) ||
+        price < 0 ||
+        price > 100000000 ||
+        !Number.isInteger(compare) ||
+        compare < 0 ||
+        compare > 100000000 ||
+        (compare > 0 && compare < price)
+      )
+        throw fail(
+          400,
+          "Harga Premium harus rupiah bulat; harga normal minimal sama dengan harga jual atau nol.",
+        );
+      cfg.premiumPrices[t.id] = price;
+      cfg.premiumComparePrices[t.id] = compare;
+    }
     if (
       cfg.enabled &&
       (!cfg.bank ||
         !cfg.account ||
         /^0+$/.test(cfg.account) ||
         !cfg.holder ||
-        Object.values(cfg.prices).every((p) => !p))
+        [
+          ...Object.values(cfg.prices),
+          ...Object.values(cfg.premiumPrices),
+        ].every((p) => !p))
     )
       throw fail(
         400,
@@ -366,6 +430,9 @@ function createCommerce(
   app.post("/api/orders", auth, async (req, res) => {
     const theme = THEMES.find((t) => t.id === req.body?.theme);
     if (!theme) throw fail(400, "Pilih tema yang tersedia.");
+    const packageId = req.body?.packageId ?? "pro";
+    if (typeof packageId !== "string" || !Object.hasOwn(PACKAGES, packageId))
+      throw fail(400, "Pilih Paket Pro atau Paket Premium.");
     let result;
     await db.transaction(async () => {
       await db
@@ -396,10 +463,10 @@ function createCommerce(
               (["pending_payment", "rejected"].includes(active.status) &&
                 active.deadline > now()))
           ) {
-            if (active.theme_id !== theme.id)
+            if (active.theme_id !== theme.id || active.package_id !== packageId)
               throw fail(
                 409,
-                "Batalkan pesanan sebelumnya sebelum mengganti tema acara ini.",
+                "Batalkan pesanan sebelumnya sebelum mengganti tema atau paket acara ini.",
               );
             result = active;
             return;
@@ -407,19 +474,22 @@ function createCommerce(
         }
       }
       const cfg = await settings();
+      const packagePrice = (
+        packageId === "pro" ? cfg.prices : cfg.premiumPrices
+      )[theme.id];
       if (
         !cfg.enabled ||
         !cfg.bank ||
         !cfg.account ||
         !cfg.holder ||
-        !cfg.prices[theme.id]
+        !packagePrice
       )
         throw fail(503, "Pemesanan belum tersedia. Hubungi admin.");
       const existing = await db
         .prepare(
-          "SELECT * FROM theme_orders WHERE owner=? AND theme_id=? AND status IN ('pending_payment','awaiting_verification','rejected') ORDER BY created DESC",
+          "SELECT * FROM theme_orders WHERE owner=? AND theme_id=? AND package_id=? AND status IN ('pending_payment','awaiting_verification','rejected') ORDER BY created DESC",
         )
-        .all(req.session.user_id, theme.id);
+        .all(req.session.user_id, theme.id, packageId);
       result =
         !eventId &&
         existing.find(
@@ -432,19 +502,20 @@ function createCommerce(
       const bank = bankSnapshot(cfg, req.body?.bankId, fail);
       await db
         .prepare(
-          "INSERT INTO theme_orders(id,owner,theme_id,amount,bank_snapshot,status,confirmation,reason,created,deadline) VALUES(?,?,?,?,?,?,?,?,?,?)",
+          "INSERT INTO theme_orders(id,owner,theme_id,amount,bank_snapshot,status,confirmation,reason,created,deadline,package_id) VALUES(?,?,?,?,?,?,?,?,?,?,?)",
         )
         .run(
           id,
           req.session.user_id,
           theme.id,
-          cfg.prices[theme.id],
+          packagePrice,
           JSON.stringify(bank),
           "pending_payment",
           "{}",
           "",
           created,
           deadline,
+          packageId,
         );
       if (eventId) {
         await db
@@ -911,6 +982,35 @@ function createCommerce(
   }
   async function validateLicense(event, data) {
     const l = await writable(event);
+    if (l && !l.legacy) {
+      const premium = l.package_id === "premium",
+        max = Math.max(premium ? 20 : 10, Number(l.legacy_gallery || 0));
+      if ((data.gallery || []).length > max)
+        throw fail(
+          403,
+          `Paket ${premium ? "Premium" : "Pro"} maksimal ${max} foto galeri.`,
+        );
+      if (!premium) {
+        if (data.stories?.length && !l.legacy_story)
+          throw fail(403, "Love Story tersedia pada Paket Premium.");
+        for (const key of [
+          "videoUrl",
+          "autoScroll",
+          "embedMaps",
+          "themeAccent",
+          "coverFont",
+        ]) {
+          const defaultValue =
+            key === "coverFont"
+              ? "great-vibes"
+              : ["autoScroll", "embedMaps"].includes(key)
+                ? false
+                : "";
+          if (data[key] !== undefined && data[key] !== defaultValue)
+            throw fail(403, "Fitur ini tersedia pada Paket Premium.");
+        }
+      }
+    }
     if (l) {
       if (data.theme && data.theme !== l.theme_id)
         throw fail(403, "Tema berbeda memerlukan pembelian baru.");

@@ -10,6 +10,7 @@ const tables = {
     "id",
     "owner",
     "theme_id",
+    "package_id",
     "amount",
     "bank_snapshot",
     "status",
@@ -28,6 +29,8 @@ const tables = {
     "order_id",
     "theme_id",
     "legacy",
+    "legacy_story",
+    "legacy_gallery",
     "locked_date",
     "locked_timezone",
     "expires_at",
@@ -130,6 +133,18 @@ async function importSqlite({ sourceFile, targetUrl }) {
           continue;
         const rows = source.prepare(`SELECT * FROM ${table}`).iterate();
         for (const row of rows) {
+          if (table === "event_licenses" && row.legacy_story === undefined) {
+            const old = JSON.parse(
+              source
+                .prepare("SELECT data FROM events WHERE id=?")
+                .get(row.event_id)?.data || "{}",
+            );
+            row.legacy_story = old.stories?.length ? 1 : 0;
+            row.legacy_gallery = Array.isArray(old.gallery)
+              ? old.gallery.length
+              : 0;
+          }
+
           if (table === "photos" && !row.size_bytes)
             row.size_bytes = fs.statSync(
               path.join(
@@ -142,7 +157,15 @@ async function importSqlite({ sourceFile, targetUrl }) {
             .prepare(
               `INSERT INTO ${table}(${columns.join(",")}) VALUES(${columns.map(() => "?").join(",")})`,
             )
-            .run(...columns.map((column) => row[column] ?? null));
+            .run(
+              ...columns.map(
+                (column) =>
+                  row[column] ??
+                  (table === "theme_orders" && column === "package_id"
+                    ? "pro"
+                    : null),
+              ),
+            );
           counts[table]++;
         }
       }

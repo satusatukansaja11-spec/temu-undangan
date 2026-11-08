@@ -63,7 +63,7 @@ test("Migrasi SQLite lama idempoten dan mempertahankan akun, hash dan undangan",
     await migrate(db);
     assert.equal(
       (await db.prepare("SELECT COUNT(*) n FROM schema_migrations").get()).n,
-      7,
+      8,
     );
     assert.equal(
       (
@@ -154,3 +154,89 @@ test(
     }
   },
 );
+
+test("Paket Pro backfill preserves existing paid invoice amounts", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "temu-package-migration-"));
+  const sqlite = new DatabaseSync(path.join(dir, "app.sqlite"));
+  try {
+    sqlite.exec(
+      "CREATE TABLE schema_migrations(version TEXT PRIMARY KEY,applied TEXT NOT NULL)",
+    );
+    const root = path.join(__dirname, "../db/migrations/sqlite");
+    for (const file of fs
+      .readdirSync(root)
+      .filter((f) => f.endsWith(".sql") && f < "008")
+      .sort()) {
+      sqlite.exec(fs.readFileSync(path.join(root, file), "utf8"));
+      sqlite
+        .prepare("INSERT INTO schema_migrations VALUES(?,?)")
+        .run(file, new Date().toISOString());
+    }
+    sqlite
+      .prepare("INSERT INTO users VALUES(?,?,?,NULL)")
+      .run("old", "Old Customer", "old-package@example.test");
+    sqlite
+      .prepare(
+        "INSERT INTO theme_orders(id,owner,theme_id,amount,bank_snapshot,status,confirmation,reason,created,deadline) VALUES(?,?,?,?,?,?,?,?,?,?)",
+      )
+      .run(
+        "old-invoice",
+        "old",
+        "navy",
+        123456,
+        "{}",
+        "paid",
+        "{}",
+        "",
+        "2026-01-01",
+        "2026-01-02",
+      );
+    sqlite
+      .prepare("INSERT INTO events VALUES(?,?,?,?,?,?,?)")
+      .run(
+        "old-event",
+        "old",
+        "old-event",
+        "draft",
+        JSON.stringify({
+          stories: [{ title: "Lama", text: "Tetap disimpan" }],
+          gallery: Array(11).fill("/media/legacy"),
+        }),
+        "2026-01-01",
+        "2026-01-01",
+      );
+    sqlite
+      .prepare(
+        "INSERT INTO event_licenses(event_id,order_id,theme_id,legacy,created) VALUES(?,?,?,?,?)",
+      )
+      .run("old-event", "old-invoice", "navy", 0, "2026-01-01");
+  } finally {
+    sqlite.close();
+  }
+  const { connectDatabase } = require("../db");
+  const db = await connectDatabase({ dataDir: dir, databaseUrl: null });
+  try {
+    await migrate(db);
+    const row = await db
+      .prepare("SELECT amount,status,package_id FROM theme_orders WHERE id=?")
+      .get("old-invoice");
+    assert.equal(row.package_id, "pro");
+    assert.equal(row.amount, 123456);
+    assert.equal(row.status, "paid");
+    const grant = await db
+      .prepare(
+        "SELECT legacy_story,legacy_gallery FROM event_licenses WHERE event_id=?",
+      )
+      .get("old-event");
+    assert.equal(grant.legacy_story, 1);
+    assert.equal(grant.legacy_gallery, 11);
+    await migrate(db);
+    assert.equal(
+      (await db.prepare("SELECT COUNT(*) n FROM theme_orders").get()).n,
+      1,
+    );
+  } finally {
+    await db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});

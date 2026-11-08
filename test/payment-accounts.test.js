@@ -175,7 +175,7 @@ test("Multiple payment banks: selection, immutable invoice, ownership and state 
     assert.ok(navy.themeImages.cover.startsWith("/theme-assets/"));
     assert.ok(navy.themeImages.inside.startsWith("/theme-assets/"));
     const themes = await (await call("/api/themes")).json();
-    assert.equal(themes.themes.length, 5);
+    assert.equal(themes.themes.length, 20);
     assert.ok(
       themes.themes.every((t) => t.usageCount === 0),
       "Unpaid orders do not inflate usage counts",

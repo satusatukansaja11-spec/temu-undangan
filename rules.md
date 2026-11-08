@@ -252,3 +252,13 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Mendukung beberapa gambar transparan PNG/WebP, maksimal 12 per tema dan 5 MB per gambar. Server memeriksa isi gambar, ukuran piksel, format dan transparansi, lalu mengoptimalkan WebP. SVG mentah tidak diterima sebagai unggahan.
 - Ornamen dapat ditempatkan di halaman dan sudut tertentu, bergerak berayun/melayang atau diam. Tidak menutup kontrol; animasi berhenti di luar layar, saat tab disembunyikan, dan ketika pengguna memilih reduced motion.
 - Countdown seluruh tema memiliki empat kotak dengan warna tema, angka dan label yang terbaca. Tema baru menggunakan token warna bersama sehingga mengikuti pola yang sama tanpa mengubah logika tanggal/zona waktu.
+
+## 19. Paket Pro/Premium dan tema tambahan
+
+- Paket berlaku per acara. Harga Pro dan Premium ditentukan pemilik per tema, termasuk harga normal/promo dan keterangan layanan. Nol berarti paket pada tema tersebut belum dijual.
+- Pilihan paket disimpan dalam pesanan; harga nominal memakai server dan tidak dapat diturunkan melalui browser. Perubahan harga tidak mengubah tagihan yang sudah dibuat. Mengganti paket/tema saat ada pesanan aktif memerlukan pembatalan pesanan sebelumnya.
+- Paket Pro maksimal 10 foto galeri; Premium maksimal 20. Premium mencakup Love Story, tautan video/live streaming, tombol gulir otomatis, peta Google Maps tertanam, pilihan font nama dan aksen warna. Server menolak manipulasi fitur Premium dari Paket Pro.
+- Pertahankan data/entitlement lama: undangan legacy tetap mengikuti fitur sebelumnya; foto yang sudah tersimpan melampaui batas tidak dihapus, tetapi jumlahnya tidak dapat ditambah. Cerita lama tetap dapat dikelola.
+- Kedua paket mengikuti aturan satu acara/satu pembayaran, tanggal terkunci dan masa aktif sampai hari pernikahan. Penyesuaian dari referensi: tidak menjanjikan tanpa masa aktif, penerima tanpa batas melampaui kuota teknis, unggahan musik pengguna, QR check-in maupun balasan ucapan yang belum tersedia.
+- Semua tema dapat dipratinjau. Katalog memakai empat slide kategori, masing-masing lima tema. Tambahkan 5 Elegan, 5 Flower/Bunga dan 5 Islami dengan aset/desain sesuai `desain.MD`.
+- Musik tetap berasal dari pustaka pengelola. QR check-in dan balasan ucapan ditandai belum tersedia pada rincian paket. Jangan menampilkan fitur tersebut sebagai sudah aktif.

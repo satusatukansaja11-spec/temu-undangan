@@ -315,3 +315,15 @@ Katalog menampilkan jumlah penggunaan setiap tema berdasarkan lisensi yang dibay
 Pembaruan menggunakan migrasi **007_theme_ornaments.sql** untuk SQLite dan PostgreSQL. Jalankan `npm run db:migrate` sebelum restart jika migrasi otomatis dinonaktifkan; konfigurasi `AUTO_MIGRATE=true` menjalankannya saat startup. Backup database sebelum pembaruan. Tidak perlu mengunggah `.env` ke GitHub. Skrip impor SQLite ke PostgreSQL dan sinkronisasi penyimpanan menyertakan aset ornamen.
 
 Kotak countdown mengikuti warna masing-masing tema. Untuk tema baru, gunakan token CSS `--countdown-bg`, `--countdown-text` dan `--countdown-border`; warna dasar tersedia sebagai fallback. Animasi dekorasi menghormati pengaturan pengurangan gerakan perangkat.
+
+### Paket Pro, Premium dan katalog slide
+
+Katalog menyediakan 20 tema: 5 tema sebelumnya ditambah 5 Elegan, 5 Flower/Bunga dan 5 Islami. Setiap kategori memiliki slide yang dapat digeser atau dipindahkan memakai panah. Data desain bersama ada di `public/theme-library.js`; semua tema tersedia pada Preview, checkout, dropdown latar dan ornamen admin.
+
+**Admin → Rekening & harga** menyediakan harga jual/normal Pro dan Premium untuk setiap tema serta keterangan paket. Nilai 0 berarti paket belum dijual. Harga Pro lama tetap digunakan sebagai harga Pro; Premium dan tema baru default 0 sampai diisi pemilik. Pengguna memilih paket pada checkout; nama paket dan nominal tersimpan pada pesanan serta terlihat oleh admin/pelanggan.
+
+Pro mengizinkan 10 foto galeri. Premium mengizinkan 20 foto, Love Story, link video/live streaming, gulir otomatis, peta Google Maps tertanam, font nama dan warna aksen. Pengaturan tambahan tersedia di editor **Info & tampilan**. Gulir otomatis baru bergerak setelah tombol ditekan, berhenti saat pengguna menggulir manual/tab disembunyikan dan menghormati reduced motion. Warna tombol/countdown memakai teks putih atau gelap sesuai kontras. Peta tertanam memakai alamat acara dan hanya origin Google yang diizinkan CSP; link Maps tetap tersedia.
+
+Fitur referensi disesuaikan dengan proyek: satu acara/satu pembayaran, tanggal terkunci dan masa aktif mengikuti hari pernikahan tetap berlaku; musik dikelola admin. QR check-in dan balasan ucapan mempelai ditandai belum tersedia. Data lama tidak dihapus ketika batas galeri paket diperkenalkan.
+
+Pembaruan memerlukan migrasi **008_packages.sql**. Pesanan lama diberi label Pro tanpa mengubah harga/status. Dengan `AUTO_MIGRATE=true`, migrasi berjalan saat startup. Jika dinonaktifkan, jalankan `npm run db:migrate` sebelum restart. Backup database sebelum memperbarui hosting. Skrip impor SQLite → PostgreSQL mendukung kolom paket dan sumber lama tanpa kolom tersebut. `.env` tetap privat.

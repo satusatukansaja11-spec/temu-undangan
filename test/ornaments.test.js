@@ -92,6 +92,18 @@ test("Theme ornaments: admin permissions, validated images, theme isolation, upd
     ).metadata();
     assert.equal(optimized.hasAlpha, true);
     assert.equal(optimized.format, "webp");
+    const event = await (
+      await call("/api/events", "POST", { name: "Ornament public QA" })
+    ).json();
+    await db
+      .prepare("UPDATE events SET status='ready' WHERE id=?")
+      .run(event.id);
+    await db
+      .prepare("UPDATE event_licenses SET legacy=1 WHERE event_id=?")
+      .run(event.id);
+    const publicData = await (await call("/api/public/" + event.slug)).json();
+    assert.equal(publicData.themeOrnaments.length, 1);
+    assert.equal(publicData.license, undefined);
     const navy = await (await call("/api/themes/navy/preview")).json(),
       sakura = await (await call("/api/themes/sakura/preview")).json();
     assert.equal(navy.themeOrnaments.length, 1);

@@ -7,6 +7,12 @@ let appLimits = {
   eventTracks: 20,
 };
 let mediaCache = { photos: [], tracks: [], usedBytes: 0 };
+function galleryLimit() {
+  return Math.min(
+    appLimits.galleryPhotos,
+    current?.packageFeatures?.galleryLimit ?? appLimits.galleryPhotos,
+  );
+}
 const readableBytes = (bytes) =>
   bytes >= 1024 * 1024
     ? (bytes / 1024 / 1024).toFixed(1) + " MB"
@@ -39,7 +45,7 @@ function bindMediaEditor() {
           if (busy) return toast("Tunggu hingga unggahan selesai.");
           if (current.gallery.includes(button.dataset.reusePhoto))
             return toast("Foto sudah ada di galeri.");
-          if (current.gallery.length >= appLimits.galleryPhotos)
+          if (current.gallery.length >= galleryLimit())
             return toast("Batas galeri tercapai.");
           current.gallery.push(button.dataset.reusePhoto);
           dirty = true;

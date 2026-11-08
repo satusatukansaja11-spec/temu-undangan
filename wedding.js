@@ -22,6 +22,28 @@ function validateWedding(data, fail) {
     )
       throw fail(400, `${label} tidak valid.`);
   };
+  result.videoUrl = text(data.videoUrl, "Link video/streaming", 2000);
+  if (result.videoUrl) {
+    let url;
+    try {
+      url = new URL(result.videoUrl);
+    } catch {
+      throw fail(400, "Link video harus HTTPS.");
+    }
+    if (url.protocol !== "https:" || url.username || url.password)
+      throw fail(400, "Link video harus HTTPS.");
+  }
+  for (const key of ["autoScroll", "embedMaps"]) {
+    if (data[key] !== undefined && typeof data[key] !== "boolean")
+      throw fail(400, "Pengaturan Premium tidak valid.");
+    result[key] = data[key] === true;
+  }
+  result.coverFont = data.coverFont || "great-vibes";
+  if (!["great-vibes", "georgia", "sans"].includes(result.coverFont))
+    throw fail(400, "Pilihan font tidak tersedia.");
+  result.themeAccent = text(data.themeAccent, "Warna aksen", 7);
+  if (result.themeAccent && !/^#[0-9a-f]{6}$/i.test(result.themeAccent))
+    throw fail(400, "Warna aksen tidak valid.");
   result.timezone =
     data.timezone === undefined ? "Asia/Jakarta" : data.timezone;
   if (!Object.hasOwn(ZONES, result.timezone))
