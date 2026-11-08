@@ -4,7 +4,11 @@ const fs = require("node:fs"),
   multer = require("multer"),
   sharp = require("sharp");
 const { queueDeletion } = require("./storage");
-function installThemeAssets(app, db, { admin, fail, storage, dataDir }) {
+function installThemeAssets(
+  app,
+  db,
+  { admin, fail, storage, dataDir, themes },
+) {
   const folder = path.join(dataDir, ".theme-tmp");
   fs.mkdirSync(folder, { recursive: true });
   const upload = multer({
@@ -22,11 +26,11 @@ function installThemeAssets(app, db, { admin, fail, storage, dataDir }) {
     admin,
     (req, res, next) => {
       if (
-        req.params.theme !== "meihua" ||
+        !themes.includes(req.params.theme) ||
         !["cover", "inside"].includes(req.params.slot)
       )
         return next(
-          fail(400, "Pilih latar sampul atau isi tema Meihua Pavilion."),
+          fail(400, "Pilih tema yang tersedia dan latar sampul atau isi."),
         );
       if (active >= 2)
         return next(

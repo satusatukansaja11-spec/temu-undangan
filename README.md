@@ -288,3 +288,13 @@ Tema ketiga **Meihua Pavilion** memakai dua latar terpisah: sampul untuk bunga p
 Bagian **Ucapan dan Doa Para Tamu** menampilkan kartu yang bisa digulir, jumlah ucapan publik, agregat tamu hadir, tanggal, dan pagination. Checkbox persetujuan pada RSVP tidak dicentang otomatis. Nama/ucapan hanya dipublikasikan bila tamu menyetujuinya; konfirmasi kehadiran per tamu tetap privat. Ucapan lama tidak dibuka otomatis oleh migrasi. Pengirim dapat mengubah atau menarik persetujuan dari browser yang sama selama cookie tersedia. Pemilik undangan dapat menyembunyikan/menampilkan kembali ucapan melalui editor → RSVP. Edit oleh pengirim tidak membatalkan keputusan moderasi pemilik.
 
 Deploy seluruh kode dan jalankan `npm run db:migrate` (migrasi 006). Backup database/media mencakup persetujuan, moderasi dan gambar tema; skrip impor/sinkronisasi sudah mencakupnya. Endpoint publik ucapan mengikuti batas publikasi/expiry yang sama dengan RSVP. Screenshot [ucapan HP](docs/images/public-wishes-mobile.png) dan [logo penutup](docs/images/closing-rings-mobile.png) memakai data sintetis dan ilustrasi contoh.
+
+### Tema, latar dan beberapa rekening pembayaran
+
+Acuan visual: [desain.MD](desain.MD). Katalog kini menyediakan Navy Ivory, Sakura & Butterfly, Meihua Pavilion, Jawa Heritage, dan Islamic Serenity, dalam satu baris yang dapat digeser.
+
+Di **Admin → Rekening dan harga per tema**, isi rekening utama dan gunakan **Tambah rekening** untuk bank lain (maksimal 10 rekening). Simpan harga jual setiap tema dan aktifkan penjualan setelah rekening diperiksa. Pelanggan memilih bank tujuan sebelum membuat tagihan; nomor tujuan tetap tersimpan pada tagihan walaupun rekening admin kemudian diubah. Bank hanya bisa diganti pelanggan sebelum konfirmasi pembayaran dan sebelum tenggat.
+
+Di **Admin → Menu Latar**, pilih tema melalui dropdown lalu unggah sampul dan/atau latar isi (JPG/PNG/WebP, maksimal 10 MB). Aset berlaku pada preview dan undangan tema tersebut. Foto pribadi mempelai tidak diganti. Dua tema baru belum dijual sampai harga diisi admin.
+
+Daftar rekening disimpan dalam JSON konfigurasi `shop_settings` yang sudah ada; pembaruan ini tidak memerlukan migrasi SQL baru. Pengaturan lama dengan satu rekening tetap didukung. `.env` tetap privat dan tidak perlu dikirim ke GitHub.

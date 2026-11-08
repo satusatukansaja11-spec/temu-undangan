@@ -177,7 +177,7 @@ async function renderWedding(preview, id, themeDemo = false) {
       <dialog class="gallery-lightbox" id="galleryLightbox" aria-labelledby="galleryTitle"><div class="lightbox-header"><span id="galleryTitle">Galeri foto</span><button id="closeGallery" aria-label="Tutup galeri">×</button></div><img id="galleryLarge" alt=""><div class="lightbox-controls"><button id="previousPhoto" aria-label="Foto sebelumnya">←</button><span id="galleryCounter"></span><button id="nextPhoto" aria-label="Foto berikutnya">→</button></div></dialog></div>`;
     applyNavyTheme(e);
     if (e.theme === "sakura") applySakuraTheme();
-    if (e.theme === "meihua") applyMeihuaTheme(e);
+    applyDesignedTheme(e);
     if (themeDemo) {
       const banner = document.querySelector(".preview-banner");
       banner.insertAdjacentHTML(

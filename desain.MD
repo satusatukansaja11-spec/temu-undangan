@@ -1,0 +1,58 @@
+# Desain Tema Temu Undangan
+
+Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, dan Islamic Serenity. Tema menggunakan komponen serta fitur aplikasi yang sama; yang berbeda adalah palet, ilustrasi, ornamen, dan suasana. Setiap tema dapat memiliki dua gambar latar yang diatur pemilik melalui Admin → Menu Latar.
+
+## Struktur bersama
+
+- Laptop: foto pasangan menetap di kiri; panel undangan 480 px di kanan bergulir sendiri. HP: satu kolom selebar layar, tanpa overflow horizontal.
+- Sampul: foto pasangan, The Wedding Of, nama mempelai, nama tamu, dan Buka Undangan.
+- Isi: intro nama → foto dan kutipan Ar-Rum yang sudah digunakan aplikasi → WITH LOVE/pembuka → countdown/Save the Date → profil mempelai → love story → acara → Maps → galeri → RSVP → ucapan/doa publik sesuai persetujuan → Titip Hadiah → penutup dengan logo cincin Temu.
+- Nama mempelai memakai Great Vibes lokal; judul Georgia/serif; formulir dan navigasi memakai sans-serif yang mudah dibaca. Nama/tanggal/foto tetap berasal dari data acara.
+- Float in muncul sekali saat elemen masuk layar dan menghormati reduced motion. Dekorasi tidak menangkap klik atau menutupi tombol, rekening, maupun formulir.
+- Musik mulai setelah Buka Undangan ditekan; tombol menjeda/memutar kembali. Tidak menambahkan autoplay sebelum interaksi.
+- Latar bersifat dekoratif di belakang konten dengan lapisan ivory yang menjaga keterbacaan. Foto mempelai, galeri, dan kartu rekening tidak diwarnai ulang.
+
+## Navy Ivory
+
+- Palet: navy #34415b, ivory #fffaf1, emas lembut #aa9b67. Logo Temu tetap memakai dua cincin hijau sebagai identitas layanan.
+- Sampul bawaan menggunakan ilustrasi bunga/paviliun yang sudah ada, foto oval berbingkai emas, dan nama Great Vibes.
+- Halaman isi memakai ivory dengan batas/bingkai navy dan penekanan emas pada timeline. Jangan menghilangkan isi ucapan, RSVP atau rekening ketika latar diganti.
+- Admin → Menu Latar → Navy Ivory menyediakan slot **Sampul / halaman pertama** dan **Isi undangan**. Unggahan sampul dipakai pada sampul, intro dan gambar katalog. Unggahan isi dipakai pada bagian isi; tanpa unggahan isi, latar bawaan tetap berlaku.
+
+## Jawa Heritage
+
+- Palet: cokelat #59432f, ivory #fff7e8, emas #b49558, dan aksen gelap #3f3427.
+- Unsur utama: motif kawung yang berulang secara halus, gunungan simetris pada bagian sampul, dan siluet pendopo/joglo pada area bawah.
+- Ruang tengah dibuat tenang untuk nama mempelai, foto, dan teks. Ornamen batik berada pada tepian; isi menggunakan motif kawung yang ringan, bukan tekstur gelap di belakang paragraf.
+- Foto mempelai tetap foto pengguna; tema tidak mengasumsikan pakaian adat tertentu, nama suku, gelar, atau urutan prosesi yang belum diisi pengguna.
+- Ilustrasi bawaan merupakan vektor orisinal untuk aplikasi, tidak diklaim sebagai artefak budaya atau replika batik historis tertentu.
+- Admin dapat mengganti kedua latar melalui Menu Latar → Jawa Heritage. Timeline, tombol dan bingkai foto mengikuti warna cokelat/emas.
+
+## Islamic Serenity
+
+- Palet: hijau zamrud #184d42, ivory #fffaf0, emas lembut #c7a45c, dan hijau gelap #123d35.
+- Unsur utama: lengkung mihrab, pola bintang geometris delapan sudut, garis emas yang rapi, dan siluet kubah/minaret dekoratif pada bagian bawah sampul.
+- Bagian tengah lapang dan terang; halaman isi memakai pola geometri dengan opasitas rendah di tepian.
+- Tidak membuat tulisan Arab, ayat, hadis atau kutipan keagamaan baru sebagai dekorasi. Kutipan Ar-Rum dan pembuka yang telah diminta pengguna tetap mengikuti isi aplikasi; tidak mengarang sumber agama.
+- Nama mempelai dan foto tetap dapat disesuaikan. Formulir/ucapan/galeri tetap tersedia seperti tema lain.
+- Admin dapat mengganti kedua latar melalui Menu Latar → Islamic Serenity. Tombol dan judul mengikuti emerald/emas dengan teks yang kontras.
+
+## Menu Latar di admin
+
+- Dropdown memilih Navy Ivory, Sakura & Butterfly, Meihua Pavilion, Jawa Heritage, atau Islamic Serenity.
+- Dua slot per tema: cover dan inside. Unggah JPG/PNG/WebP maksimal 10 MB; server memeriksa isi file, memperbaiki orientasi, menghapus metadata dan mengoptimalkan WebP.
+- Latar berlaku untuk tema global, tidak mengganti foto pribadi acara. Hanya admin pemilik yang dapat mengunggahnya. Pergantian latar memperbarui katalog, preview dan undangan sesuai tema.
+- Gambar bawaan dan unggahan memiliki fallback yang jelas. Teks tetap tampil jika gambar belum selesai dimuat.
+
+## Katalog tema dan harga
+
+- Kartu hanya menampilkan gambar, nama tema, harga, Preview dan Select. Tidak menampilkan deskripsi atau kalimat Satu acara untuk satu pembayaran pada kartu.
+- Semua kartu berada pada satu baris horizontal; layar kecil atau tema yang bertambah dapat digeser ke samping. Tombol minimal 44 px dan teks tidak dipotong.
+- Harga jual merah; harga normal abu-abu dicoret hanya jika lebih tinggi. Harga berasal dari konfigurasi pemilik, bukan angka yang dikarang dari referensi.
+- Tema baru default belum dijual sampai harga/rekening/penjualan diatur admin. Pembelian tetap satu acara satu pembayaran, meskipun kalimat penjelas tidak ditampilkan pada kartu katalog.
+
+## Rekening pembayaran produk
+
+- Admin dapat menambahkan hingga 10 rekening yang valid. Pembeli memilih bank tujuan sebelum membuat/mengonfirmasi tagihan. Daftar ini terpisah dari Titip Hadiah mempelai.
+- Tagihan menyimpan snapshot rekening yang dipilih. Mengubah/menghapus rekening di admin tidak mengubah tujuan pada tagihan lama diam-diam.
+- Perubahan pilihan bank untuk tagihan hanya tersedia sebelum konfirmasi pembayaran. Nominal/harga/deadline tetap mengikuti tagihan awal; setelah konfirmasi atau paid, bank dikunci.

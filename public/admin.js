@@ -19,6 +19,7 @@ const adminActionNames = {
   "admin.grant": "Akses admin diberikan",
   "admin.revoke": "Akses admin dicabut",
   "order.approve": "Pembayaran disetujui",
+  "order.bank": "Pembeli mengganti bank tujuan",
   "order.reject": "Konfirmasi pembayaran ditolak",
   "shop.update": "Pengaturan penjualan diperbarui",
   "event.activate": "Tanggal diaktifkan",

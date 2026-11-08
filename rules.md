@@ -229,3 +229,11 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Kecilkan kartu katalog, gambar, judul dan jarak antar elemen agar tiga tema tampil dalam satu baris pada laptop/desktop.
 - Pada layar kecil, pertahankan satu baris dengan gulir horizontal; kartu tidak ditumpuk ke baris berikutnya dan halaman tidak melebar keluar viewport.
 - Tombol Preview/Select tetap berlabel jelas dan nyaman disentuh. Harga jual merah serta harga normal abu-abu dicoret tetap mengikuti konfigurasi admin.
+
+## 16. Katalog ringkas, latar semua tema dan pilihan bank
+
+- Kartu katalog menampilkan gambar, nama tema, harga dan tombol Preview/Select tanpa deskripsi maupun kalimat “Satu acara untuk satu pembayaran”. Aturan pembayaran per acara tetap berlaku di server.
+- Acuan visual disimpan di [desain.MD](desain.MD), termasuk Navy Ivory dan dua tema baru: **Jawa Heritage** (kawung, gunungan, pendopo) serta **Islamic Serenity** (mihrab, geometri, emerald/emas).
+- Admin → Menu Latar menyediakan dropdown kelima tema, masing-masing dengan unggahan sampul dan isi. Pelanggan tidak dapat mengunggah latar global. Harga tema baru diatur admin sebelum dijual.
+- Pemilik dapat menyimpan maksimal 10 rekening pembayaran produk. Pembeli memilih rekening tujuan sebelum checkout. Daftar rekening ini terpisah dari rekening hadiah mempelai.
+- Rekening tujuan disimpan pada tagihan. Perubahan konfigurasi admin tidak mengubah tagihan sebelumnya. Pembeli hanya dapat mengganti bank pada pesanan miliknya yang belum dikonfirmasi dan belum melewati tenggat; nominal serta tenggat tetap.

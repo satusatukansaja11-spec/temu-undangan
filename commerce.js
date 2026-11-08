@@ -1,5 +1,10 @@
 const { randomBytes } = require("node:crypto");
 const { queueDeletion, drainDeletions } = require("./storage");
+const {
+  accountsFromSettings,
+  validateAccounts,
+  bankSnapshot,
+} = require("./payment-accounts");
 const THEMES = [
   {
     id: "navy",
@@ -19,6 +24,19 @@ const THEMES = [
     description:
       "Bunga plum merah, pegunungan berkabut dan paviliun bergaya oriental.",
     image: "/assets/meihua-cover.svg",
+  },
+  {
+    id: "jawa",
+    name: "Jawa Heritage",
+    description:
+      "Nuansa kawung, gunungan dan pendopo dalam cokelat ivory emas.",
+    image: "/assets/jawa-cover.svg",
+  },
+  {
+    id: "islami",
+    name: "Islamic Serenity",
+    description: "Hijau zamrud, ivory dan ornamen geometris islami yang teduh.",
+    image: "/assets/islami-cover.svg",
   },
 ];
 const ZONES = { "Asia/Jakarta": 7, "Asia/Makassar": 8, "Asia/Jayapura": 9 };
@@ -67,6 +85,7 @@ function createCommerce(
       (await db.prepare("SELECT data FROM shop_settings WHERE id=1").get())
         .data,
     );
+    cfg.accounts = accountsFromSettings(cfg);
     for (const t of THEMES) {
       cfg.prices[t.id] ??= 0;
     }
@@ -85,6 +104,7 @@ function createCommerce(
     fail,
     storage,
     dataDir,
+    themes: THEMES.map((t) => t.id),
   });
   const license = async (id) => {
     const l = await db
@@ -270,6 +290,11 @@ function createCommerce(
     if (!Number.isInteger(cfg.hours) || cfg.hours < 1 || cfg.hours > 168)
       throw fail(400, "Batas pembayaran 1–168 jam.");
     const previous = await settings();
+    cfg.accounts = validateAccounts(d, previous, fail);
+    const primary = cfg.accounts[0];
+    cfg.bank = primary?.bank || "";
+    cfg.account = primary?.account || "";
+    cfg.holder = primary?.holder || "";
     cfg.prices = {};
     cfg.comparePrices = {};
     for (const t of THEMES) {
@@ -380,13 +405,7 @@ function createCommerce(
       const id = "TEMU-" + randomBytes(10).toString("hex").toUpperCase(),
         created = now(),
         deadline = new Date(clock() + cfg.hours * 3600000).toISOString();
-      const bank = {
-        bank: cfg.bank,
-        account: cfg.account,
-        holder: cfg.holder,
-        instructions: cfg.instructions,
-        whatsapp: cfg.whatsapp,
-      };
+      const bank = bankSnapshot(cfg, req.body?.bankId, fail);
       await db
         .prepare(
           "INSERT INTO theme_orders(id,owner,theme_id,amount,bank_snapshot,status,confirmation,reason,created,deadline) VALUES(?,?,?,?,?,?,?,?,?,?)",
@@ -423,6 +442,35 @@ function createCommerce(
         .get(id);
     });
     res.status(201).json(orderView(result));
+  });
+  app.get("/api/payment-accounts", auth, async (req, res) => {
+    const cfg = await settings();
+    res.json({ accounts: cfg.accounts, enabled: cfg.enabled });
+  });
+  app.patch("/api/orders/:order/bank", auth, async (req, res) => {
+    await db.transaction(async () => {
+      const o = await db
+        .prepare("SELECT * FROM theme_orders WHERE id=? AND owner=?" + lock)
+        .get(req.params.order, req.session.user_id);
+      if (!o) throw fail(404, "Pesanan tidak ditemukan.");
+      if (o.status !== "pending_payment" || o.deadline <= now())
+        throw fail(
+          409,
+          "Bank hanya dapat dipilih sebelum konfirmasi pembayaran.",
+        );
+      const cfg = await settings();
+      if (!cfg.enabled)
+        throw fail(
+          503,
+          "Perubahan rekening sementara tidak tersedia. Hubungi admin.",
+        );
+      const bank = bankSnapshot(cfg, req.body?.bankId, fail);
+      await db
+        .prepare("UPDATE theme_orders SET bank_snapshot=? WHERE id=?")
+        .run(JSON.stringify(bank), o.id);
+      await audit(req.session.user_id, "order.bank", o.id, { bankId: bank.id });
+    });
+    res.json({ ok: true });
   });
   app.get("/api/orders", auth, async (req, res) =>
     res.json(

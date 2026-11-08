@@ -157,3 +157,10 @@ Hasil akhir revisi ini: 49 tes lulus, 0 gagal, 2 tes layanan PostgreSQL/S3 ekste
 ## Katalog ringkas satu baris — 7 November 2026
 
 Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul 20–22 px dan padding lebih ringkas. Chromium memeriksa posisi vertikal ketiga kartu tetap sama pada 320/390/768/1024/1440, semua kartu muat di desktop, gulir horizontal pada HP, tidak ada overflow halaman atau page error, serta tiga tombol Select tetap tersedia. Screenshot menggunakan harga contoh, bukan perubahan harga tersimpan. git diff check lulus. Backend tidak berubah; suite backend tidak diulang.
+
+## Katalog, tema dan rekening tambahan — 8 November 2026
+
+- `npm test`: 52 pengujian, 50 lulus, 2 dilewati, 0 gagal. Termasuk pilihan rekening, akses pemilik pesanan, CSRF, snapshot nominal/rekening, penguncian setelah konfirmasi, preview dua tema baru dan unggahan latar Navy untuk admin.
+- Chromium: dropdown lima tema, tambah/simpan dua rekening admin, checkout Jawa dengan bank kedua lalu ganti sebelum transfer, serta katalog lima kartu tanpa deskripsi diuji. Tidak ada error JavaScript.
+- Viewport 390×844 dan 1440×1000 diperiksa. Tema baru tidak membuat overflow horizontal di HP. Screenshot tersedia pada `docs/images/katalog-lima-tema.png`, `latar-navy-admin.png`, `jawa-mobile.png` dan `islami-mobile.png`.
+- Semua transaksi QA menggunakan rekening fiktif dan penyimpanan sementara. Tidak ada transfer, pesan WhatsApp atau perubahan data hosting produksi.
