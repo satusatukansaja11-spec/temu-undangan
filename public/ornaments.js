@@ -37,16 +37,19 @@ function ornamentFields(o = {}) {
       "",
     )}</select></label><label>Ukuran (px)<input name="size" type="number" min="60" max="240" value="${o.size || 140}" required></label><label>Durasi gerakan (detik)<input name="duration" type="number" min="4" max="20" step="0.5" value="${o.duration || 7}" required></label>`;
 }
-async function mountOrnamentEditor(theme) {
+let ornamentPreviewCleanup;
+async function mountOrnamentEditor(theme, notice = "") {
   const host = document.querySelector("#ornamentEditor");
   if (!host || document.querySelector("#adminThemeSelect")?.value !== theme)
     return;
+  ornamentPreviewCleanup?.();
+  ornamentPreviewCleanup = null;
   host.dataset.theme = theme;
   host.innerHTML = '<p role="status">Memuat ornamen…</p>';
   try {
     const data = await api("/api/admin/theme-ornaments/" + theme);
     if (!host.isConnected || host.dataset.theme !== theme) return;
-    host.innerHTML = `<h3>Gambar bergerak — ${esc(themeNames[theme])}</h3><p>Ornamen hanya tampil pada tema ini. Pilih beberapa PNG/WebP transparan (maksimal 5 MB per gambar, ${data.limit} gambar per tema). Gambar latar utuh perlu dipisahkan dahulu agar daunnya bergerak sendiri.</p><form id="ornamentUpload"><label>Gambar ornamen<input name="images" type="file" accept="image/png,image/webp" multiple required></label><div class="ornament-settings">${ornamentFields()}</div><button class="primary">Tambah gambar bergerak</button><p role="status"></p></form><div class="ornament-list">${data.ornaments.map((o) => `<form data-ornament="${esc(o.id)}"><img src="${esc(o.url)}" alt="Ornamen ${esc(themeNames[theme])}" class="ornament-thumb"><div class="ornament-settings">${ornamentFields(o)}</div><label class="check-row"><input name="enabled" type="checkbox" ${o.enabled ? "checked" : ""}> Tampilkan ornamen</label><div class="actions"><button class="primary">Simpan ornamen</button><button type="button" data-delete-ornament="${esc(o.id)}">Hapus</button></div><p role="status"></p></form>`).join("") || "<p>Belum ada ornamen tambahan untuk tema ini.</p>"}</div><a class="button" href="/tema/${esc(theme)}" target="_blank" rel="noopener">Preview gerakan tema</a>`;
+    host.innerHTML = `<h3>Gambar bergerak — ${esc(themeNames[theme])}</h3><p>Pilih gambar, atur halaman dan gerakannya, lalu klik <strong>Simpan gambar ornamen</strong>. Gambar baru terpasang setelah pesan berhasil muncul.</p><p>PNG/WebP transparan, maksimal 5 MB per gambar dan ${data.limit} gambar per tema. Ornamen Sampul terlihat sebelum Buka Undangan; pilih Halaman nama atau halaman lain untuk menampilkannya di dalam undangan.</p><p id="ornamentEditorStatus" role="status">${esc(notice)}</p><form id="ornamentUpload"><label>Gambar ornamen<input name="images" type="file" accept="image/png,image/webp" multiple required></label><div id="pendingOrnaments" aria-live="polite"></div><div class="ornament-upload-actions"><button type="submit" class="primary" disabled>Simpan gambar ornamen</button><span>Pilih gambar untuk mengaktifkan tombol Simpan.</span></div><div class="ornament-settings">${ornamentFields()}</div><div class="ornament-upload-actions"><button type="submit" class="primary" disabled>Simpan gambar ornamen</button></div><p class="ornament-form-status" role="status"></p></form><div class="ornament-saved-heading"><h4>Ornamen tersimpan (${data.ornaments.length}/${data.limit})</h4><a class="button" href="/tema/${esc(theme)}" target="_blank" rel="noopener">Lihat hasil tema</a></div><div class="ornament-list">${data.ornaments.map((o, i) => `<form data-ornament="${esc(o.id)}"><h4>Ornamen ${i + 1} · ${esc(ornamentSections[o.section])}</h4><p class="ornament-saved-badge">Tersimpan · ${o.enabled ? "Ditampilkan pada tema" : "Tidak ditampilkan"}</p><img src="${esc(o.url)}" alt="Ornamen ${esc(themeNames[theme])}" class="ornament-thumb"><div class="ornament-settings">${ornamentFields(o)}</div><label class="check-row"><input name="enabled" type="checkbox" ${o.enabled ? "checked" : ""}> Tampilkan ornamen</label><div class="actions"><button type="submit" class="primary">Simpan perubahan ornamen</button><button type="button" data-delete-ornament="${esc(o.id)}">Hapus</button></div><p role="status"></p></form>`).join("") || "<p>Belum ada ornamen tersimpan untuk tema ini.</p>"}</div>`;
     const config = (form) => {
       const d = Object.fromEntries(new FormData(form));
       return {
@@ -58,63 +61,143 @@ async function mountOrnamentEditor(theme) {
         enabled: form.elements.enabled ? form.elements.enabled.checked : true,
       };
     };
-    host.querySelector("#ornamentUpload").onsubmit = async (e) => {
+    const upload = host.querySelector("#ornamentUpload"),
+      picker = upload.elements.images,
+      feedback = upload.querySelector(".ornament-form-status"),
+      pending = host.querySelector("#pendingOrnaments"),
+      submits = Array.from(upload.querySelectorAll("[type=submit]"));
+    let files = [],
+      urls = [],
+      savedCount = data.ornaments.length,
+      saving = false;
+    const clearUrls = () => {
+      urls.forEach((url) => URL.revokeObjectURL(url));
+      urls = [];
+    };
+    ornamentPreviewCleanup = clearUrls;
+    const renderPending = () => {
+      clearUrls();
+      submits.forEach((b) => (b.disabled = saving || !files.length));
+      upload.querySelector(".ornament-upload-actions>span").textContent =
+        files.length
+          ? "Klik Simpan untuk memasang gambar pada tema ini."
+          : "Pilih gambar untuk mengaktifkan tombol Simpan.";
+      if (!files.length) {
+        pending.innerHTML = "";
+        return;
+      }
+      const settings = config(upload);
+      pending.innerHTML = `<p><strong>${files.length} gambar dipilih — belum disimpan.</strong></p><div class="ornament-pending-grid">${files
+        .map((file) => {
+          const url = URL.createObjectURL(file);
+          urls.push(url);
+          return `<figure><div class="ornament-admin-preview"><img src="${url}" alt="Pratinjau ${esc(file.name)}" class="ornament-motion-${esc(settings.motion)}"></div><figcaption>${esc(file.name)}</figcaption></figure>`;
+        })
+        .join("")}</div>`;
+      pending
+        .querySelectorAll("img")
+        .forEach((img) =>
+          img.style.setProperty("--ornament-duration", settings.duration + "s"),
+        );
+    };
+    picker.onchange = () => {
+      files = Array.from(picker.files);
+      feedback.textContent = "";
+      const invalid = files.some(
+        (file) =>
+          !["image/png", "image/webp"].includes(file.type) ||
+          file.size > 5 * 1024 * 1024,
+      );
+      if (files.length + savedCount > data.limit || invalid) {
+        feedback.textContent = invalid
+          ? "Gunakan PNG/WebP transparan maksimal 5 MB per gambar."
+          : "Maksimal 12 ornamen per tema. Pilih lebih sedikit gambar.";
+        files = [];
+        picker.value = "";
+      }
+      renderPending();
+    };
+    upload
+      .querySelectorAll(".ornament-settings select,.ornament-settings input")
+      .forEach((input) =>
+        input.addEventListener("input", () => {
+          if (!saving) renderPending();
+        }),
+      );
+    upload.onsubmit = async (e) => {
       e.preventDefault();
-      const form = e.target,
-        feedback = form.querySelector("[role=status]"),
-        button = form.querySelector("button"),
-        files = Array.from(form.elements.images.files);
-      if (files.length + data.ornaments.length > data.limit) {
+      if (saving || !files.length) return;
+      if (files.length + savedCount > data.limit) {
         feedback.textContent = "Maksimal 12 ornamen per tema.";
         return;
       }
-      if (files.some((f) => f.size > 5 * 1024 * 1024)) {
-        feedback.textContent = "Setiap gambar maksimal 5 MB.";
-        return;
-      }
-      button.disabled = true;
+      const settings = config(upload);
+      saving = true;
+      const total = files.length;
       let uploaded = 0;
+      Array.from(upload.elements).forEach((input) => (input.disabled = true));
       try {
-        for (const file of files) {
-          feedback.textContent = `Mengunggah ${uploaded + 1} dari ${files.length}…`;
+        while (files.length) {
+          feedback.textContent = `Menyimpan gambar ${uploaded + 1} dari ${total}…`;
           const body = new FormData();
-          body.append("image", file);
-          body.append("config", JSON.stringify(config(form)));
+          body.append("image", files[0]);
+          body.append("config", JSON.stringify(settings));
           await api("/api/admin/theme-ornaments/" + theme, {
             method: "POST",
             body,
           });
+          files.shift();
+          savedCount++;
           uploaded++;
         }
-        await mountOrnamentEditor(theme);
-        toast(`${uploaded} ornamen ditambahkan.`);
+        const message = `${uploaded} gambar ornamen berhasil disimpan untuk ${themeNames[theme]}. Klik Lihat hasil tema untuk memeriksanya.`;
+        clearUrls();
+        await mountOrnamentEditor(theme, message);
+        toast(message);
       } catch (error) {
-        feedback.textContent = `${uploaded} gambar berhasil. ${error.message} Muat ulang daftar sebelum mencoba lagi.`;
+        feedback.textContent = `${uploaded ? uploaded + " gambar sudah tersimpan. " : ""}${error.message}${uploaded ? " Gambar yang tersisa dapat disimpan ulang tanpa menggandakan yang berhasil." : ""}`;
         if (uploaded) {
-          const retry = document.createElement("button");
-          retry.type = "button";
-          retry.textContent = "Muat ulang daftar";
-          retry.onclick = () => mountOrnamentEditor(theme);
-          feedback.append(retry);
+          const info = host.querySelector("#ornamentEditorStatus");
+          info.textContent = `${savedCount} ornamen tersimpan untuk ${themeNames[theme]}. Selesaikan sisa unggahan, lalu lihat hasil tema.`;
         }
+        saving = false;
       } finally {
-        button.disabled = false;
+        saving = false;
+        Array.from(upload.elements).forEach(
+          (input) => (input.disabled = false),
+        );
+        submits.forEach((b) => (b.disabled = !files.length));
+        if (upload.isConnected) renderPending();
       }
     };
-    host.querySelectorAll("[data-ornament]").forEach((form) => {
+    host.querySelectorAll("[data-ornament]").forEach((form, index) => {
+      const status = form.querySelector("[role=status]");
+      form.addEventListener(
+        "input",
+        () =>
+          (status.textContent =
+            "Perubahan belum disimpan. Klik Simpan perubahan ornamen."),
+      );
       form.onsubmit = async (e) => {
         e.preventDefault();
-        const b = form.querySelector("button"),
-          feedback = form.querySelector("[role=status]");
+        const b = form.querySelector("[type=submit]"),
+          settings = config(form);
         b.disabled = true;
+        status.textContent = "Menyimpan pengaturan…";
         try {
           await api(
             "/api/admin/theme-ornaments/" + theme + "/" + form.dataset.ornament,
-            { method: "PATCH", body: JSON.stringify(config(form)) },
+            { method: "PATCH", body: JSON.stringify(settings) },
           );
-          feedback.textContent = "Pengaturan ornamen disimpan.";
+          status.textContent =
+            "Pengaturan ornamen berhasil disimpan. Muat ulang halaman tema untuk melihat hasilnya.";
+          form.querySelector("h4").textContent =
+            `Ornamen ${index + 1} · ${ornamentSections[settings.section]}`;
+          form.querySelector(".ornament-saved-badge").textContent =
+            "Tersimpan · " +
+            (settings.enabled ? "Ditampilkan pada tema" : "Tidak ditampilkan");
         } catch (error) {
-          feedback.textContent = error.message;
+          status.textContent = error.message;
         } finally {
           b.disabled = false;
         }
@@ -128,9 +211,9 @@ async function mountOrnamentEditor(theme) {
             "/api/admin/theme-ornaments/" + theme + "/" + form.dataset.ornament,
             { method: "DELETE" },
           );
-          await mountOrnamentEditor(theme);
+          await mountOrnamentEditor(theme, "Ornamen berhasil dihapus.");
         } catch (error) {
-          form.querySelector("[role=status]").textContent = error.message;
+          status.textContent = error.message;
           b.disabled = false;
         }
       };
@@ -139,8 +222,9 @@ async function mountOrnamentEditor(theme) {
     if (host.isConnected && host.dataset.theme === theme) {
       host.textContent = error.message;
       const retry = document.createElement("button");
+      retry.type = "button";
       retry.textContent = "Coba lagi";
-      retry.onclick = () => mountOrnamentEditor(theme);
+      retry.onclick = () => mountOrnamentEditor(theme, notice);
       host.append(retry);
     }
   }

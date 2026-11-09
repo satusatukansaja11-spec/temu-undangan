@@ -91,3 +91,9 @@ Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, da
 
 - Admin → Rekening & harga memakai dropdown **Pilih tema**, mengikuti pola Menu Latar. Hanya formulir harga tema terpilih yang terlihat; perubahan pada tema lain tetap tersimpan di form sampai Simpan ditekan. Nilai Pro/Premium dan harga normal tetap terpisah.
 - Kartu Pro/Premium pada Paket Undangan mula-mula menampilkan fasilitas sampai **Revisi selama masa aktif**. **Tampilkan lebih banyak** membuka fasilitas tambahan serta rincian ketentuan, dan berganti menjadi **Tampilkan lebih sedikit** untuk menutupnya. Kedua kartu dapat dibuka secara independen.
+
+## Status penyimpanan ornamen
+
+- Pisahkan gambar yang baru dipilih (pratinjau dengan label belum disimpan) dari daftar ornamen tersimpan. Tombol Simpan gambar ornamen terlihat dekat pemilih file dan di bawah pengaturan.
+- Pesan berhasil tetap terlihat setelah unggahan selesai. Setiap gambar tersimpan mempunyai status tampil/nonaktif, tombol Simpan perubahan ornamen, dan akses Lihat hasil tema.
+- Keterangan halaman menjelaskan perbedaan Sampul sebelum Buka Undangan dengan halaman isi. Jika unggahan beberapa gambar gagal sebagian, percobaan ulang hanya mengirim gambar yang belum berhasil.

@@ -1869,3 +1869,85 @@
     object-position: center 35%;
   }
 }
+.ornament-upload-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 18px 0;
+}
+.ornament-upload-actions > button {
+  min-height: 44px;
+}
+.ornament-upload-actions > span {
+  font-size: 11px;
+  color: #706a80;
+}
+.ornament-pending-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 12px;
+}
+.ornament-pending-grid figure {
+  margin: 0;
+  min-width: 0;
+}
+.ornament-pending-grid figcaption {
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  margin-top: 6px;
+}
+.ornament-admin-preview {
+  display: grid;
+  place-items: center;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid #dedbea;
+  border-radius: 10px;
+  background: repeating-conic-gradient(#f2eff8 0% 25%, #fff 0% 50%) 0/16px 16px;
+}
+.ornament-admin-preview img {
+  width: 90px;
+  height: 110px;
+  object-fit: contain;
+  transform-origin: top right;
+  animation-duration: var(--ornament-duration, 7s);
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease-in-out;
+}
+.ornament-saved-heading {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 22px 0;
+}
+.ornament-saved-heading h4 {
+  margin: 0;
+}
+.ornament-saved-badge {
+  display: inline-block;
+  background: #e8eddf;
+  color: #385345;
+  padding: 5px 10px;
+  border-radius: 18px;
+  font-size: 11px !important;
+}
+#ornamentEditorStatus:not(:empty) {
+  background: #edf6ec;
+  color: #315239;
+  padding: 12px 14px;
+  border: 1px solid #cbdcc4;
+  border-radius: 8px;
+}
+.ornament-form-status:not(:empty) {
+  padding: 10px 0;
+  font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ornament-admin-preview img {
+    animation: none !important;
+  }
+}

@@ -202,3 +202,10 @@ Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul
 - Kedua kartu paket menampilkan tepat 10 fasilitas sampai Revisi selama masa aktif. Kontrol native details/summary membuka/menutup fasilitas lanjutan secara independen dan memperbarui label lebih banyak/lebih sedikit tanpa mengubah fitur paket.
 - Tampilan lebar 320, 390, 768 dan 1440 px diperiksa tanpa overflow halaman, error JavaScript, atau aset lokal gagal. Screenshot: docs/images/admin-harga-dropdown.png dan docs/images/paket-ringkas.png. Harga pada gambar menggunakan data QA sementara.
 - Verifikasi memakai database sementara dan alur penyimpanan API asli. Tidak ada perubahan skema, konfigurasi hosting, data produksi, atau `.env`.
+
+## Penyimpanan ornamen diperjelas — 9 November 2026
+
+- Pengujian backend ornamen lulus: otorisasi/CSRF, validasi gambar, isolasi tema, konfigurasi, batas jumlah, penyimpanan, penghapusan dan endpoint publik.
+- Chromium: pemilihan dua PNG belum mengirim unggahan; tombol Simpan menyimpan keduanya. Daftar tetap ada setelah reload, edit/tampil/nonaktif berhasil, dan gambar terlihat pada halaman nama tema. Kegagalan unggahan kedua disimulasikan; retry menyimpan sisanya tanpa menggandakan gambar pertama. PNG tanpa transparansi menampilkan pesan kesalahan dan tombol dapat dipakai kembali.
+- Layar 320, 390, 768 dan 1440 px diperiksa tanpa overflow atau error JavaScript. Pratinjau lokal memakai object URL yang dibersihkan saat form/halaman diganti. Screenshot: ornamen-sebelum-simpan.png, ornamen-tersimpan.png, ornamen-hasil-tema.png di docs/images/.
+- Pemeriksaan memakai database sementara dan gambar fixture. Tidak memeriksa/mengubah data hosting pengguna. Tidak ada perubahan skema atau `.env`.

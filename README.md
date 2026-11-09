@@ -309,7 +309,7 @@ Katalog menampilkan jumlah penggunaan setiap tema berdasarkan lisensi yang dibay
 
 1. Buka **Admin → Menu latar**, lalu pilih tema.
 2. Di **Gambar bergerak**, pilih satu atau beberapa PNG/WebP berlatar transparan. Daun yang menyatu dengan gambar latar perlu dipisahkan lebih dahulu menggunakan editor gambar.
-3. Tentukan halaman, sudut, gerakan, ukuran dan durasi, lalu tekan **Tambah gambar bergerak**. Maksimal 12 gambar per tema, 5 MB per gambar. Gambar disimpan sebagai WebP yang dioptimalkan.
+3. Tentukan halaman, sudut, gerakan, ukuran dan durasi, lalu tekan **Simpan gambar ornamen**. Maksimal 12 gambar per tema, 5 MB per gambar. Gambar disimpan sebagai WebP yang dioptimalkan.
 4. Edit pengaturan setiap gambar, nonaktifkan sementara, atau hapus sesuai kebutuhan. **Preview gerakan tema** membuka hasilnya. Gambar tidak otomatis ditambahkan ke tema lain.
 
 Pembaruan menggunakan migrasi **007_theme_ornaments.sql** untuk SQLite dan PostgreSQL. Jalankan `npm run db:migrate` sebelum restart jika migrasi otomatis dinonaktifkan; konfigurasi `AUTO_MIGRATE=true` menjalankannya saat startup. Backup database sebelum pembaruan. Tidak perlu mengunggah `.env` ke GitHub. Skrip impor SQLite ke PostgreSQL dan sinkronisasi penyimpanan menyertakan aset ornamen.
@@ -329,3 +329,5 @@ Fitur referensi disesuaikan dengan proyek: satu acara/satu pembayaran, tanggal t
 Pembaruan memerlukan migrasi **008_packages.sql**. Pesanan lama diberi label Pro tanpa mengubah harga/status. Dengan `AUTO_MIGRATE=true`, migrasi berjalan saat startup. Jika dinonaktifkan, jalankan `npm run db:migrate` sebelum restart. Backup database sebelum memperbarui hosting. Skrip impor SQLite → PostgreSQL mendukung kolom paket dan sumber lama tanpa kolom tersebut. `.env` tetap privat.
 
 Harga per tema kini dipilih melalui dropdown pada **Admin → Rekening & harga**, seperti **Menu Latar**. Pilih tema, isi harga Pro/Premium, lalu simpan; perubahan beberapa tema tetap dipertahankan saat berpindah pilihan. Kartu Paket Undangan menampilkan daftar ringkas sampai **Revisi selama masa aktif**, dengan **Tampilkan lebih banyak** untuk membuka sisanya. Pembaruan tampilan ini tidak memerlukan migrasi database tambahan.
+
+Memilih file ornamen belum menyimpan gambar. Setelah pratinjau bertanda **belum disimpan** muncul, klik **Simpan gambar ornamen** di atas/bawah pengaturan. Tunggu pesan **berhasil disimpan** dan daftar **Ornamen tersimpan**, lalu klik **Lihat hasil tema**. Untuk mengubah posisi/gerakan gambar yang sudah ada, klik **Simpan perubahan ornamen** pada gambar tersebut. Halaman **Sampul** tampil sebelum Buka Undangan; **Halaman nama** dan halaman lain tampil di dalam undangan. Gunakan PNG/WebP dengan transparansi; kesalahan file/unggahan ditampilkan pada formulir.
