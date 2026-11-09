@@ -1,6 +1,11 @@
 function packageFeatureList(id) {
-  const index = id === "premium" ? 2 : 1;
-  return `<ul class="package-feature-list">${window.TEMU_PACKAGE_FEATURES.features.map((row) => `<li class="${row[index] ? "included" : "excluded"}"><span aria-hidden="true">${row[index] ? "✓" : "×"}</span><span>${esc(row[0])}${typeof row[index] === "string" ? `: <strong>${esc(row[index])}</strong>` : ""}${!row[index] ? "<small>Khusus Premium</small>" : ""}</span></li>`).join("")}</ul><p class="package-term">Satu acara, tanggal dikunci; masa aktif mengikuti hari pernikahan. Galeri tetap mengikuti batas penyimpanan hosting.</p><details class="package-pending"><summary>Fitur yang belum tersedia</summary><p>${window.TEMU_PACKAGE_FEATURES.pending.map(esc).join(" · ")}. Fitur ini belum termasuk layanan aktif.</p></details>`;
+  const index = id === "premium" ? 2 : 1,
+    features = window.TEMU_PACKAGE_FEATURES.features;
+  const boundary =
+    features.findIndex((row) => row[0] === "Revisi selama masa aktif") + 1;
+  const list = (rows) =>
+    `<ul class="package-feature-list">${rows.map((row) => `<li class="${row[index] ? "included" : "excluded"}"><span aria-hidden="true">${row[index] ? "✓" : "×"}</span><span>${esc(row[0])}${typeof row[index] === "string" ? `: <strong>${esc(row[index])}</strong>` : ""}${!row[index] ? "<small>Khusus Premium</small>" : ""}</span></li>`).join("")}</ul>`;
+  return `${list(features.slice(0, boundary))}<details class="package-more"><summary><span class="package-expand-label">Tampilkan lebih banyak</span><span class="package-collapse-label">Tampilkan lebih sedikit</span><span aria-hidden="true" class="package-more-arrow">⌄</span></summary>${list(features.slice(boundary))}<p class="package-term">Satu acara, tanggal dikunci; masa aktif mengikuti hari pernikahan. Galeri tetap mengikuti batas penyimpanan hosting.</p><details class="package-pending"><summary>Fitur yang belum tersedia</summary><p>${window.TEMU_PACKAGE_FEATURES.pending.map(esc).join(" · ")}. Fitur ini belum termasuk layanan aktif.</p></details></details>`;
 }
 function premiumAppearanceForm() {
   if (!current.packageFeatures?.premium)

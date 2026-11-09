@@ -86,3 +86,8 @@ Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, da
 - Fitur bersama: pilih tema dari katalog, nama tamu/WhatsApp, dashboard, RSVP/ucapan/emoji, link Maps, countdown/kalender, kado fisik/rekening, pustaka musik admin, serta revisi selama masa aktif. Tetap satu acara satu pembayaran, tanggal dikunci dan masa aktif mengikuti hari acara; referensi “tanpa masa aktif” tidak menggantikan aturan proyek.
 - QR check-in dan balasan ucapan oleh mempelai ditampilkan sebagai **belum tersedia**, bukan fasilitas aktif. Musik khusus tetap diminta melalui admin; pelanggan tidak mengunggah lagu. Foto lama tidak dihapus saat batas paket diberlakukan.
 - Kartu Titip Hadiah memakai chip emas SVG dengan kontak/garis sesuai referensi. Nomor rekening, nama pemilik dan tombol Salin tetap teks/kontrol asli.
+
+## Pengaturan harga dan ringkasan paket
+
+- Admin → Rekening & harga memakai dropdown **Pilih tema**, mengikuti pola Menu Latar. Hanya formulir harga tema terpilih yang terlihat; perubahan pada tema lain tetap tersimpan di form sampai Simpan ditekan. Nilai Pro/Premium dan harga normal tetap terpisah.
+- Kartu Pro/Premium pada Paket Undangan mula-mula menampilkan fasilitas sampai **Revisi selama masa aktif**. **Tampilkan lebih banyak** membuka fasilitas tambahan serta rincian ketentuan, dan berganti menjadi **Tampilkan lebih sedikit** untuk menutupnya. Kedua kartu dapat dibuka secara independen.

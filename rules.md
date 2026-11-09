@@ -262,3 +262,9 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Kedua paket mengikuti aturan satu acara/satu pembayaran, tanggal terkunci dan masa aktif sampai hari pernikahan. Penyesuaian dari referensi: tidak menjanjikan tanpa masa aktif, penerima tanpa batas melampaui kuota teknis, unggahan musik pengguna, QR check-in maupun balasan ucapan yang belum tersedia.
 - Semua tema dapat dipratinjau. Katalog memakai empat slide kategori, masing-masing lima tema. Tambahkan 5 Elegan, 5 Flower/Bunga dan 5 Islami dengan aset/desain sesuai `desain.MD`.
 - Musik tetap berasal dari pustaka pengelola. QR check-in dan balasan ucapan ditandai belum tersedia pada rincian paket. Jangan menampilkan fitur tersebut sebagai sudah aktif.
+
+## 20. Harga per tema dengan dropdown dan paket ringkas
+
+- Pengaturan harga menampilkan satu tema melalui dropdown seperti Menu Latar. Pergantian pilihan tidak membuang perubahan yang belum disimpan dan tidak menghapus harga tema lainnya.
+- Jika ada harga tidak valid pada tema yang tersembunyi, pilih/tampilkan tema tersebut sebelum menunjukkan pesan validasi agar pengguna dapat memperbaikinya.
+- Ringkas daftar fasilitas Pro/Premium sampai Revisi selama masa aktif. Gunakan kontrol Tampilkan lebih banyak / Tampilkan lebih sedikit yang dapat dioperasikan lewat keyboard; fasilitas dan pembatasan paket sebenarnya tidak berubah.

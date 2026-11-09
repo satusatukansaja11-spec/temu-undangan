@@ -1787,3 +1787,85 @@
 .package-feature-list small {
   color: #75695f;
 }
+/* Pilih satu tema untuk mengedit harga; nilai tema lain tetap tersimpan di form. */
+.theme-price-editor {
+  margin: 28px 0;
+}
+.theme-price-editor > label {
+  display: block;
+}
+.admin-shell #adminPriceThemeSelect {
+  display: block;
+  width: 100%;
+  max-width: 520px;
+  min-height: 48px;
+  padding: 12px;
+  margin: 12px 0 20px;
+}
+.theme-price-editor .admin-theme-prices {
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 18px;
+}
+.theme-price-editor [data-theme-price][hidden] {
+  display: none !important;
+}
+.theme-price-editor .admin-theme-prices article {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  align-items: start;
+}
+.theme-price-editor .admin-theme-prices article > img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+}
+.theme-price-editor .admin-theme-prices article > div {
+  min-width: 0;
+}
+.package-more > summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 12px;
+  color: #385345;
+  padding: 9px 4px;
+}
+.package-more > summary::-webkit-details-marker {
+  display: none;
+}
+.package-more > summary:focus-visible {
+  outline: 2px solid #385345;
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+.package-more .package-collapse-label {
+  display: none;
+}
+.package-more[open] .package-expand-label {
+  display: none;
+}
+.package-more[open] .package-collapse-label {
+  display: inline;
+}
+.package-more[open] .package-more-arrow {
+  transform: rotate(180deg);
+}
+.package-more > .package-feature-list {
+  margin-top: 12px;
+}
+.package-overview > article {
+  align-self: start;
+}
+@media (max-width: 600px) {
+  .theme-price-editor .admin-theme-prices article {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .theme-price-editor .admin-theme-prices article > img {
+    height: 160px;
+    object-position: center 35%;
+  }
+}

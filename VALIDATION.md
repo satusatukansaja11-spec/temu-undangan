@@ -195,3 +195,10 @@ Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul
 - QR check-in dan balasan ucapan mempelai tetap diberi keterangan belum tersedia. Aturan tanggal/masa aktif serta pustaka musik admin dipertahankan sesuai proyek. Tidak ada transfer dana/pesan eksternal/deployment hosting atau perubahan data produksi.
 - Migrasi baru 008 perlu dijalankan saat deployment; `.env` tidak dimasukkan ke GitHub. Harga yang tampak pada screenshot adalah data QA sementara, bukan harga jual yang ditetapkan untuk produksi.
 - Pemeriksaan lanjutan: entitlement galeri/cerita lama disimpan saat migrasi, sedangkan perpindahan draft Premium → Pro tidak memberi fitur Premium gratis. Endpoint publik memakai penyaringan paket yang sama dan menyertakan ornamen tema tanpa metadata tagihan/lisensi privat. Kasus ini tercakup pengujian otomatis.
+
+## Dropdown harga dan daftar paket ringkas — 9 November 2026
+
+- Chromium memeriksa 20 pilihan tema dan satu formulir harga yang terlihat, perpindahan tema tanpa kehilangan isian, penyimpanan harga dua tema sekaligus tanpa mengubah tema lain, serta penampilan otomatis tema dengan input harga tersembunyi yang tidak valid.
+- Kedua kartu paket menampilkan tepat 10 fasilitas sampai Revisi selama masa aktif. Kontrol native details/summary membuka/menutup fasilitas lanjutan secara independen dan memperbarui label lebih banyak/lebih sedikit tanpa mengubah fitur paket.
+- Tampilan lebar 320, 390, 768 dan 1440 px diperiksa tanpa overflow halaman, error JavaScript, atau aset lokal gagal. Screenshot: docs/images/admin-harga-dropdown.png dan docs/images/paket-ringkas.png. Harga pada gambar menggunakan data QA sementara.
+- Verifikasi memakai database sementara dan alur penyimpanan API asli. Tidak ada perubahan skema, konfigurasi hosting, data produksi, atau `.env`.

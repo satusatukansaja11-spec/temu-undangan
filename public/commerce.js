@@ -1,10 +1,20 @@
+let adminPriceTheme = "navy";
 function adminThemePricing(cfg) {
-  return `<div class="admin-theme-prices">${Object.entries(themeNames)
+  return `<div class="theme-price-editor"><h3>Harga per tema</h3><label for="adminPriceThemeSelect">Pilih tema<select id="adminPriceThemeSelect">${Object.entries(
+    themeNames,
+  )
     .map(
       ([id, name]) =>
-        `<article><img src="${themeDesigns[id].cover}" alt="Tema ${esc(name)}"><div><h3>${esc(name)}</h3><strong data-price-summary="${id}">Pro: ${cfg.prices[id] ? rupiah(cfg.prices[id]) : "Belum dijual"} · Premium: ${cfg.premiumPrices?.[id] ? rupiah(cfg.premiumPrices[id]) : "Belum dijual"}</strong><label>Harga Paket Pro (rupiah)<input name="price_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.prices[id] || 0}" required></label><label>Harga normal Pro (opsional)<input name="compare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.comparePrices?.[id] || 0}"></label><label>Harga Paket Premium (rupiah)<input name="premium_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.premiumPrices?.[id] || 0}" required></label><label>Harga normal Premium (opsional)<input name="premiumCompare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.premiumComparePrices?.[id] || 0}"></label><p>Isi 0 pada harga normal jika tidak ada promo. Harga jual 0 berarti pembayaran tema belum dibuka.</p><a class="button" href="/tema/${id}" target="_blank" rel="noopener">Preview</a></div></article>`,
+        `<option value="${id}" ${id === adminPriceTheme ? "selected" : ""}>${esc(name)}</option>`,
     )
-    .join("")}</div>`;
+    .join("")}</select></label><div class="admin-theme-prices">${Object.entries(
+    themeNames,
+  )
+    .map(
+      ([id, name]) =>
+        `<article data-theme-price="${id}" ${id === adminPriceTheme ? "" : "hidden"}><img src="${themeDesigns[id].cover}" alt="Tema ${esc(name)}"><div><h3>${esc(name)}</h3><strong data-price-summary="${id}">Pro: ${cfg.prices[id] ? rupiah(cfg.prices[id]) : "Belum dijual"} · Premium: ${cfg.premiumPrices?.[id] ? rupiah(cfg.premiumPrices[id]) : "Belum dijual"}</strong><label>Harga Paket Pro (rupiah)<input name="price_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.prices[id] || 0}" required></label><label>Harga normal Pro (opsional)<input name="compare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.comparePrices?.[id] || 0}"></label><label>Harga Paket Premium (rupiah)<input name="premium_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.premiumPrices?.[id] || 0}" required></label><label>Harga normal Premium (opsional)<input name="premiumCompare_${id}" type="number" min="0" max="100000000" step="1" value="${cfg.premiumComparePrices?.[id] || 0}"></label><p>Isi 0 pada harga normal jika tidak ada promo. Harga jual 0 berarti pembayaran tema belum dibuka.</p><a class="button" href="/tema/${id}" target="_blank" rel="noopener">Preview</a></div></article>`,
+    )
+    .join("")}</div></div>`;
 }
 const rupiah = (n) =>
   new Intl.NumberFormat("id-ID", {
@@ -398,6 +408,16 @@ async function mountAdminShop() {
         "",
       )}<div id="extraPaymentAccounts"></div><button type="button" id="addPaymentAccount">＋ Tambah rekening</button><p>Maksimal 10 rekening. Pelanggan memilih bank sebelum membuat tagihan.</p><label>Batas pembayaran (jam)<input name="hours" type="number" min="1" max="168" value="${cfg.hours}" required></label><fieldset class="package-description-settings"><legend>Keterangan paket untuk pelanggan</legend>${["pro", "premium"].map((id) => `<label>Keterangan Paket ${id === "pro" ? "Pro" : "Premium"}<textarea name="description_${id}" maxlength="1000" rows="3">${esc(cfg.packageDescriptions?.[id] || "")}</textarea></label>`).join("")}</fieldset>${adminThemePricing(cfg)}<button class="primary">Simpan rekening & harga</button><p id="shopSettingsFeedback" role="status"></p></form></section><dialog id="reviewPayment" class="bank-dialog"><form id="reviewPaymentForm"><h2>Periksa pembayaran</h2><p id="reviewSummary"></p><label>Keputusan<select name="decision"><option value="approve">Setujui & aktifkan</option><option value="reject">Tolak konfirmasi</option></select></label><label>Nominal yang masuk (rupiah)<input name="amount" type="number" min="1" step="1"></label><label>Referensi mutasi bank (unik)<input name="transferRef" maxlength="140"></label><label class="check-row"><input type="checkbox" name="fundsChecked"> Saya sudah memeriksa dana masuk di mutasi rekening</label><label>Alasan penolakan / persetujuan transfer terlambat<textarea name="reason" maxlength="1000" rows="3"></textarea></label><p id="reviewFeedback" role="alert"></p><div class="actions"><button type="button" id="closeReview">Batal</button><button class="primary" id="submitReview">Simpan keputusan</button></div></form></dialog>`,
   );
+  const priceSelect = document.querySelector("#adminPriceThemeSelect");
+  const selectPriceTheme = (id) => {
+    adminPriceTheme = id;
+    priceSelect.value = id;
+    host
+      .querySelectorAll("[data-theme-price]")
+      .forEach((row) => (row.hidden = row.dataset.themePrice !== id));
+  };
+  priceSelect.onchange = () => selectPriceTheme(priceSelect.value);
+  document.querySelector("#shopSettings").noValidate = true;
   const extra = document.querySelector("#extraPaymentAccounts");
   const addAccount = (row = {}) => {
     const box = document.createElement("fieldset");
@@ -432,6 +452,16 @@ async function mountAdminShop() {
   };
   document.querySelector("#shopSettings").onsubmit = async (e) => {
     e.preventDefault();
+    const invalid = Array.from(e.target.elements).find(
+      (input) => input.willValidate && !input.validity.valid,
+    );
+    if (invalid) {
+      const row = invalid.closest("[data-theme-price]");
+      if (row) selectPriceTheme(row.dataset.themePrice);
+      invalid.reportValidity();
+      return;
+    }
+
     const d = Object.fromEntries(new FormData(e.target));
     d.enabled = e.target.elements.enabled.checked;
     d.accounts = [
