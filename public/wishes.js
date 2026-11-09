@@ -31,6 +31,8 @@ async function loadPublicWishes(id, preview = false, demo = false, page = 1) {
     target.querySelector("#wishRefresh").onclick = () =>
       loadPublicWishes(id, preview, demo, page);
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     if (target.isConnected) {
       target.innerHTML = `<p role="alert">${esc(e.message)}</p><button type="button" id="retryWishes">Coba lagi</button>`;
       target.querySelector("#retryWishes").onclick = () =>
@@ -60,12 +62,14 @@ async function loadWishModeration(id, page = 1) {
             });
             await loadWishModeration(id, page);
           } catch (e) {
-            toast(e.message);
+            toast(e.message, "error");
             b.disabled = false;
           }
         }),
     );
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     if (target.isConnected)
       target.innerHTML = `<p role="alert">${esc(e.message)}</p>`;
   }

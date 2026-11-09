@@ -136,6 +136,8 @@ async function mountThemeAssets() {
             feedback.textContent =
               "Latar disimpan dan digunakan katalog/undangan.";
           } catch (error) {
+            toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
             feedback.textContent = error.message;
           } finally {
             b.disabled = false;

@@ -73,6 +73,10 @@ function bindWeddingEditor() {
         );
         dirty = true;
         renderEditor();
+        toast(
+          "Bagian undangan diubah. Tekan Simpan untuk menyimpan perubahan.",
+          "info",
+        );
       }),
   );
   document.querySelectorAll("[data-remove-extra]").forEach(
@@ -82,6 +86,10 @@ function bindWeddingEditor() {
         current[key].splice(Number(i), 1);
         dirty = true;
         renderEditor();
+        toast(
+          "Bagian undangan diubah. Tekan Simpan untuk menyimpan perubahan.",
+          "info",
+        );
       }),
   );
   if (step === 8) {
@@ -113,6 +121,8 @@ async function loadRsvpReport(id, page = 1) {
     target.querySelector("#nextRsvp").onclick = () =>
       loadRsvpReport(id, page + 1);
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     if (target.isConnected) {
       target.textContent = e.message;
       const button = document.createElement("button");
@@ -204,11 +214,14 @@ async function renderWedding(preview, id, themeDemo = false) {
           try {
             if (!navigator.clipboard?.writeText) throw Error();
             await navigator.clipboard.writeText(input.value);
-            toast("Nomor berhasil disalin.");
+            toast("Nomor berhasil disalin.", "success");
           } catch {
             input.focus();
             input.select();
-            toast("Nomor sudah dipilih. Gunakan Salin pada perangkat Anda.");
+            toast(
+              "Nomor sudah dipilih. Gunakan Salin pada perangkat Anda.",
+              "warning",
+            );
           }
         }),
     );
@@ -243,6 +256,7 @@ async function renderWedding(preview, id, themeDemo = false) {
         } catch {
           toast(
             "Musik belum dapat diputar. Tekan tombol Musik untuk mencoba lagi.",
+            "warning",
           );
         } finally {
           syncMusic();
@@ -251,6 +265,8 @@ async function renderWedding(preview, id, themeDemo = false) {
       };
     }
   } catch (error) {
+    toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
     root.innerHTML = `<div class="not-found"><h1>Undangan belum ditemukan.</h1><p>${esc(error.message)}</p><a class="button" href="/">Kembali ke beranda</a></div>`;
   }
 }
@@ -377,6 +393,8 @@ async function bindGuestRsvp(slug, preview) {
         ? "Konfirmasi berhasil diperbarui. Terima kasih!"
         : "Konfirmasi berhasil disimpan. Terima kasih!";
     } catch (error) {
+      toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
       feedback.textContent = error.message;
     } finally {
       button.disabled = false;

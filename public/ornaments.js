@@ -112,6 +112,7 @@ async function mountOrnamentEditor(theme, notice = "") {
         feedback.textContent = invalid
           ? "Gunakan PNG/WebP transparan maksimal 5 MB per gambar."
           : "Maksimal 12 ornamen per tema. Pilih lebih sedikit gambar.";
+        toast(feedback.textContent, "warning");
         files = [];
         picker.value = "";
       }
@@ -129,6 +130,7 @@ async function mountOrnamentEditor(theme, notice = "") {
       if (saving || !files.length) return;
       if (files.length + savedCount > data.limit) {
         feedback.textContent = "Maksimal 12 ornamen per tema.";
+        toast(feedback.textContent, "warning");
         return;
       }
       const settings = config(upload);
@@ -153,8 +155,10 @@ async function mountOrnamentEditor(theme, notice = "") {
         const message = `${uploaded} gambar ornamen berhasil disimpan untuk ${themeNames[theme]}. Klik Lihat hasil tema untuk memeriksanya.`;
         clearUrls();
         await mountOrnamentEditor(theme, message);
-        toast(message);
+        toast(message, "success");
       } catch (error) {
+        toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
         feedback.textContent = `${uploaded ? uploaded + " gambar sudah tersimpan. " : ""}${error.message}${uploaded ? " Gambar yang tersisa dapat disimpan ulang tanpa menggandakan yang berhasil." : ""}`;
         if (uploaded) {
           const info = host.querySelector("#ornamentEditorStatus");
@@ -197,6 +201,8 @@ async function mountOrnamentEditor(theme, notice = "") {
             "Tersimpan · " +
             (settings.enabled ? "Ditampilkan pada tema" : "Tidak ditampilkan");
         } catch (error) {
+          toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
           status.textContent = error.message;
         } finally {
           b.disabled = false;
@@ -213,12 +219,16 @@ async function mountOrnamentEditor(theme, notice = "") {
           );
           await mountOrnamentEditor(theme, "Ornamen berhasil dihapus.");
         } catch (error) {
+          toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
           status.textContent = error.message;
           b.disabled = false;
         }
       };
     });
   } catch (error) {
+    toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
     if (host.isConnected && host.dataset.theme === theme) {
       host.textContent = error.message;
       const retry = document.createElement("button");

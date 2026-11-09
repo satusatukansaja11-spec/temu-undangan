@@ -331,3 +331,11 @@ Pembaruan memerlukan migrasi **008_packages.sql**. Pesanan lama diberi label Pro
 Harga per tema kini dipilih melalui dropdown pada **Admin → Rekening & harga**, seperti **Menu Latar**. Pilih tema, isi harga Pro/Premium, lalu simpan; perubahan beberapa tema tetap dipertahankan saat berpindah pilihan. Kartu Paket Undangan menampilkan daftar ringkas sampai **Revisi selama masa aktif**, dengan **Tampilkan lebih banyak** untuk membuka sisanya. Pembaruan tampilan ini tidak memerlukan migrasi database tambahan.
 
 Memilih file ornamen belum menyimpan gambar. Setelah pratinjau bertanda **belum disimpan** muncul, klik **Simpan gambar ornamen** di atas/bawah pengaturan. Tunggu pesan **berhasil disimpan** dan daftar **Ornamen tersimpan**, lalu klik **Lihat hasil tema**. Untuk mengubah posisi/gerakan gambar yang sudah ada, klik **Simpan perubahan ornamen** pada gambar tersebut. Halaman **Sampul** tampil sebelum Buka Undangan; **Halaman nama** dan halaman lain tampil di dalam undangan. Gunakan PNG/WebP dengan transparansi; kesalahan file/unggahan ditampilkan pada formulir.
+
+### Snackbar untuk hasil tindakan
+
+Website memakai notifikasi snackbar bersama: **Berhasil** (hijau), **Informasi** (biru), **Perhatian** (kuning) dan **Terjadi kesalahan** (merah muda). Notifikasi dipakai pada simpan/hapus/unggah, pesanan/pembayaran, login/logout/daftar, salin/bagikan, serta validasi formulir. Pesan di dekat kolom/form tetap tersedia.
+
+Snackbar dapat ditutup dengan tombol ×, dibatasi empat pesan dan tidak menggandakan pesan identik. Setiap pesan memiliki timer sendiri; timer dijeda saat kursor/fokus keyboard ada di pesan atau tab disembunyikan. Pesan login/logout dibawa sekali setelah perpindahan halaman. Notifikasi tetap terlihat saat dialog terbuka. Penambahan ini tidak membutuhkan migrasi database.
+
+Untuk pengembangan gunakan `toast(pesan, 'success' | 'info' | 'warning' | 'error')`. Permintaan API yang memiliki pesan otomatis dicatat di `public/snackbar.js`; jangan menambahkan notifikasi sukses kedua pada handler yang sama. Pesan sukses hanya boleh muncul setelah proses berhasil. Teks ditulis sebagai teks biasa, bukan HTML.

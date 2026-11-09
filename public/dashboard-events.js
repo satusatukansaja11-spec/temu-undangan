@@ -50,6 +50,8 @@ function openNewEvent() {
       step = 0;
       await edit(event.id);
     } catch (error) {
+      toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
       document.querySelector("#newEventError").textContent = error.message;
     } finally {
       b.disabled = false;
@@ -70,7 +72,7 @@ function renderAdminAccess() {
         document.querySelector("#adminAccessFeedback").textContent =
           "Hak admin belum ditemukan di database aplikasi ini. Periksa email dan konfigurasi database terminal.";
     } catch (e) {
-      toast(e.message);
+      toast(e.message, "error");
     }
   };
 }

@@ -42,14 +42,18 @@ function bindMediaEditor() {
     document.querySelectorAll("[data-reuse-photo]").forEach(
       (button) =>
         (button.onclick = () => {
-          if (busy) return toast("Tunggu hingga unggahan selesai.");
+          if (busy) return toast("Tunggu hingga unggahan selesai.", "warning");
           if (current.gallery.includes(button.dataset.reusePhoto))
-            return toast("Foto sudah ada di galeri.");
+            return toast("Foto sudah ada di galeri.", "warning");
           if (current.gallery.length >= galleryLimit())
-            return toast("Batas galeri tercapai.");
+            return toast("Batas galeri tercapai.", "warning");
           current.gallery.push(button.dataset.reusePhoto);
           dirty = true;
           renderEditor();
+          toast(
+            "Foto ditambahkan ke galeri. Tekan Simpan untuk menyimpan perubahan.",
+            "info",
+          );
         }),
     );
     document.querySelectorAll("[data-delete-photo]").forEach(
@@ -69,9 +73,9 @@ function bindMediaEditor() {
             );
             await refreshMedia();
             renderEditor();
-            toast("Foto dihapus permanen.");
+            toast("Foto dihapus permanen.", "success");
           } catch (error) {
-            toast(error.message);
+            toast(error.message, "error");
           }
         }),
     );

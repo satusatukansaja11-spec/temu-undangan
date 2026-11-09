@@ -60,33 +60,53 @@ const greetings = {
     "Wei De Dong Tian. Dengan penuh rasa syukur, kami mengundang Anda untuk merayakan pernikahan kami.",
   Umum: "Dengan penuh kebahagiaan, kami mengundang Anda untuk menjadi bagian dari hari pernikahan kami.",
 };
-function toast(t) {
-  const el = document.querySelector("#toast");
-  el.textContent = t;
-  el.classList.add("show");
-  setTimeout(() => el.classList.remove("show"), 6000);
+function toast(message, type = "info", options = {}) {
+  return window.snackbar.show(message, type, options);
 }
 async function api(url, options = {}) {
-  const r = await fetch(url, {
-    ...options,
-    headers: {
-      ...(options.body instanceof FormData
-        ? {}
-        : { "Content-Type": "application/json" }),
-      "X-CSRF-Token": csrf || "",
-      ...options.headers,
-    },
-  });
-  const d = await r
-    .json()
-    .catch(() => ({ error: "Koneksi ke server bermasalah." }));
-  if (!r.ok) {
-    if (r.status === 401 && url.startsWith("/api/")) {
-      me = null;
-      login();
-    }
-    throw Error(d.error || "Tindakan gagal. Coba kembali.");
+  let r;
+  try {
+    r = await fetch(url, {
+      ...options,
+      headers: {
+        ...(options.body instanceof FormData
+          ? {}
+          : { "Content-Type": "application/json" }),
+        "X-CSRF-Token": csrf || "",
+        ...options.headers,
+      },
+    });
+  } catch (error) {
+    toast(
+      "Tidak dapat terhubung ke server. Periksa koneksi internet, lalu coba lagi.",
+      "error",
+    );
+    throw Error(
+      "Tidak dapat terhubung ke server. Periksa koneksi internet, lalu coba lagi.",
+    );
   }
+  let d;
+  try {
+    d = await r.json();
+    if (!d || typeof d !== "object") throw Error();
+  } catch {
+    const message =
+      "Respons server tidak valid. Muat ulang halaman lalu coba kembali.";
+    toast(message, "error");
+    throw Error(message);
+  }
+  if (!r.ok) {
+    const message = d.error || "Tindakan gagal. Coba kembali.";
+    toast(message, "error");
+    if (r.status === 401 && url.startsWith("/api/")) {
+      setTimeout(() => {
+        me = null;
+        login();
+      }, 0);
+    }
+    throw Error(message);
+  }
+  window.snackbar.requestSuccess(url, options.method || "GET", d, options.body);
   return d;
 }
 const logo = '<a href="/dashboard" class="brand">temu<span>✳</span></a>';
@@ -113,12 +133,12 @@ function shell(content) {
         location.replace("/login");
       } catch (error) {
         button.disabled = false;
-        toast(error.message);
+        toast(error.message, "error");
       }
     });
 }
 function leave(fn) {
-  if (busy) return toast("Tunggu hingga unggahan selesai.");
+  if (busy) return toast("Tunggu hingga unggahan selesai.", "warning");
   if (
     dirty &&
     !confirm("Ada perubahan yang belum disimpan. Tinggalkan halaman?")
@@ -127,7 +147,7 @@ function leave(fn) {
   dirty = false;
   return Promise.resolve()
     .then(fn)
-    .catch((error) => toast(error.message));
+    .catch((error) => toast(error.message, "error"));
 }
 function login(info = {}) {
   renderLogin(info);
@@ -138,7 +158,7 @@ async function dashboard() {
     events = await api("/api/events");
     renderDashboard();
   } catch (e) {
-    toast(e.message);
+    toast(e.message, "error");
   }
 }
 function renderDashboard() {
@@ -210,28 +230,31 @@ function remove(id) {
     try {
       await api("/api/events/" + id, { method: "DELETE" });
       dialog.close();
-      toast("Undangan berhasil dihapus.");
+      toast("Undangan berhasil dihapus.", "success");
       await dashboard();
     } catch (e) {
-      toast(e.message);
+      toast(e.message, "error");
     }
   };
 }
 function share(e) {
   if (e.status === "expired")
-    return toast("Masa aktif undangan telah berakhir.");
+    return toast("Masa aktif undangan telah berakhir.", "warning");
   if (e.license && !e.license.paid)
     return toast(
       "Pembayaran acara perlu disetujui sebelum undangan dibagikan.",
+      "warning",
     );
   if (e.license && !e.license.legacy && !e.license.lockedDate)
     return toast(
       "Klik Tetapkan tanggal, simpan dan aktifkan tanggal pernikahan sebelum membagikan undangan.",
+      "warning",
     );
   if (e.status !== "ready")
     return toast(
       "Lengkapi dan simpan undangan terlebih dahulu: " +
         (e.missing || []).map((k) => labels[k] || k).join(", "),
+      "warning",
     );
   renderSharing(e);
 }
@@ -243,7 +266,7 @@ async function edit(id) {
     await refreshMedia();
     renderEditor();
   } catch (e) {
-    toast(e.message);
+    toast(e.message, "error");
   }
 }
 function field(k, label = labels[k], type = "text", hint = "") {
@@ -351,7 +374,7 @@ function renderEditor() {
   bindMediaEditor();
   if (step === 3) {
     document.querySelector("#gallery").onchange = async (e) => {
-      if (busy) return toast("Tunggu hingga unggahan selesai.");
+      if (busy) return toast("Tunggu hingga unggahan selesai.", "warning");
       const input = e.target,
         files = Array.from(input.files),
         progress = document.querySelector("#galleryUploadStatus");
@@ -360,7 +383,7 @@ function renderEditor() {
       try {
         for (const [i, file] of files.entries()) {
           if (current.gallery.length >= galleryLimit()) {
-            toast(`Maksimal ${galleryLimit()} foto galeri.`);
+            toast(`Maksimal ${galleryLimit()} foto galeri.`, "warning");
             break;
           }
           if (progress.isConnected)
@@ -376,9 +399,10 @@ function renderEditor() {
         if (completed)
           toast(
             `${completed} foto diunggah. Tekan Simpan untuk menyimpan galeri.`,
+            "success",
           );
       } catch (error) {
-        toast(error.message);
+        toast(error.message, "error");
       } finally {
         if (input.isConnected) input.disabled = false;
         renderEditor();
@@ -411,6 +435,10 @@ function renderEditor() {
             fn(+b.dataset[a]);
             dirty = true;
             renderEditor();
+            toast(
+              "Susunan galeri diubah. Tekan Simpan untuk menyimpan perubahan.",
+              "info",
+            );
           }),
       );
   }
@@ -419,6 +447,7 @@ function renderEditor() {
       if (!current.religion)
         return toast(
           "Pilih agama pada bagian Info & tampilan terlebih dahulu.",
+          "info",
         );
       if (
         current.opening &&
@@ -437,13 +466,16 @@ async function upload(file) {
     !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
     file.size > appLimits.imageMB * 1024 * 1024
   ) {
-    toast(`Gunakan JPEG, PNG, atau WebP maksimal ${appLimits.imageMB} MB.`);
+    toast(
+      `Gunakan JPEG, PNG, atau WebP maksimal ${appLimits.imageMB} MB.`,
+      "warning",
+    );
     return;
   }
   busy++;
   const button = document.querySelector("#save");
   if (button) button.disabled = true;
-  toast("Mengunggah " + file.name + "…");
+  const uploadNotice = toast("Mengunggah " + file.name + "…", "info");
   try {
     const f = new FormData();
     f.append("photo", file);
@@ -451,18 +483,22 @@ async function upload(file) {
       method: "POST",
       body: f,
     });
-    toast("Foto berhasil diunggah. Tekan Simpan untuk menyimpan susunan.");
+    toast(
+      "Foto berhasil diunggah. Tekan Simpan untuk menyimpan susunan.",
+      "success",
+    );
     return r.url;
   } catch (e) {
-    toast(e.message);
+    toast(e.message, "error");
   } finally {
+    window.snackbar.dismiss(uploadNotice);
     busy--;
     if (button) button.disabled = !!busy;
   }
 }
 async function save(e) {
   e.preventDefault();
-  if (busy) return toast("Tunggu hingga unggahan selesai.");
+  if (busy) return toast("Tunggu hingga unggahan selesai.", "warning");
   const b = document.querySelector("#save");
   b.disabled = true;
   b.textContent = "Menyimpan…";
@@ -478,8 +514,11 @@ async function save(e) {
         ? "Tersimpan. Undangan siap dibagikan!"
         : "Draft tersimpan. Masih perlu: " +
             current.missing.map((k) => labels[k] || k).join(", "),
+      "success",
     );
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     document.querySelector("#formError").textContent = e.message;
     b.disabled = false;
     b.textContent = "Simpan";
@@ -548,6 +587,8 @@ window.addEventListener("beforeunload", (e) => {
     renderLanding(info);
     mountCatalog();
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     root.innerHTML =
       '<p class="loading">Tidak dapat menghubungi server. Muat ulang halaman untuk mencoba kembali.</p>';
   }

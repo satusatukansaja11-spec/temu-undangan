@@ -4,6 +4,7 @@ async function renderSharing(event) {
     if (event.status !== "ready") {
       toast(
         "Undangan belum siap dibagikan. Lengkapi dan simpan terlebih dahulu.",
+        "warning",
       );
       return;
     }
@@ -42,9 +43,14 @@ async function renderSharing(event) {
       try {
         await navigator.clipboard.writeText(text);
         feedback("Berhasil disalin.");
+        toast("Pesan berhasil disalin.", "success");
       } catch {
         feedback(
           "Browser tidak mengizinkan salin otomatis. Gunakan pratinjau pesan untuk menyalin manual.",
+        );
+        toast(
+          "Browser tidak mengizinkan salin otomatis. Salin pesan secara manual.",
+          "warning",
         );
       }
     };
@@ -74,6 +80,8 @@ async function renderSharing(event) {
               draw();
               feedback("Penerima dihapus.");
             } catch (e) {
+              toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
               feedback(e.message);
             }
           }),
@@ -109,15 +117,21 @@ async function renderSharing(event) {
           (b.onclick = async () => {
             const r = recipients.find((r) => r.id === b.dataset.linkRecipient);
             try {
-              if (navigator.share)
+              if (navigator.share) {
                 await navigator.share({
                   title: event.name,
                   url: personalUrl(r.name),
                 });
-              else await copy(personalUrl(r.name));
+                toast("Tautan undangan berhasil dibagikan.", "success");
+              } else await copy(personalUrl(r.name));
             } catch (e) {
-              if (e.name !== "AbortError")
+              if (e.name !== "AbortError") {
                 feedback("Bagikan belum berhasil. Gunakan Salin pesan.");
+                toast(
+                  "Bagikan belum berhasil. Gunakan Salin pesan.",
+                  "warning",
+                );
+              }
             }
           }),
       );
@@ -155,6 +169,8 @@ async function renderSharing(event) {
         document.querySelector("#messageStatus").textContent =
           "Pesan berhasil disimpan.";
       } catch (e) {
+        toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
         document.querySelector("#messageStatus").textContent = e.message;
       } finally {
         button.disabled = false;
@@ -177,6 +193,8 @@ async function renderSharing(event) {
         document.querySelector("#recipientName").value = "";
         feedback("Nama penerima berhasil ditambahkan.");
       } catch (e) {
+        toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
         feedback(e.message);
       } finally {
         button.disabled = false;
@@ -191,6 +209,8 @@ async function renderSharing(event) {
         await add(names);
         feedback("Nama berhasil diimpor.");
       } catch (e) {
+        toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
         feedback(e.message || "File tidak valid. Gunakan JSON array nama.");
       } finally {
         e.target.value = "";
@@ -213,11 +233,12 @@ async function renderSharing(event) {
       a.href = url;
       a.download = "nama-penerima.json";
       a.click();
+      toast("Daftar penerima siap diunduh.", "success");
       setTimeout(() => URL.revokeObjectURL(url), 1000);
     };
     draw();
   } catch (error) {
-    toast(error.message);
+    toast(error.message, "error");
   }
 }
 

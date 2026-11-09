@@ -34,9 +34,9 @@ function bindGiftManager() {
           });
           dirty = false;
           renderEditor();
-          toast("Rekening dihapus.");
+          toast("Rekening dihapus.", "success");
         } catch (e) {
-          toast(e.message);
+          toast(e.message, "error");
         }
       }),
   );
@@ -85,6 +85,7 @@ function editBank(index) {
     if (!bank || !account || !holder) {
       dialog.querySelector("#bankError").textContent =
         "Bank, nomor rekening dan atas nama wajib diisi.";
+      toast("Bank, nomor rekening dan atas nama wajib diisi.", "warning");
       return;
     }
     const gifts = [...(current.gifts || [])];
@@ -100,8 +101,10 @@ function editBank(index) {
       dirty = false;
       dialog.close();
       renderEditor();
-      toast("Rekening dan perubahan undangan berhasil disimpan.");
+      toast("Rekening dan perubahan undangan berhasil disimpan.", "success");
     } catch (error) {
+      toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
       dialog.querySelector("#bankError").textContent = error.message;
       button.disabled = false;
     }

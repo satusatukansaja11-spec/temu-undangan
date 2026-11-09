@@ -153,6 +153,8 @@ async function mountCatalog() {
     if (price)
       price.innerHTML = `<p class="site-kicker">PAKET UNDANGAN</p><h2>Pilih paket hari bahagia Anda.</h2>${packageOverview(data.themes)}<p>Pembayaran transfer diverifikasi admin. Setiap paket berlaku untuk satu acara dan tanggal pernikahan yang ditetapkan.</p>`;
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     section.innerHTML = `<h2>Katalog tema</h2><p role="alert">${esc(e.message)}</p><button id="retryCatalog">Coba lagi</button>`;
     document.querySelector("#retryCatalog").onclick = mountCatalog;
   }
@@ -253,6 +255,8 @@ async function renderOrders(selectedTheme) {
           history.replaceState({}, "", "/pesanan/" + o.id);
           await renderOrder(o.id);
         } catch (error) {
+          toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
           document.querySelector("#shopFeedback").textContent = error.message;
         } finally {
           button.disabled = false;
@@ -276,6 +280,8 @@ async function renderOrders(selectedTheme) {
       `<h2>Riwayat pesanan</h2>${orders.length ? orders.map((o) => `<article class="order-card"><h3>${esc(themeNames[o.theme_id] || o.theme_id)}</h3><p>${esc(o.id)} · ${esc(o.packageName)} · ${rupiah(o.amount)}</p><p>${esc(orderStatuses[o.status])}</p><a class="button" href="/pesanan/${esc(o.id)}">Lihat pesanan</a></article>`).join("") : "<p>Belum ada pesanan. Pilih tema untuk memulai.</p>"}<h2>Katalog tema</h2>${catalogCards(catalog.themes, eventId)}`;
     bindCatalogSlides();
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     document.querySelector("#shopFeedback").textContent = e.message;
   }
 }
@@ -319,6 +325,8 @@ async function renderOrder(id) {
           });
           await renderOrder(id);
         } catch (error) {
+          toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
           document.querySelector("#shopFeedback").textContent = error.message;
         } finally {
           button.disabled = false;
@@ -328,9 +336,9 @@ async function renderOrder(id) {
     document.querySelector("#copySellerAccount").onclick = async () => {
       try {
         await navigator.clipboard.writeText(bank.account);
-        toast("Nomor rekening disalin.");
+        toast("Nomor rekening disalin.", "success");
       } catch {
-        toast("Salin nomor rekening yang ditampilkan di atas.");
+        toast("Salin nomor rekening yang ditampilkan di atas.", "info");
       }
     };
     if (paid && o.event_id)
@@ -345,7 +353,7 @@ async function renderOrder(id) {
           });
           renderOrder(id);
         } catch (e) {
-          toast(e.message);
+          toast(e.message, "error");
         }
       };
       document.querySelector("#paymentConfirmation").onsubmit = async (e) => {
@@ -373,8 +381,11 @@ async function renderOrder(id) {
           await renderOrder(id);
           toast(
             "Konfirmasi masuk antrean admin. Tema belum aktif sampai dana disetujui.",
+            "info",
           );
         } catch (error) {
+          toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
           document.querySelector("#shopFeedback").textContent = error.message;
         } finally {
           b.disabled = false;
@@ -382,6 +393,8 @@ async function renderOrder(id) {
       };
     }
   } catch (e) {
+    toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
     document.querySelector("#shopFeedback").textContent = e.message;
   }
 }
@@ -438,7 +451,8 @@ async function mountAdminShop() {
   };
   (cfg.accounts || []).slice(1).forEach(addAccount);
   document.querySelector("#addPaymentAccount").onclick = () => {
-    if (extra.children.length >= 9) return toast("Maksimal 10 rekening.");
+    if (extra.children.length >= 9)
+      return toast("Maksimal 10 rekening.", "warning");
     addAccount();
   };
   document.querySelector("#refreshOrders").onclick = renderAdmin;
@@ -514,6 +528,8 @@ async function mountAdminShop() {
       document.querySelector("#shopSettingsFeedback").textContent =
         "Rekening dan harga disimpan.";
     } catch (error) {
+      toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
       document.querySelector("#shopSettingsFeedback").textContent =
         error.message;
     } finally {
@@ -560,8 +576,11 @@ async function mountAdminShop() {
         d.decision === "approve"
           ? "Pembayaran disetujui, satu undangan diaktifkan."
           : "Konfirmasi ditolak dengan alasan.",
+        d.decision === "approve" ? "success" : "warning",
       );
     } catch (error) {
+      toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
       document.querySelector("#reviewFeedback").textContent = error.message;
     } finally {
       b.disabled = false;
@@ -576,9 +595,12 @@ function renderArchive(e) {
 }
 async function activateWeddingDate() {
   if (dirty)
-    return toast("Simpan perubahan terlebih dahulu, lalu aktifkan tanggal.");
+    return toast(
+      "Simpan perubahan terlebih dahulu, lalu aktifkan tanggal.",
+      "warning",
+    );
   if (!current.date)
-    return toast("Isi tanggal pada Waktu & tempat, lalu Simpan.");
+    return toast("Isi tanggal pada Waktu & tempat, lalu Simpan.", "warning");
   const zone = current.timezone || "Asia/Jakarta";
   if (
     !confirm(
@@ -596,9 +618,9 @@ async function activateWeddingDate() {
       }),
     });
     await edit(current.id);
-    toast("Tanggal dikunci dan masa aktif ditetapkan.");
+    toast("Tanggal dikunci dan masa aktif ditetapkan.", "success");
   } catch (e) {
-    toast(e.message);
+    toast(e.message, "error");
   }
 }
 

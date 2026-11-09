@@ -268,3 +268,10 @@ Pengujian memakai rekening fiktif berlabel contoh. Pembayaran nyata hanya dibuka
 - Pengaturan harga menampilkan satu tema melalui dropdown seperti Menu Latar. Pergantian pilihan tidak membuang perubahan yang belum disimpan dan tidak menghapus harga tema lainnya.
 - Jika ada harga tidak valid pada tema yang tersembunyi, pilih/tampilkan tema tersebut sebelum menunjukkan pesan validasi agar pengguna dapat memperbaikinya.
 - Ringkas daftar fasilitas Pro/Premium sampai Revisi selama masa aktif. Gunakan kontrol Tampilkan lebih banyak / Tampilkan lebih sedikit yang dapat dioperasikan lewat keyboard; fasilitas dan pembatasan paket sebenarnya tidak berubah.
+
+## 21. Snackbar hasil tindakan
+
+- Gunakan snackbar bersama dengan status success, info, warning dan error pada hasil tindakan utama, termasuk simpan, unggah, hapus, akun, pembayaran, penerima, RSVP dan salin/bagikan.
+- Jangan memberi sukses saat permintaan gagal atau respons server tidak valid. Pengiriman WhatsApp dilakukan pengguna; snackbar hanya memberi instruksi melanjutkan pengiriman, bukan mengklaim pesan sudah diterima.
+- Pertahankan validasi dekat kolom, batasi tumpukan empat pesan, deduplikasi pesan yang sama, sediakan tombol tutup dan timer independen yang dijeda saat hover/fokus/tab tersembunyi. Notifikasi tetap dapat digunakan di dialog dan tidak menutupi navigasi undangan.
+- Tampilkan teks sebagai teks biasa, gunakan live region sesuai tingkat pesan, hormati reduced motion dan jangan menampilkan password/rahasia di notifikasi. Tidak ada perubahan paket, pembayaran atau hak akses karena penambahan snackbar.

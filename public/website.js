@@ -102,6 +102,8 @@ function renderLogin(info = {}, register = false) {
               : ""))
         : "/dashboard";
     } catch (e) {
+      toast(e.message || "Tindakan gagal. Coba kembali.", "error");
+
       error.textContent = e.message;
       b.disabled = false;
       b.textContent = register ? "Buat akun baru" : "Masuk";
@@ -126,7 +128,7 @@ function renderLogin(info = {}, register = false) {
                 : ""))
           : "/dashboard";
       } catch (e) {
-        toast(e.message);
+        toast(e.message, "error");
       }
     };
   const errors = {
@@ -135,8 +137,10 @@ function renderLogin(info = {}, register = false) {
     apple_login: "Login Apple belum berhasil. Silakan coba kembali.",
   };
   const error = new URLSearchParams(location.search).get("error");
-  if (errors[error])
+  if (Object.hasOwn(errors, error)) {
     document.querySelector("#accountError").textContent = errors[error];
+    toast(errors[error], "error");
+  }
 }
 function renderGuestScreen() {
   document.title = "Layar Tamu — Temu";
@@ -155,7 +159,7 @@ function renderGuestScreen() {
     try {
       await document.querySelector("#guestDisplay").requestFullscreen();
     } catch {
-      toast("Layar penuh tidak tersedia pada browser ini.");
+      toast("Layar penuh tidak tersedia pada browser ini.", "warning");
     }
   };
 }

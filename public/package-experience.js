@@ -30,6 +30,10 @@ function bindPremiumAppearance() {
       current.themeAccent = "";
       dirty = true;
       renderEditor();
+      toast(
+        "Warna bawaan tema dipilih. Tekan Simpan untuk menyimpan perubahan.",
+        "info",
+      );
     };
 }
 function applyPackageExperience(event) {
@@ -122,6 +126,7 @@ function applyPackageExperience(event) {
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
       toast(
         "Gulir otomatis dimatikan oleh pengaturan pengurangan gerakan perangkat.",
+        "info",
       );
       return;
     }

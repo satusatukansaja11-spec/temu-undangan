@@ -97,8 +97,10 @@ async function renderAdmin() {
         });
         dialog.close();
         await renderAdmin();
-        toast("Tanggal dikoreksi dan dicatat.");
+        toast("Tanggal dikoreksi dan dicatat.", "success");
       } catch (error) {
+        toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
         document.querySelector("#dateCorrectionFeedback").textContent =
           error.message;
       } finally {
@@ -113,6 +115,7 @@ async function renderAdmin() {
         feedback = document.querySelector("#adminMusicFeedback");
       if (file.size > appLimits.audioMB * 1024 * 1024) {
         feedback.textContent = "File melebihi batas ukuran.";
+        toast("File melebihi batas ukuran.", "warning");
         return;
       }
       const form = new FormData(e.target);
@@ -122,8 +125,10 @@ async function renderAdmin() {
       try {
         await api("/api/admin/music", { method: "POST", body: form });
         await renderAdmin();
-        toast("Lagu ditambahkan ke pustaka pelanggan.");
+        toast("Lagu ditambahkan ke pustaka pelanggan.", "success");
       } catch (error) {
+        toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
         feedback.textContent = error.message;
       } finally {
         busy--;
@@ -150,11 +155,12 @@ async function renderAdmin() {
               result.cleanupPending
                 ? "Lagu dinonaktifkan. Pembersihan file menunggu penyimpanan."
                 : "Lagu dihapus.",
+              "success",
             );
           } catch (error) {
             document.querySelector("#adminFeedback").textContent =
               error.message;
-            toast(error.message);
+            toast(error.message, "error");
           } finally {
             b.disabled = false;
           }
@@ -164,6 +170,8 @@ async function renderAdmin() {
     await mountThemeAssets();
     mountAdminWorkspace(overview, tracks, audit);
   } catch (error) {
+    toast(error.message || "Tindakan gagal. Coba kembali.", "error");
+
     document.querySelector("#adminFeedback").textContent = error.message;
   }
 }

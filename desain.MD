@@ -97,3 +97,10 @@ Dokumen ini menjadi acuan implementasi visual tema Navy Ivory, Jawa Heritage, da
 - Pisahkan gambar yang baru dipilih (pratinjau dengan label belum disimpan) dari daftar ornamen tersimpan. Tombol Simpan gambar ornamen terlihat dekat pemilih file dan di bawah pengaturan.
 - Pesan berhasil tetap terlihat setelah unggahan selesai. Setiap gambar tersimpan mempunyai status tampil/nonaktif, tombol Simpan perubahan ornamen, dan akses Lihat hasil tema.
 - Keterangan halaman menjelaskan perbedaan Sampul sebelum Buka Undangan dengan halaman isi. Jika unggahan beberapa gambar gagal sebagian, percobaan ulang hanya mengirim gambar yang belum berhasil.
+
+## Snackbar global
+
+- Mengikuti referensi empat kartu pastel: success lime, informasi biru, warning kuning dan error merah muda, masing-masing ikon, judul singkat, pesan dan tombol tutup 44 px. Bahasa antarmuka Indonesia.
+- Posisi kanan bawah, responsif sampai 320 px dan memakai safe-area. Di undangan posisinya di atas navigasi bawah; di modal pesan dipindahkan ke dialog aktif agar tombol dapat digunakan.
+- Maksimal empat pesan, deduplikasi, timer terpisah 6–10 detik. Kursor/fokus keyboard/tab tersembunyi menjeda timer; reduced motion menonaktifkan animasi masuk. Snackbar tidak merebut fokus ketika muncul.
+- Gunakan success sesudah penyimpanan/tindakan sukses, info untuk proses/instruksi/perubahan lokal belum disimpan, warning untuk validasi/pembatasan, dan error ketika gagal. Navigasi biasa dan mengetik tidak memunculkan snackbar berulang. Pesan formulir serta konfirmasi tindakan destruktif tetap mengikuti alur yang ada.

@@ -209,3 +209,12 @@ Perubahan CSS mengatur satu baris grid horizontal, thumbnail 205–240 px, judul
 - Chromium: pemilihan dua PNG belum mengirim unggahan; tombol Simpan menyimpan keduanya. Daftar tetap ada setelah reload, edit/tampil/nonaktif berhasil, dan gambar terlihat pada halaman nama tema. Kegagalan unggahan kedua disimulasikan; retry menyimpan sisanya tanpa menggandakan gambar pertama. PNG tanpa transparansi menampilkan pesan kesalahan dan tombol dapat dipakai kembali.
 - Layar 320, 390, 768 dan 1440 px diperiksa tanpa overflow atau error JavaScript. Pratinjau lokal memakai object URL yang dibersihkan saat form/halaman diganti. Screenshot: ornamen-sebelum-simpan.png, ornamen-tersimpan.png, ornamen-hasil-tema.png di docs/images/.
 - Pemeriksaan memakai database sementara dan gambar fixture. Tidak memeriksa/mengubah data hosting pengguna. Tidak ada perubahan skema atau `.env`.
+
+## Snackbar global — 9 November 2026
+
+- `npm test`: 58 pengujian; 56 lulus, 2 integrasi PostgreSQL/S3 dilewati karena layanan pengujian belum dikonfigurasi, 0 gagal. Unit snackbar mencakup empat tipe, live-region, teks aman, deduplikasi, batas tumpukan, tombol tutup, timer independen, jeda hover/fokus dan flash akun.
+- Chromium memeriksa empat kartu pastel, tombol tutup, input teks yang menyerupai HTML tetap sebagai teks, snackbar dalam dialog modal dan perpindahannya saat dialog ditutup, validasi kuning, simpan pengaturan admin asli, kesalahan koneksi dan respons HTML yang tidak menghasilkan pesan sukses.
+- Pengujian clock browser membuktikan timer lama tidak menutup pesan yang lebih baru, hover/fokus keyboard menjeda timer dan Enter dapat menutup pesan. Daftar akun serta logout asli memunculkan pesan sekali setelah redirect.
+- Lebar 320, 390, 768 dan 1440 px diperiksa tanpa overflow atau error JavaScript. Screenshot: `docs/images/snackbar-empat-status.png` dan `docs/images/snackbar-mobile.png`.
+- Notifikasi sukses otomatis hanya dipakai untuk endpoint yang belum mempunyai pesan hasil khusus; handler lama diberi tipe eksplisit. Error server/koneksi muncul lewat API bersama, sedangkan pesan validasi dekat kolom tetap ada. Instruksi WhatsApp tidak mengklaim pengiriman pesan telah selesai.
+- Semua pengujian memakai database dan akun QA sementara. Tidak mengirim WhatsApp, melakukan pembayaran, mengubah data hosting, menambah dependensi atau mengubah schema/`.env`.
